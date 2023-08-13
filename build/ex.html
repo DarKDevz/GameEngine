@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Popup Window</title>
+    <style>
+        #mainCanvas {
+            transform-origin: 0 0;
+        }
+    </style>
+    <script>
+        function openPopupWindow() {
+            var popup = window.open('', '_blank', 'width=400,height=400');
+
+            var fileInput = document.createElement('input');
+            fileInput.type = 'file';
+
+            fileInput.onchange = function(event) {
+                var file = event.target.files[0];
+                var reader = new FileReader();
+
+                reader.onload = function(event) {
+                    var result = event.target.result;
+
+                    if (file.type.startsWith('image/')) {
+                        // Process image file
+                        var image = new Image();
+                        image.onload = function() {
+                            var canvas = document.createElement('canvas');
+                            canvas.width = image.width;
+                            canvas.height = image.height;
+
+                            var context = canvas.getContext('2d');
+                            context.drawImage(image, 0, 0);
+
+                            var imageData = context.getImageData(0, 0, image.width, image.height);
+                            var pixels = imageData.data;
+
+                            // Close the popup window after processing
+                            popup.close();
+
+                            // Draw the pixels on the main window's canvas
+                            var mainCanvas = document.getElementById('mainCanvas');
+                            var mainContext = mainCanvas.getContext('2d');
+
+                            // Zoom out the canvas by setting the scale
+                            var scale = 0.3; // Adjust the scale factor as desired
+                            mainContext.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+                            mainContext.scale(scale, scale);
+
+                            // Create new ImageData object with extracted pixel data and dimensions
+                            var newImageData = new ImageData(pixels, image.width, image.height);
+                            mainContext.putImageData(newImageData, 0, 0);
+                            mainContext.setTransform(1, 0, 0, 1, 0, 0); // Reset the transform
+
+                            // Save the image data as JSON file
+                            var json = {
+                                image: Array.from(pixels),
+                                width: image.width,
+                                height: image.height
+                            };
+                            var jsonData = JSON.stringify(json);
+                            var blob = new Blob([jsonData], {
+                                type: 'application/json'
+                            });
+                            var url = URL.createObjectURL(blob);
+                            var link = document.getElementById('saveLink');
+                            link.href = url;
+                            link.download = 'image_data.json';
+                            link.style.display = 'block';
+                        };
+
+                        image.src = result;
+                    } else if (file.type.startsWith('audio/') || file.type === 'text/plain') {
+                        // Throw an error for audio or text file
+                        throw new Error('Unsupported file type');
+                    } else {
+                        // Throw an error for unsupported file types
+                        throw new Error('Invalid file type');
+                    }
+                };
+
+                reader.readAsDataURL(file);
+            };
+
+            popup.document.body.appendChild(fileInput);
+        }
+
+        function loadImageData(event) {
+            var file = event.target.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function(event) {
+                var result = event.target.result;
+                var json = JSON.parse(result);
+                var pixels = json.image;
+                var width = json.width;
+                var height = json.height;
+
+                // Draw the image data onto the main canvas
+                var mainCanvas = document.getElementById('mainCanvas');
+                var mainContext = mainCanvas.getContext('2d');
+
+                // Zoom out the canvas by setting the scale
+                var scale = 0.3; // Adjust the scale factor as desired
+                mainContext.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+                mainContext.scale(scale, scale);
+
+                // Create new ImageData object with extracted pixel data and dimensions
+                var newImageData = new ImageData(new Uint8ClampedArray(pixels), width, height);
+                mainContext.putImageData(newImageData, 0, 0);
+                mainContext.setTransform(1, 0, 0, 1, 0, 0); // Reset the transform
+            };
+
+            reader.readAsText(file);
+        }
+    </script>
+</head>
+
+<body>
+    <button onclick="openPopupWindow()">Open Popup Window</button>
+    <canvas id="mainCanvas" width="900" height="900"></canvas>
+    <br>
+    <input type="file" accept=".json" onchange="loadImageData(event)">
+    <a id="saveLink" style="display: none;">Save</a>
+</body>
+
+</html>

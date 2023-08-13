@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="libs/p5.js"></script>
+    <script>
+        let canvas = document.createElement('canvas');
+        let context = canvas.getContext('2d');
+        //Remove image smoothing, makes pixelated images blurry
+        context.imageSmoothingEnabled = false;
+        if(this._ImageData) {
+            console.log(this._ImageData());
+            let image = new Image();
+            image.onload = function() {
+                        window.document.body.append(canvas);
+                        canvas.width = image.width;
+                        canvas.height = image.height;
+                        context.drawImage(image, 0, 0);
+                        console.log(image.src);
+                        // Pass the loaded image data to the main window
+                        //window.close();
+                    };
+
+                    // Set the source of the image to the base64 data
+            image.src = this._ImageData();
+        }
+        function handleFile(input) {
+            let file = input.files[0];
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                let result = event.target.result;
+                if (file.type.startsWith('image/')) {
+                    // Create a new image element
+                    let image = new Image();
+
+                    image.onload = function() {
+                        window.document.body.append(canvas);
+
+                        // Set the canvas dimensions to match the image
+                        canvas.width = image.width;
+                        canvas.height = image.height;
+
+                        // Draw the image on the canvas
+                        context.drawImage(image, 0, 0);
+
+                        // Get the pixel data from the canvas
+                        let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+                        // Store the pixel data in the variable
+                        let loadedImage = {
+                            imageb64: image.src.split(',')[1],
+                            width: imageData.width,
+                            height: imageData.height
+                        };
+                        // Pass the loaded image data to the main window
+                        //window.opener.jsonImage(loadedImage);
+                        //window.close();
+                    };
+
+                    // Set the source of the image to the base64 data
+                    console.error(result);
+                    //Directly pass the image data instead of reparsing it
+                    window.opener.jsonImage(result);
+                    image.src = result;
+                } else if (file.type.startsWith('audio/') || file.type === 'text/plain') {
+                    // Throw an error for audio or text file
+                    throw new Error('Unsupported file type');
+                } else {
+                    // Throw an error for unsupported file types
+                    throw new Error('Invalid file type');
+                }
+            };
+
+            reader.readAsDataURL(file);
+        }
+    </script>
+</head>
+
+<body>
+    <input type="file" onchange="handleFile(this)">
+</body>
+
+</html>

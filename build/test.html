@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Script Exporter</title>
+    <script src="libs/jszip.min.js"></script>
+    <script>
+        async function createZip() {
+            var zip = new JSZip();
+            var scriptTags = [
+                { path: 'libs/p5.min.js' },
+                { path: 'engine/collision/Box2D.js' },
+                { path: 'engine/utils.js' },
+                { path: 'engine/engine.js' },
+                { path: 'engine/collision/p5.collide.js' },
+                { path: 'engine/collision/handler.js' },
+                { path: 'engine/objects/collision.js' },
+                { path: 'engine/components/component.js' },
+                { path: 'engine/components/scriptComponent.js' },
+                { path: 'engine/objects/object.js' },
+                { path: 'engine/objects/contactListener.js' },
+                { path: 'engine/objects/box.js' },
+                { path: 'engine/objects/player.js' },
+                { path: 'engine/objects/end.js' },
+                { path: 'engine/objects/text.js' },
+                { path: 'engine/objects/enemyBox.js' },
+                { path: 'engine/objects/interactive.js' },
+                { path: 'engine/objects/bullet.js' },
+                { path: 'engine/objects/movingPlatform.js' },
+                { path: 'loader/level.js' },
+                { path: 'loader/support.js' },
+                { path: 'index.html'}
+            ];
+            const regex = /<!-- .*<\/script>/gms;
+
+            // Fetch and add script files to the zip
+            await Promise.all(scriptTags.map(async function (scriptInfo) {
+                var response = await fetch(scriptInfo.path);
+                var scriptContent = await response.text();
+                if(scriptInfo.path.endsWith(".html")) {
+                    scriptContent = scriptContent.replace(regex, '');
+                }
+                console.log(scriptContent);
+                zip.file(scriptInfo.path, scriptContent);
+            }));
+
+            // Generate the zip
+            zip.generateAsync({ type: 'blob' })
+                .then(function (content) {
+                    // Create a download link for the zip file
+                    var link = document.createElement('a');
+                    link.href = URL.createObjectURL(content);
+                    link.download = 'scripts.zip';
+                    link.textContent = 'Download Zip';
+
+                    // Append the link to the document
+                    document.body.appendChild(link);
+                });
+        }
+    </script>
+</head>
+
+<body>
+    <button onclick="createZip()">Generate Zip</button>
+</body>
+
+</html>

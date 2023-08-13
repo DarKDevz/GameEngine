@@ -1,0 +1,165 @@
+html {
+	height: 0%;
+}
+body {
+    padding: 0;
+    margin: 0%;
+}
+#playButton {
+	position: absolute;
+	left: calc(50% - 57px);
+	width: fit-content;
+	height: 30;
+	border-radius: 7px;
+	border-color: #000;
+	cursor: pointer;
+
+}
+#newButton {
+	position: absolute;
+	left: calc(50%);
+	height: 30;
+	border-radius: 7px;
+	border-color: #000;
+	cursor: pointer;
+
+}
+#refreshButton {
+	position: absolute;
+	left: calc(50% + 55px);
+	height: 30;
+	border-radius: 7px;
+	border-color: #000;
+	cursor: pointer;
+
+}
+#addSelect {
+	position: relative;
+	height: 30;
+	cursor: pointer;
+	border-radius: 8px;
+	
+}
+#fileHolder {
+	position: absolute;
+	z-index: 1;
+}
+#addButton {
+	position: relative;
+	cursor: pointer;
+	width: 30;
+	height: 30;
+	border-radius: 7px;
+	border-color: #000;
+}
+#loadFile {
+	cursor: pointer;
+	position: relative;
+	width: fit-content;
+	height: 30;
+	width: 30;
+	padding: 0;
+	top: -3;
+	border-radius: 7px;
+	border-color: #000;
+}
+#saveFile {
+	cursor: pointer;
+	position: relative;
+	width: fit-content;
+	height: 30;
+	width: 30;
+	border-radius: 7px;
+	border-color: #000;
+}
+#exportFile {
+	cursor: pointer;
+	position: relative;
+	top: -3;
+}
+.allButtons {
+	cursor: pointer;
+
+	border-radius: 7px;
+	width: fit-content;
+	height: 30;
+	margin: .5px;
+	border-color: #000;
+}
+.file-upload {
+border: 1px solid black;
+border-radius: 3px;
+padding: 3px;
+}
+
+.file-upload input {
+overflow: hidden;
+width: 0;
+}
+.contentBrowser {
+    transition: top 0.2s ease-out 0s;
+}
+.accordion-header {
+    cursor: pointer;
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+    /* Adjust the transition duration and timing function as needed */
+}
+#leftHolder {
+	position: absolute;
+	width: 13vw;
+	margin: 0%;
+}
+#rightHolder {
+	position: absolute;
+	overflow: hidden;
+	height: 100vh;
+	right: 0;
+	margin: 0;
+	width: calc(87vw);
+}
+#leftDiv {
+	position: relative;
+	float: left;
+	height: calc(100vh);
+	width: calc(100% - 8px);
+	margin: 0%;
+	background-color: #0a2f5b;
+	overflow: auto;
+	font: menu;
+	color: #ffffffae;
+}
+#colDivider {
+	position:relative;
+	float: right;
+	height: calc(100vh);
+	cursor: col-resize;
+	width:  8px;
+	margin: 0px;
+	background-color: #000;
+}
+#topDiv {
+	position: relative;
+	width: 100%;
+	height: calc(50vh - 4px);
+	background-color: yellow;
+}
+#bottomDiv {
+	position: relative;
+	width: 100%;
+	height: calc(50vh - 4px);
+	background-color: #0a2f5b;
+	color: #ffffffae;
+}
+
+#divider {
+	position: relative;
+	width: 100%;
+	cursor: row-resize;
+	height: 8px;
+	background-color: #000;
+}

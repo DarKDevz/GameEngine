@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="libs/p5.js"></script>
+    <script>
+        let scale = 0.2;
+        let loadedImage;
+        let mainCanvas;
+
+        function setup() {
+            let canvasWidth = 400;
+            let canvasHeight = 400;
+            mainCanvas = createCanvas(canvasWidth, canvasHeight);
+            mainCanvas.parent('mainCanvas');
+        }
+
+        function draw() {
+            background(0);
+
+            if (loadedImage) {
+                image(loadedImage, 0, 0, loadedImage.width * scale, loadedImage.height * scale);
+            }
+        }
+
+        function openPopupWindow() {
+            let popup = window.open('imagePopup.html', '_blank', 'width=400,height=400');
+        }
+
+        function saveImageData() {
+            if (loadedImage) {
+                let json = {
+                    imageb64: loadedImage.canvas.toDataURL('image/png').split(',')[1],
+                    width: loadedImage.width,
+                    height: loadedImage.height
+                };
+
+                let jsonStr = JSON.stringify(json, null, 2);
+                let blob = new Blob([jsonStr], {
+                    type: 'application/json'
+                });
+
+                let saveLink = document.getElementById('saveLink');
+                saveLink.href = URL.createObjectURL(blob);
+                saveLink.download = 'image_data.json';
+            }
+        }
+
+        function handleFile(input) {
+            let file = input.files[0];
+
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                let fileData = event.target.result;
+                jsonImage(fileData);
+            };
+            reader.readAsText(file);
+        }
+
+        function jsonImage(fileData) {
+            let data = JSON.parse(fileData);
+            loadedImage = loadImage('data:image/png;base64,' + data.imageb64,
+                function(img) {
+                    scale = 0.2;
+                    loadedImage.width = data.width;
+                    loadedImage.height = data.height;
+                    redraw();
+                });
+        }
+    </script>
+</head>
+
+<body>
+    <button onclick="openPopupWindow()">Open Popup</button>
+    <div id="mainCanvas"></div>
+    <a id="saveLink" style="display: none;">Save</a>
+    <input type="file" onchange="handleFile(this)" accept=".json">
+</body>
+
+</html>

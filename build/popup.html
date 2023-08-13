@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Popup Window</title>
+    <link rel="stylesheet" href="utils/codemirror.css" />
+    <link rel="stylesheet" href="utils/darkmode.css" />
+    <script src="engine/utils.js"></script>
+    <script src="utils/codemirror.js"></script>
+    <script src="utils/codemirrorjs.js"></script>
+    <script src="utils/beautify.js"></script>
+    <script src="utils/uglify.js"></script>
+    <script src="utils/prettier.js"></script>
+    <script src="utils/babelParser.js"></script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .CodeMirror {
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <textarea id="popupEditor"></textarea>
+
+    <script>
+document.addEventListener("keydown", function (event) {
+if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+event.preventDefault();
+    sendTextToMainWindow();
+}
+});
+var editor = CodeMirror.fromTextArea(document.getElementById("popupEditor"), {
+    value: "",
+    mode: "javascript",
+    lineNumbers: true,
+    theme: "dracula",
+    autofocus: true,
+            });
+
+    function receivePopupText() {
+        var text = window.opener.scriptData();
+        var beautifiedText = js_beautify(text, {
+            indent_size: 2,
+        }); // Beautify the text
+        editor.setValue(beautifiedText);
+    }
+
+    function sendTextToMainWindow() {
+        //prettier formats it as i like
+        prettierPlugins.babel.parsers.parser =
+            prettierPlugins.babel.parsers.babel.parse;
+        prettierPlugins.babel.parsers.tabWidth = 0
+        var text = editor.getValue();
+        //Replace single lines into /**/ comments
+        let regex = /(\/\/)(.*)/gm;
+        text = text.replace(regex,'/*$2*/')
+        var beautifiedText = js_beautify(text, {
+            indent_size: 0, // Set indent size to 0
+            space_in_empty_paren: true, // Preserve space in empty parentheses
+            jslint_happy: true, // Use JSLint-compatible formatting
+            keep_array_indentation: false, // Remove array indentation
+            preserve_newlines: false, // Remove new lines
+            semicolon_after_statement: true,
+        });
+        let toBeReviewed = beautifiedText;
+        //TRUE semicolon after statement
+        try {
+            beautifiedText = prettier.format(
+            toBeReviewed,
+            prettierPlugins.babel.parsers
+           );
+            // Remove new lines
+            removeNewLines = (beautifiedText.replace(/\r?\n|\r/g, ""));
+            try {
+            let temp = {shown:{}};
+            (new Function(beautifiedText)).call(temp);
+                try {
+                    window.opener.receivePopupText(removeNewLines);
+                    receivePopupText()
+                } catch (error) {
+                    alert("Couldn't send to window");
+                    alert(error);
+                    console.error(error);
+                }
+                } catch (error) {
+                alert("script has typeerror:");
+                alert(error)
+                }
+                } catch (error) {
+                    alert("syntax mistake:" + error);
+                }
+            }
+            receivePopupText();
+    </script>
+</body>
+
+</html>

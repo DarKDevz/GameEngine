@@ -1,0 +1,18 @@
+{
+    "liveServer.settings.port": 5501,
+    "actionButtons": {
+        "reloadButton": null,
+        "loadNpmCommands": false,
+        "commands": [
+            {
+                "name": "Build",
+                "singleInstance": true,
+                "color": "#af565c",
+                "command": "tsc",
+            },
+        ]
+    },
+    "files.exclude":{
+        "**/*.js": {"when": "$(basename).ts"}
+    }
+}
