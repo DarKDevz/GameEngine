@@ -93,7 +93,7 @@ class Player {
             right = keyIsDown(68) || keyIsDown(39);
             left = keyIsDown(65) || keyIsDown(37);
             up = keyIsDown(87) || keyIsDown(38);
-            down = keyIsDown(16) || keyIsDown(40);
+            down = keyIsDown(91) || keyIsDown(16) || keyIsDown(40);
             //Space
             if (up && this.godMode) {
                 this.vel.y = -7

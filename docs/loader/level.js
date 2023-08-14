@@ -318,7 +318,8 @@ class Level {
     }
     loadLevel() {
         player.pos = this.pos.copy();
-        player.cameraPos = player.pos.copy();
+        player.cameraPos.x = this.pos.x;
+        player.cameraPos.y = this.pos.y;
         player.grounded = false;
         player.groundedId = null;
         player.colliding = false;
