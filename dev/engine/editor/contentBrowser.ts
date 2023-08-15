@@ -140,9 +140,6 @@ async function createZip() {
         return `
         import * as test from "./export.json" assert {type : "json"};
         let sceneObj = test.default;
-        globalThis.windowResized = function() {
-            resizeCanvas(windowWidth, windowHeight);
-        }
         globalThis.preload = function() {
             player = new Player();
             engine = new Engine();

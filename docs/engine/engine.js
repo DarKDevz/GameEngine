@@ -13,12 +13,18 @@ class Engine {
         this.hasUUID = false;
         this.assignedUUID = "";
         this.camera = new Camera(0, 0);
+        this.gui = createGraphics(windowWidth, windowHeight);
         this.world = new b2World(new b2Vec2(0, 100) //gravity
         , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
         this.componentList = Engine.componentList;
         window.keyPressed = this.keyPress.bind(this);
         // this.body = new p2.Body({ mass: 1 });
         // this.world.addBody(this.body);
+    }
+    resize(ww = windowWidth, wh = windowHeight) {
+        resizeCanvas(ww, wh);
+        engine.gui.resizeCanvas(ww, wh);
+        this.getActiveScene().resize(ww, wh);
     }
     mouseScreen() {
         let mult = 1 / this.camera.zoom;
@@ -37,17 +43,19 @@ class Engine {
     keyPress(key) {
         this.getActiveScene().keyPress(key);
     }
-    loadFromObject(obj, autoDraw = false) {
+    loadFromObject(obj, autoEvents = false) {
         ScenesfromObject(obj);
-        if (autoDraw) {
+        if (autoEvents) {
             this.Initiate();
         }
     }
     Initiate() {
-        window.draw = this.draw.bind(this);
+        window.draw ??= this.draw.bind(this);
+        window.windowResized ??= () => this.resize();
     }
     setup() { }
     draw() {
+        this.gui.clear();
         push();
         background(150, 230, 240);
         let scene = this.getActiveScene();
@@ -62,9 +70,8 @@ class Engine {
         //Late Update
         scene.lateUpdate();
         pop();
-        push();
-        text("FPS: " + round(frameRate() / 10) * 10, 50, 50);
-        pop();
+        this.gui.text("FPS: " + round(frameRate() / 10) * 10, 50, 50);
+        image(this.gui, 0, 0, width, height);
     }
     addObj(box, doId = false) {
         box.init();

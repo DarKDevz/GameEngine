@@ -4160,7 +4160,7 @@ declare global {
      *   supported on Safari and IE on touch-based desktops
      *   (laptops).
      */
-    let touches: object[];
+    let touches: Vec[];
 
     /**
      *   Creates a new p5.Image (the datatype for storing

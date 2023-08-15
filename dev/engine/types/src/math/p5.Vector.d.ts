@@ -4,6 +4,7 @@ import * as p5 from '../../index';
 
 declare module '../../index' {
     class Vector {
+        [x: string]: any;
         /**
          *   A class to describe a two or three-dimensional
          *   vector, specifically a Euclidean (also known as

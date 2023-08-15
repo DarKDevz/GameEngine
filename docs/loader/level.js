@@ -204,6 +204,11 @@ class Level {
         this.pos = pos;
         this.maxPos = maxPos;
     }
+    resize(ww, wh) {
+        for (let t_box of this.boxes) {
+            t_box.resize(ww, wh);
+        }
+    }
     addObj(box) {
         box.init();
         this.boxes = [...this.boxes, box];

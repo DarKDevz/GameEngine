@@ -49,6 +49,7 @@ interface Player {
     size: Vec;
     vel: Vec;
     old: Vec;
+    dir: {[x:string]:any}
     cameraPos: xyObject;
     godMode: boolean;
     grounded: boolean;

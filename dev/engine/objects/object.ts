@@ -19,6 +19,8 @@ class GameObject {
         this.imageInitialized = false;
         engine.uuidList[this.uuid] = this;
     }
+    resize(ww: number,wh: number) {
+    }
     keyPress(event: Event) {
 
     }

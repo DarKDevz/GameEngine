@@ -8,9 +8,6 @@ function doReload() {
     console.error("works");
     preload();
 }
-function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
-}
 function checkLoad() {
     if(window.loaded) {
         clearInterval(loadInterval);

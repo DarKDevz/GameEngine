@@ -1,7 +1,7 @@
 import * as test from "./examples/platformer.json" assert { type: "json" };
 window.topDiv = undefined;
 window.windowResized = function () {
-    resizeCanvas(window.topDiv.clientWidth, window.topDiv.clientHeight);
+    engine.resize(window.topDiv.clientWidth, window.topDiv.clientHeight);
     //UI Resize
     editor.onResize();
 };
