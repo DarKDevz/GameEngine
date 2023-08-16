@@ -61,7 +61,6 @@ class GUIElement {
                 }
             }
             if (foundNonUsed) {
-                mouseIsPressed = true;
                 mouseX = foundNonUsed.x;
                 mouseY = foundNonUsed.y;
             }
@@ -205,12 +204,13 @@ class Joystick extends GUIElement {
     }
 }
 function touchStarted() {
-    if (!stick)
-        return;
-    if (!fullscreen()) {
+    stick.handlePress();
+    engine.updateGui(false);
+    if (engine.mobile) {
         fullscreen(true);
     }
-    stick.handlePress();
+    if (!stick)
+        return;
     return false; // Prevent default
 }
 function touchEnded() {

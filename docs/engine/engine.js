@@ -188,6 +188,14 @@ class Engine {
         this.usedUUID.push(UUID);
         return UUID;
     }
+    updateGui(display = true) {
+        for (let uuid in this.guiObjects) {
+            let GUIElement = this.guiObjects[uuid];
+            GUIElement.update();
+            if (display)
+                GUIElement.display();
+        }
+    }
 }
 class Camera {
     constructor(x, y, zoom = 1) {

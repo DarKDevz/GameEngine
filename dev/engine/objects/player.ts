@@ -26,7 +26,6 @@ class Player {
             "down": false
         }
         this.shouldJump = false;
-        console.log(engine);
         if (engine.mobile) {
             let baseSize = windowHeight / 3;
             let stickSize = windowHeight / 6;
@@ -111,16 +110,7 @@ class Player {
         if (notDoingInput) {
             /*figure out way to get only mousePos which isn't touching anything*/
             if (mouseIsPressed && !overui) {
-                //console.log(overui)
-                if (!engine.mobile) {
-                    this.shootTowards(mouseX, mouseY);
-                } else {
-                    for (let touch of touches) {
-                        if (!touch?.used) {
-                            this.shootTowards(touch.x, touch.y)
-                        }
-                    }
-                }
+                this.shootTowards(mouseX, mouseY);
             }
             let right, left, up, down;
             this.dir["up"] = this.dir["up"]?true:this.shouldJump;
@@ -253,7 +243,6 @@ class Player {
             x: cos(toMouse.heading()),
             y: sin(toMouse.heading())
         };
-        //console.log(direction)
         const currentTime = Date.now();
         const timeSinceLastShot = currentTime - this.lastShotTime;
 
