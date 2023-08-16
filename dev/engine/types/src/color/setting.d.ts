@@ -243,7 +243,7 @@ declare module '../../index' {
          *   @param a normalized alpha val.
          *   @chainable
          */
-        clear(r: number, g: number, b: number, a: number): p5;
+        clear(r?: number, g?: number, b?: number, a?: number): p5;
 
         /**
          *   colorMode() changes the way p5.js interprets color

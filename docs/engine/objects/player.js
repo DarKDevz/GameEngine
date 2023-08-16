@@ -1,5 +1,6 @@
 var player;
 let stick;
+let jumpBtn;
 class Player {
     constructor() {
         this.pos = createVector(400, -1000);
@@ -27,6 +28,9 @@ class Player {
             let baseSize = windowHeight / 3;
             let stickSize = windowHeight / 6;
             stick = new Joystick(baseSize / 1.5, windowHeight - baseSize / 1.5, baseSize, stickSize);
+            jumpBtn = new Button(windowWidth - baseSize / 1.5, windowHeight - baseSize / 1.5, baseSize, () => {
+                this.dir["up"] = true;
+            });
         }
         //Enable Running physics
         //world.gravity.y = 5;
@@ -72,7 +76,7 @@ class Player {
         //this.groundDetector.draw();
         //this.SideDetector.draw();
         if (!this.body) {
-            if (navigator.userAgent.includes("Mobile")) {
+            if (engine.mobile) {
                 engine.camera.zoom = .7;
             }
             let bodyDef = new b2BodyDef;
@@ -109,12 +113,14 @@ class Player {
         let overui = window['overUI'] !== undefined ? overUI : false;
         let notDoingInput = document.activeElement === document.body || document.activeElement === window.canvas;
         stick?.display();
+        jumpBtn?.display();
         if (notDoingInput) {
             /*figure out way to get only mousePos which isn't touching anything*/
             stick?.update(this.dir);
+            jumpBtn?.update();
             if (mouseIsPressed && !overui) {
                 //console.log(overui)
-                if (!navigator.userAgent.includes("Mobile")) {
+                if (!engine.mobile) {
                     this.shootTowards(mouseX, mouseY);
                 }
                 else {
@@ -321,104 +327,4 @@ class Player {
         resetMatrix();
         //translate(-this.cameraPos.x, -this.cameraPos.y);
     }
-}
-class Joystick {
-    baseSize;
-    stickSize;
-    position;
-    stickPosition;
-    isDragging;
-    constructor(x, y, baseSize, stickSize) {
-        this.baseSize = baseSize;
-        this.stickSize = stickSize;
-        this.position = createVector(x, y);
-        this.stickPosition = this.position.copy();
-        this.isDragging = false;
-    }
-    update(dir) {
-        if (this.isDragging) {
-            let minDist = Infinity;
-            let closestTouch;
-            for (let touch of touches) {
-                const distance = this.position.dist(createVector(touch.x, touch.y));
-                if (distance < minDist) {
-                    minDist = distance;
-                    closestTouch = touch;
-                }
-            }
-            if (closestTouch) {
-                this.stickPosition.x = closestTouch.x;
-                this.stickPosition.y = closestTouch.y;
-                closestTouch.used = true;
-                // Constrain stick inside the base circle
-                const distance = this.position.dist(this.stickPosition);
-                if (distance > this.baseSize / 2) {
-                    const direction = this.stickPosition.copy().sub(this.position);
-                    direction.setMag(this.baseSize / 2);
-                    this.stickPosition = this.position.copy().add(direction);
-                }
-                const direction = this.stickPosition.copy().sub(this.position);
-                let parsedDir = (direction.copy().setMag(1));
-                dir["right"] = parsedDir.x > .5 ? parsedDir.x : false;
-                dir["left"] = parsedDir.x < -.5 ? parsedDir.x : false;
-                dir["down"] = parsedDir.y > .5 ? parsedDir.y : false;
-                dir["up"] = parsedDir.y < -.5 ? parsedDir.y : false;
-                dir["dir"] = parsedDir;
-            }
-        }
-        else {
-            dir["right"] =
-                dir["left"] =
-                    dir["down"] =
-                        dir["up"] = false;
-        }
-    }
-    display() {
-        // Base circle
-        engine.gui.fill(200);
-        engine.gui.ellipse(this.position.x, this.position.y, this.baseSize);
-        // Stick
-        engine.gui.fill(150);
-        engine.gui.ellipse(this.stickPosition.x, this.stickPosition.y, this.stickSize);
-        engine.gui.fill(0);
-    }
-    handlePress() {
-        for (let touch of touches) {
-            if (touch) {
-                const distance = this.position.dist(createVector(touch.x, touch.y));
-                if (distance < this.baseSize / 2) {
-                    this.isDragging = true;
-                    return;
-                }
-            }
-        }
-    }
-    handleRelease() {
-        for (let touch of touches) {
-            if (touch) {
-                const distance = this.position.dist(createVector(touch.x, touch.y));
-                if (distance < this.baseSize / 1.25) {
-                    this.isDragging = true;
-                    return;
-                }
-            }
-        }
-        this.isDragging = false;
-        this.stickPosition = this.position.copy();
-    }
-}
-function touchStarted() {
-    if (!stick)
-        return;
-    stick.handlePress();
-    return false; // Prevent default
-}
-function touchEnded() {
-    if (!stick)
-        return;
-    stick.handleRelease();
-    for (let touch of touches) {
-        touch.used = undefined;
-    }
-    return false; // Prevent default
 }

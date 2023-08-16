@@ -14,7 +14,9 @@ class Engine {
         this.hasUUID = false;
         this.assignedUUID = "";
         this.camera = new Camera(0, 0);
-        this.gui = createGraphics(windowWidth,windowHeight);
+        this.gui = createGraphics(windowWidth, windowHeight);
+        this.guiObjects = {}
+        this.mobile = navigator.userAgent.includes("Mobile");
         this.world = new b2World(new b2Vec2(0, 100)    //gravity
             , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
         this.componentList = Engine.componentList
@@ -24,8 +26,8 @@ class Engine {
     }
     resize(ww = windowWidth, wh = windowHeight) {
         resizeCanvas(ww, wh);
-        engine.gui.resizeCanvas(ww,wh);
-        this.getActiveScene().resize(ww,wh);
+        engine.gui.resizeCanvas(ww, wh);
+        this.getActiveScene().resize(ww, wh);
     }
     mouseScreen(): { x: number, y: number } {
         let mult = 1 / this.camera.zoom
@@ -52,7 +54,7 @@ class Engine {
     }
     Initiate() {
         window.draw ??= this.draw.bind(this);
-        window.windowResized ??= ()=> this.resize();
+        window.windowResized ??= () => this.resize();
     }
     setup() { }
     draw() {
@@ -71,8 +73,9 @@ class Engine {
         //Late Update
         scene.lateUpdate();
         pop()
+        this.gui.fill(0);
         this.gui.text("FPS: " + round(frameRate() / 10) * 10, 50, 50);
-        image(this.gui,0,0,width,height);
+        image(this.gui, 0, 0, width, height);
     }
     addObj(box: GameObject, doId = false) {
         box.init()
@@ -149,7 +152,7 @@ class Engine {
         }
         var UUID = "0x" + (Math.random() * 99999999999999999).toString(16);
         let stack = 0;
-        while (this.uuidList[UUID]||this.usedUUID.includes(UUID)) {
+        while (this.uuidList[UUID] || this.usedUUID.includes(UUID)) {
             stack++;
             UUID = "0x" + (Math.random() * 99999999999999999).toString(16);
             if (stack >= 99999999) {

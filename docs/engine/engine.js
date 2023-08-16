@@ -14,6 +14,8 @@ class Engine {
         this.assignedUUID = "";
         this.camera = new Camera(0, 0);
         this.gui = createGraphics(windowWidth, windowHeight);
+        this.guiObjects = {};
+        this.mobile = navigator.userAgent.includes("Mobile");
         this.world = new b2World(new b2Vec2(0, 100) //gravity
         , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
         this.componentList = Engine.componentList;
@@ -70,6 +72,7 @@ class Engine {
         //Late Update
         scene.lateUpdate();
         pop();
+        this.gui.fill(0);
         this.gui.text("FPS: " + round(frameRate() / 10) * 10, 50, 50);
         image(this.gui, 0, 0, width, height);
     }

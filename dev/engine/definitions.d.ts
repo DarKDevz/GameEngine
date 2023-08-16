@@ -7,7 +7,7 @@ declare var b2Body: Box2D.Dynamics.b2Body
 declare var b2PolygonShape: Box2D.Collision.Shapes.b2PolygonShape
 declare var canvas: any
 declare var MapData: { data: any }
-declare var JSZip : any
+declare var JSZip: any
 
 type Vec = ReturnType<typeof createVector>
 type Div = ReturnType<typeof createDiv>
@@ -49,7 +49,7 @@ interface Player {
     size: Vec;
     vel: Vec;
     old: Vec;
-    dir: {[x:string]:any}
+    dir: { [x: string]: any }
     cameraPos: xyObject;
     godMode: boolean;
     grounded: boolean;
@@ -189,6 +189,9 @@ interface Engine {
     errorText: string;
     zoom: number;
     camera: Camera;
+    gui: ReturnType<typeof createGraphics>
+    mobile: boolean
+    guiObjects: { [x: string]: GameObject }
 }
 interface Camera {
     target: any;
