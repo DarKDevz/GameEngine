@@ -204,7 +204,7 @@ class Joystick extends GUIElement {
     }
 }
 function touchStarted() {
-    stick.handlePress();
+    stick?.handlePress();
     engine.updateGui(false);
     if (engine.mobile) {
         fullscreen(true);
