@@ -12,7 +12,7 @@ function checkLoad() {
     if (window.loaded) {
         clearInterval(loadInterval);
         engine = new Engine();
-        windowResized = ()=>{engine.resize()};
+        window.windowResized = () => { engine.resize(); };
         player = new Player();
         JsonMap(MapData);
         engine.cameraPos = player.cameraPos;

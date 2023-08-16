@@ -53,18 +53,35 @@ class GUIElement {
     remove() {
         engine.guiObjects[this.id] = undefined;
     }
+    setMousePressed() {
+        if (engine.mobile) {
+            let foundNonUsed
+            for (let touch of touches) {
+                if (!touch?.used) {
+                    foundNonUsed = touch;
+                }
+            }
+            if (foundNonUsed) {
+                mouseIsPressed = true;
+                mouseX = foundNonUsed.x;
+                mouseY = foundNonUsed.y;
+            } else {
+                mouseIsPressed = false;
+            }
+        }
+    }
     display(...args:any) {}
     update(...args:any) {}
 }
 class Button extends GUIElement{
     position: Vec;
-    cb: Function
+    cb: Function[]
     size: number;
     pressed: boolean
-    constructor(x: number, y: number, radius: number, callback: Function) {
+    constructor(x: number, y: number, radius: number, pressed: Function,notPressed: Function) {
         super()
         this.position = createVector(x, y)
-        this.cb = callback;
+        this.cb = [pressed,notPressed];
         this.size = radius
         this.pressed = false;
     }
@@ -81,10 +98,14 @@ class Button extends GUIElement{
         this.pressed = minDist < this.size / 2
         if (closestTouch) {
             if (this.pressed) {
-                this.cb()
+                this.cb[0]()
                 closestTouch.used = true;
             }
         }
+        if(!this.pressed) {
+            this.cb[1]()
+        }
+        this.setMousePressed()
     }
     display() {
         engine.gui.fill(200,50)
@@ -147,6 +168,7 @@ class Joystick extends GUIElement{
             this.dir["down"] =
             this.dir["up"] = false
         }
+        this.setMousePressed()
     }
     display() {
         // Base circle

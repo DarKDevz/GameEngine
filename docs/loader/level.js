@@ -296,6 +296,11 @@ class Level {
     earlyUpdate(shouldRun = true) {
         if (!shouldRun)
             return 1;
+        for (let uuid in engine.guiObjects) {
+            let GUIElement = engine.guiObjects[uuid];
+            GUIElement.update();
+            GUIElement.display();
+        }
         for (let t_box of this.boxes) {
             t_box.earlyUpdate();
         }

@@ -17,6 +17,10 @@ class Engine {
         this.gui = createGraphics(windowWidth, windowHeight);
         this.guiObjects = {}
         this.mobile = navigator.userAgent.includes("Mobile");
+        if (this.mobile) {
+            //Default mouseButton to be left
+            mouseButton = 'left'
+        }
         this.world = new b2World(new b2Vec2(0, 100)    //gravity
             , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
         this.componentList = Engine.componentList
@@ -28,12 +32,27 @@ class Engine {
         resizeCanvas(ww, wh);
         engine.gui.resizeCanvas(ww, wh);
         this.getActiveScene().resize(ww, wh);
-        for(let uuid in this.guiObjects) {
+        for (let uuid in this.guiObjects) {
             let GUIElement = this.guiObjects[uuid];
-            GUIElement.resize(ww,wh);
+            GUIElement.resize(ww, wh);
         }
     }
     mouseScreen(): { x: number, y: number } {
+        if (this.mobile) {
+            let foundNonUsed
+            for (let touch of touches) {
+                if (!touch?.used) {
+                    foundNonUsed = touch;
+                }
+            }
+            if (foundNonUsed) {
+                mouseIsPressed = true;
+                mouseX = foundNonUsed.x;
+                mouseY = foundNonUsed.y;
+            } else {
+                mouseIsPressed = false;
+            }
+        }
         let mult = 1 / this.camera.zoom
         return {
             x: (mouseX * mult + this.cameraPos.x - (width / 2 * mult)),

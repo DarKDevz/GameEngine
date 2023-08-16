@@ -2,6 +2,7 @@ var player: Player;
 let stick;
 let jumpBtn;
 class Player {
+    shouldJump: boolean;
     constructor() {
         this.pos = createVector(400, -1000);
         this.size = createVector(30, 70);
@@ -24,6 +25,7 @@ class Player {
             "up": false,
             "down": false
         }
+        this.shouldJump = false;
         console.log(engine);
         if (engine.mobile) {
             let baseSize = windowHeight / 3;
@@ -36,7 +38,9 @@ class Player {
                 stick.stickSize = wh / 6
             }
             jumpBtn = new Button(windowWidth - windowHeight / 3 / 1.5, windowHeight - windowHeight / 3 / 1.5, windowHeight / 3, () => {
-                this.dir["up"] = true;
+                this.shouldJump = true;
+            },()=>{
+                this.shouldJump = false;
             })
             jumpBtn.resize = (ww,wh)=>{
                 jumpBtn.position.x = ww - wh / 3 / 1.5
@@ -104,12 +108,8 @@ class Player {
         //controlller
         let overui = window['overUI'] !== undefined ? overUI : false;
         let notDoingInput = document.activeElement === document.body || document.activeElement === window.canvas;
-        stick?.display()
-        jumpBtn?.display()
         if (notDoingInput) {
             /*figure out way to get only mousePos which isn't touching anything*/
-            stick?.update();
-            jumpBtn?.update()
             if (mouseIsPressed && !overui) {
                 //console.log(overui)
                 if (!engine.mobile) {
@@ -123,6 +123,7 @@ class Player {
                 }
             }
             let right, left, up, down;
+            this.dir["up"] = this.dir["up"]?true:this.shouldJump;
             right = keyIsDown(68) || keyIsDown(39) || this.dir["right"];
             left = keyIsDown(65) || keyIsDown(37) || Math.abs(this.dir["left"] * 1);
             up = keyIsDown(87) || keyIsDown(38) || this.dir["up"];
