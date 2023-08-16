@@ -2,8 +2,8 @@ import * as test from "./examples/platformer.json" assert {type : "json"};
 let lowestFrameRate = 60;
 let sceneObj = test.default;
 globalThis.preload = function() {
-	player = new Player();
 	engine = new Engine();
+	player = new Player();
 	engine.loadFromObject(sceneObj,true);
 }
 globalThis.setup = function() {

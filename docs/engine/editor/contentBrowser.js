@@ -138,8 +138,8 @@ async function createZip() {
         import * as test from "./export.json" assert {type : "json"};
         let sceneObj = test.default;
         globalThis.preload = function() {
-            player = new Player();
             engine = new Engine();
+            player = new Player();
             engine.loadFromObject(sceneObj,true);
         }
         globalThis.setup = function() {

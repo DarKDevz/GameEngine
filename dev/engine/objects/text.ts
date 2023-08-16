@@ -35,8 +35,24 @@ class TextObject extends GameObject {
 
 }
 class GUIElement {
-    constructor() {}
-    add(obj) {}
+    id: UUID
+    constructor() {
+        this.id;
+        this.add();
+    }
+    resize(ww,wh) {
+        
+    }
+    add() {
+        if(this.id !== undefined) {
+            this.remove()
+        }
+        this.id = engine.generateUUID()
+        engine.guiObjects[this.id] = this;
+    }
+    remove() {
+        engine.guiObjects[this.id] = undefined;
+    }
     display(...args:any) {}
     update(...args:any) {}
 }
@@ -47,7 +63,6 @@ class Button extends GUIElement{
     pressed: boolean
     constructor(x: number, y: number, radius: number, callback: Function) {
         super()
-        this.add(this)
         this.position = createVector(x, y)
         this.cb = callback;
         this.size = radius
@@ -85,17 +100,18 @@ class Joystick extends GUIElement{
     position: Vec;
     stickPosition: any;
     isDragging: boolean;
-    constructor(x: number, y: number, baseSize: number, stickSize: number) {
+    dir: {[x:string]:any}
+    constructor(x: number, y: number, baseSize: number, stickSize: number, direction:{ [x: string]: any; }) {
         super()
-        this.add(this)
         this.baseSize = baseSize;
         this.stickSize = stickSize;
         this.position = createVector(x, y);
         this.stickPosition = this.position.copy();
         this.isDragging = false;
+        this.dir = direction;
     }
 
-    update(dir: { [x: string]: any; }) {
+    update() {
         if (this.isDragging) {
             let minDist = Infinity
             let closestTouch;
@@ -119,17 +135,17 @@ class Joystick extends GUIElement{
                 }
                 const direction = this.stickPosition.copy().sub(this.position);
                 let parsedDir = (direction.copy().setMag(1));
-                dir["right"] = parsedDir.x > .5 ? parsedDir.x : false;
-                dir["left"] = parsedDir.x < -.5 ? parsedDir.x : false;
-                dir["down"] = parsedDir.y > .5 ? parsedDir.y : false;
-                dir["up"] = parsedDir.y < -.5 ? parsedDir.y : false;
-                dir["dir"] = parsedDir;
+                this.dir["right"] = parsedDir.x > .5 ? parsedDir.x : false;
+                this.dir["left"] = parsedDir.x < -.5 ? parsedDir.x : false;
+                this.dir["down"] = parsedDir.y > .5 ? parsedDir.y : false;
+                this.dir["up"] = parsedDir.y < -.5 ? parsedDir.y : false;
+                this.dir["dir"] = parsedDir;
             }
         } else {
-            dir["right"] =
-                dir["left"] =
-                dir["down"] =
-                dir["up"] = false
+            this.dir["right"] =
+            this.dir["left"] =
+            this.dir["down"] =
+            this.dir["up"] = false
         }
     }
     display() {

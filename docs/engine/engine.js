@@ -27,6 +27,10 @@ class Engine {
         resizeCanvas(ww, wh);
         engine.gui.resizeCanvas(ww, wh);
         this.getActiveScene().resize(ww, wh);
+        for (let uuid in this.guiObjects) {
+            let GUIElement = this.guiObjects[uuid];
+            GUIElement.resize(ww, wh);
+        }
     }
     mouseScreen() {
         let mult = 1 / this.camera.zoom;

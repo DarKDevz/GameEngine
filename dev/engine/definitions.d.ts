@@ -178,7 +178,7 @@ interface Engine {
     scene: Level[]
     activeScene: number
     files: { [x: string]: gameFile }
-    uuidList: { [x: string]: GameObject }
+    uuidList: { [x: UUID]: GameObject }
     usedUUID: UUID[]
     hasUUID: boolean
     assignedUUID: string
@@ -191,7 +191,7 @@ interface Engine {
     camera: Camera;
     gui: ReturnType<typeof createGraphics>
     mobile: boolean
-    guiObjects: { [x: string]: GameObject }
+    guiObjects: { [x: UUID]: GUIElement }
 }
 interface Camera {
     target: any;

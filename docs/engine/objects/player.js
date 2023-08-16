@@ -24,26 +24,55 @@ class Player {
             "up": false,
             "down": false
         };
-        if (navigator.userAgent.includes("Mobile")) {
+        console.log(engine);
+        if (engine.mobile) {
             let baseSize = windowHeight / 3;
             let stickSize = windowHeight / 6;
-            stick = new Joystick(baseSize / 1.5, windowHeight - baseSize / 1.5, baseSize, stickSize);
-            jumpBtn = new Button(windowWidth - baseSize / 1.5, windowHeight - baseSize / 1.5, baseSize, () => {
+            stick = new Joystick(windowHeight / 3 / 1.5, windowHeight - windowHeight / 3 / 1.5, windowHeight / 3, windowHeight / 6, this.dir);
+            stick.resize = (ww, wh) => {
+                stick.position.x = wh / 3 / 1.5;
+                stick.position.y = wh - wh / 3 / 1.5;
+                stick.baseSize = wh / 3;
+                stick.stickSize = wh / 6;
+            };
+            jumpBtn = new Button(windowWidth - windowHeight / 3 / 1.5, windowHeight - windowHeight / 3 / 1.5, windowHeight / 3, () => {
                 this.dir["up"] = true;
             });
+            jumpBtn.resize = (ww, wh) => {
+                jumpBtn.position.x = ww - wh / 3 / 1.5;
+                jumpBtn.position.y = wh - wh / 3 / 1.5;
+                jumpBtn.size = wh / 3;
+            };
+            engine.camera.zoom = .7;
         }
+        let bodyDef = new b2BodyDef;
+        var fixDef = new b2FixtureDef;
+        fixDef.density = 1.0;
+        fixDef.friction = 0.5;
+        fixDef.restitution = 0;
+        bodyDef.type = b2Body.b2_dynamicBody;
+        fixDef.shape = new b2PolygonShape;
+        fixDef.shape.SetAsBox(this.size.x / 2 //half width
+        , this.size.y / 2 //half height
+        );
+        bodyDef.position.x = this.posCenter().x;
+        bodyDef.position.y = this.posCenter().y;
+        //this.body = new p2.Body({mass:0,position:[this.x,-this.y],fixedRotation : true})
+        //this.body.addShape(new p2.Box({ width: this.width,height:this.height}));
+        this.body = engine.world.CreateBody(bodyDef);
+        this.body.CreateFixture(fixDef);
+        this.body.SetFixedRotation(true);
+        //Continuous Collision Detection
+        this.body.SetBullet(true);
+        //User data for contact listener
+        this.body.SetUserData(this);
+        //Custom gravity scale i made
+        this.body.gravityScale = new b2Vec2(0, 0);
+        //We override this so we can use our own physics things
+        engine.physics = true;
+        engine.cameraPos = this.cameraPos;
         //Enable Running physics
         //world.gravity.y = 5;
-    }
-    buttonDirection(button, direction) {
-        button.mousePressed(() => {
-            mouseIsPressed = false;
-            this.dir[direction] = true;
-        });
-        button.mouseReleased(() => {
-            this.dir[direction] = false;
-        });
-        return button;
     }
     get x() {
         return this.pos.x;
@@ -68,44 +97,6 @@ class Player {
             return 1;
         fill(125);
         rect(this.pos.x, this.pos.y, this.size.x, this.size.y);
-        //if(this.body) DrawAll()
-        //DrawShape(this.body.GetFixtureList().GetShape(),this.body.m_xf)
-        //this.phySprite.draw();
-        //fill(125);
-        //rect(this.pos.x, this.pos.x, this.size.x, this.size.y);
-        //this.groundDetector.draw();
-        //this.SideDetector.draw();
-        if (!this.body) {
-            if (engine.mobile) {
-                engine.camera.zoom = .7;
-            }
-            let bodyDef = new b2BodyDef;
-            var fixDef = new b2FixtureDef;
-            fixDef.density = 1.0;
-            fixDef.friction = 0.5;
-            fixDef.restitution = 0;
-            bodyDef.type = b2Body.b2_dynamicBody;
-            fixDef.shape = new b2PolygonShape;
-            fixDef.shape.SetAsBox(this.size.x / 2 //half width
-            , this.size.y / 2 //half height
-            );
-            bodyDef.position.x = this.posCenter().x;
-            bodyDef.position.y = this.posCenter().y;
-            //this.body = new p2.Body({mass:0,position:[this.x,-this.y],fixedRotation : true})
-            //this.body.addShape(new p2.Box({ width: this.width,height:this.height}));
-            this.body = engine.world.CreateBody(bodyDef);
-            this.body.CreateFixture(fixDef);
-            this.body.SetFixedRotation(true);
-            //Continuous Collision Detection
-            this.body.SetBullet(true);
-            //User data for contact listener
-            this.body.SetUserData(this);
-            //Custom gravity scale i made
-            this.body.gravityScale = new b2Vec2(0, 0);
-            //We override this so we can use our own physics things
-            engine.physics = true;
-            engine.cameraPos = this.cameraPos;
-        }
     }
     update() {
         this.old = this.pos.copy();
