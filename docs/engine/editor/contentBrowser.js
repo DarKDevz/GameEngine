@@ -135,12 +135,12 @@ async function createZip() {
     var zip = new JSZip();
     let createSketchFile = function () {
         return `
-        import * as test from "./export.json" assert {type : "json"};
-        let sceneObj = test.default;
-        globalThis.preload = function() {
+        globalThis.preload = async function() {
             engine = new Engine();
             player = new Player();
-            engine.loadFromObject(sceneObj,true);
+            const response = await fetch("./export.json");
+            const data = await response.json();
+            engine.loadFromObject(data,true);
         }
         globalThis.setup = function() {
             createCanvas(windowWidth, windowHeight);

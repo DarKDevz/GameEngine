@@ -1,10 +1,10 @@
-import * as test from "./examples/platformer.json" assert { type: "json" };
 let lowestFrameRate = 60;
-let sceneObj = test.default;
-globalThis.preload = function () {
+globalThis.preload = async function () {
     engine = new Engine();
     player = new Player();
-    engine.loadFromObject(sceneObj, true);
+    const response = await fetch("./examples/platformer.json");
+    const data = await response.json();
+    engine.loadFromObject(data, true);
 };
 globalThis.setup = function () {
     createCanvas(windowWidth, windowHeight);

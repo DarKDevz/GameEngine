@@ -1,17 +1,16 @@
-
-import * as test from "./examples/platformer.json" assert {type: "json"};
-
 window.topDiv = undefined;
 window.windowResized= function () {
     engine.resize(window.topDiv.clientWidth, window.topDiv.clientHeight);
     //UI Resize
     editor.onResize();
 }
-window.preload= function () {
-    window.loaded = false;
+window.preload= async function () {
     engine = new Engine();
     player = new Player();
-	engine.loadFromObject(test.default)
+    const response = await fetch("./examples/platformer.json");
+    const data = await response.json();
+    window.loaded = false;
+	engine.loadFromObject(data)
 }
 window.setup= function () {
     //Initialize Game things
