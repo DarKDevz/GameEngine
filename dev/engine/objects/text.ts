@@ -208,6 +208,9 @@ class Joystick extends GUIElement{
 }
 function touchStarted() {
     if (!stick) return;
+    if(!fullscreen()) {
+        fullscreen(true)
+    }
     stick.handlePress();
     return false; // Prevent default
 }
