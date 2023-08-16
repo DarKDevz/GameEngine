@@ -15,7 +15,6 @@ function checkLoad() {
         window.windowResized = () => { engine.resize(); };
         player = new Player();
         JsonMap(MapData);
-        engine.cameraPos = player.cameraPos;
     }
     else if (window.editorData) {
         changeMapData(window.editorData);

@@ -13,9 +13,9 @@ class Engine {
         this.usedUUID = [];
         this.hasUUID = false;
         this.assignedUUID = "";
-        this.camera = new Camera(0, 0);
+        this.camera = engine?.camera?engine.camera:new Camera(0, 0);
         this.gui = createGraphics(windowWidth, windowHeight);
-        this.guiObjects = {}
+        this.guiObjects = Object.assign({},engine?.guiObjects)
         this.mobile = navigator.userAgent.includes("Mobile");
         if (this.mobile) {
             //Default mouseButton to be left
