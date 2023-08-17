@@ -4,6 +4,7 @@ class Engine {
     static componentList;
     static fileTypeList;
     constructor() {
+        this.physics = engine?.physics ? true : false;
         this.scene = [];
         this.zoom = 1;
         this.currentScene;
@@ -21,7 +22,7 @@ class Engine {
             mouseButton = 'left';
         }
         this.world = new b2World(new b2Vec2(0, 100) //gravity
-        , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
+            , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
         this.componentList = Engine.componentList;
         window.keyPressed = this.keyPress.bind(this);
         // this.body = new p2.Body({ mass: 1 });

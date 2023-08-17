@@ -400,11 +400,27 @@ class Level {
             }
         });
         accordionMenu(headerText, inputField, "Scene: " + this.ind, openerState[this.ind]);
+        /*drag and drop behaviour */
+        headerText.elt.ondragover = (event) => {
+            event.preventDefault();
+        };
+        headerText.elt.ondrop = (event) => {
+            event.preventDefault();
+            let objUUID = event.dataTransfer.getData("objUUID");
+            if (objUUID === "")
+                return;
+            let obj = engine.getfromUUID(objUUID);
+            console.log(obj, obj.scene);
+            removeObject(objUUID);
+            this.addObj(obj);
+            shouldUpdateLevels = true;
+        };
         for (let box of this.boxes) {
+            let isDragging = false;
             let _box = createDiv(box.constructor.name);
             _box.style("cursor: pointer; width: fit-content;");
-            _box.mousePressed(() => {
-                if (engine.currentScene === this.ind) {
+            _box.mouseReleased(() => {
+                if (engine.currentScene === this.ind && !isDragging) {
                     editor.setSelection([box.uuid]);
                     editor.setCameraPos(box);
                 }
@@ -419,6 +435,15 @@ class Level {
                 }
             });
             _box.parent(inputField);
+            _box.elt.draggable = "true";
+            _box.elt.ondragstart = (event) => {
+                event.dataTransfer.setData("objUUID", box.uuid);
+                console.log(box);
+                isDragging = true;
+            };
+            _box.elt.ondragend = (event) => {
+                isDragging = false;
+            };
         }
         sceneBtn.parent(leftDiv);
         sceneHolder.push(sceneBtn);

@@ -136,7 +136,7 @@ function PanelsInit() {
 }
 async function createZip() {
     var zip = new JSZip();
-    let createSketchFile = function() {
+    let createSketchFile = function () {
         return `
         globalThis.preload = async function() {
             engine = new Engine();
@@ -181,7 +181,7 @@ async function createZip() {
         { path: 'loader/support.js' },
         { path: 'index.html' },
         { path: 'sketch.js', makeFile: createSketchFile },
-        { path: 'export.json',makeFile:createMapFile}
+        { path: 'export.json', makeFile: createMapFile }
     ];
     const regex = /<!-- .*<\/script>/gms;
 

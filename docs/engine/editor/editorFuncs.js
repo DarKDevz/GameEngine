@@ -164,7 +164,7 @@ class Editor {
             content.removeOldContent();
             readTypeAndName();
         }
-        if (shouldUpdateLevels) {
+        if (shouldUpdateLevels && engine?.scene?.length > 0) {
             shouldUpdateLevels = false;
             this.updateLevels();
         }
@@ -535,6 +535,8 @@ class Editor {
     }
     async makeFile(event) {
         event.preventDefault();
+        if (!event?.dataTransfer?.files[0])
+            return;
         let dragFile = event.dataTransfer.files[0];
         let newName = dragFile.name.split(".");
         newName.pop();
@@ -633,6 +635,8 @@ class Editor {
                     let addButton = createButton("Add");
                     divHolder.elt.ondrop = (event) => {
                         //console.log(event);
+                        if (event.dataTransfer.getData("UUID") === "")
+                            return;
                         console.warn(event.dataTransfer.getData("UUID"));
                         if (event.dataTransfer.files.length > 0) {
                             this.makeFile(event).then((file) => {

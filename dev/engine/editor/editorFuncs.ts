@@ -1,7 +1,7 @@
 var editor: Editor;
 var forceMenuUpdate = false,
     forceBrowserUpdate = false,
-    lastWasPressed:any = false,
+    lastWasPressed: any = false,
     overUI = false,
     Pressed = lastWasPressed,
     button = null,
@@ -60,7 +60,7 @@ class Editor {
         return _;
     }
     startSelect() {
-        if (lastWasPressed !== 'startedOverUi'&& lastWasPressed != Pressed && Pressed && mouseButton === LEFT) {
+        if (lastWasPressed !== 'startedOverUi' && lastWasPressed != Pressed && Pressed && mouseButton === LEFT) {
             this.selectionBox.push(this.mouseCoords().array());
             this.startPos = this.mouseCoords();
         }
@@ -145,10 +145,10 @@ class Editor {
             this.selectionBox[1][1] - this.selectionBox[0][1]);
     }
     onUpdate() {
-        if(mouseIsPressed&&overUI) {
+        if (mouseIsPressed && overUI) {
             lastWasPressed = 'startedOverUi'
         }
-        if (!overUI&&lastWasPressed!=='startedOverUi') {
+        if (!overUI && lastWasPressed !== 'startedOverUi') {
             lastWasPressed = Pressed;
             Pressed = mouseIsPressed && !this.levelMode;
         }
@@ -161,10 +161,10 @@ class Editor {
             this.moveScreen()
         }
         if (!this.levelMode && lastWasPressed != Pressed && !mouseIsPressed && !overUI) {
-            if(lastWasPressed==='startedOverUi') {
+            if (lastWasPressed === 'startedOverUi') {
                 lastWasPressed = false;
-            }else {
-            this.releaseSelectBox();
+            } else {
+                this.releaseSelectBox();
             }
         } else if (Pressed && this.selectionBox[0] && !this.selectionBox[2]) {
             this.mouseDown();
@@ -197,7 +197,7 @@ class Editor {
             content.removeOldContent()
             readTypeAndName()
         }
-        if (shouldUpdateLevels) {
+        if (shouldUpdateLevels && engine?.scene?.length > 0) {
             shouldUpdateLevels = false;
             this.updateLevels()
         }
@@ -585,11 +585,12 @@ class Editor {
     }
     async makeFile(event: any): Promise<gameFile> {
         event.preventDefault();
+        if (!event?.dataTransfer?.files[0]) return;
         let dragFile = event.dataTransfer.files[0];
         let newName: any = dragFile.name.split(".");
         newName.pop();
         newName = newName.join(".");
-        let data:string;
+        let data: string;
         if (dragFile.type === "text/javascript") {
             data = await dragFile.text()
         } else if (dragFile.type.startsWith("image")) {
@@ -597,7 +598,7 @@ class Editor {
         } else {
             return;
         }
-        let file = addGameFile(data, dragFile.type === "text/javascript" ? ".js": ".img");
+        let file = addGameFile(data, dragFile.type === "text/javascript" ? ".js" : ".img");
         content.changeName(file, newName);
         return file
     }
@@ -680,25 +681,26 @@ class Editor {
                     let addButton = createButton("Add");
                     divHolder.elt.ondrop = (event: { dataTransfer: DataTransfer }) => {
                         //console.log(event);
+                        if (event.dataTransfer.getData("UUID") === "") return;
                         console.warn(event.dataTransfer.getData("UUID"));
-                        if(event.dataTransfer.files.length > 0) {
-                            this.makeFile(event).then((file:gameFile)=>{
+                        if (event.dataTransfer.files.length > 0) {
+                            this.makeFile(event).then((file: gameFile) => {
                                 let className = Engine.fileTypeList[file.type];
                                 engine.getfromUUID(info[i]).components.push(new engine.componentList[className]({
                                     obj: engine.getfromUUID(info[i]),
                                     fileUUID: file.UUID
                                 }));
                             })
-                        }else {
-                        let uuid = event.dataTransfer.getData("UUID");
-                        let file = engine.files[uuid];
-                        let className = Engine.fileTypeList[file.type];
-                        console.log(className);
-                        engine.getfromUUID(info[i]).components.push(new engine.componentList[className]({
-                            obj: engine.getfromUUID(info[i]),
-                            fileUUID: uuid
-                        }));
-                        console.warn(file);
+                        } else {
+                            let uuid = event.dataTransfer.getData("UUID");
+                            let file = engine.files[uuid];
+                            let className = Engine.fileTypeList[file.type];
+                            console.log(className);
+                            engine.getfromUUID(info[i]).components.push(new engine.componentList[className]({
+                                obj: engine.getfromUUID(info[i]),
+                                fileUUID: uuid
+                            }));
+                            console.warn(file);
                         }
                     };
                     divHolder.elt.ondragover = (event) => {

@@ -246,7 +246,6 @@ class gameScript extends Component {
 		}
 		inp.elt.ondragover = (event) => {
 			event.preventDefault();
-			window.mouseReleased = () => { }
 			//console.warn(event.dataTransfer.getData("UUID"));
 		}
 	}
@@ -263,29 +262,32 @@ class gameScript extends Component {
 		let alreadyHasName = _file.references.name;
 		let buttonName = alreadyHasName ? alreadyHasName : _file.UUID
 		buttonName = buttonName + typeOfFile
+		let isDragging = false;
 		let inp = createButton(buttonName).parent(Panel.HUD);
 		inp.elt.draggable = "true";
 		inp.elt.ondragstart = (event) => {
 			event.dataTransfer.setData("UUID", file.UUID);
 			console.log(file);
+			isDragging = true;
 		}
-		inp.mousePressed(() => {
+		inp.elt.ondragend = () => {
+			isDragging = false;
+		}
+		inp.mouseReleased(() => {
+			if (isDragging) return;
 			if (mouseButton === "right") {
 				content.changeName(_file);
 			} else {
-				window.mouseReleased = () => {
-					window.mouseReleased = () => { };
-					var popupWindow = window.open("popup.html", "Popup Window", "width=400,height=300");
-					window.scriptData = function () {
-						return _get().toString()
-					}
-					window.receivePopupText = (text) => {
-						console.warn(text);
-						_file.data = text;
-						set(_file);
-						_get = () => text;
-					};
+				var popupWindow = window.open("popup.html", "Popup Window", "width=400,height=300");
+				window.scriptData = function () {
+					return _get().toString()
 				}
+				window.receivePopupText = (text) => {
+					console.warn(text);
+					_file.data = text;
+					set(_file);
+					_get = () => text;
+				};
 			}
 		});
 		inp.size(140, 140);
@@ -390,41 +392,43 @@ class gameSprite extends Component {
 	}
 	ContentBrowser(file: gameFile, Panel: any) {
 		let _file = file;
+		let isDragging = false;
 		let img = createImg(_file.data, "Not Loading").parent(Panel.HUD);
 		img.elt.draggable = "true";
 		img.elt.ondragstart = (event) => {
 			event.dataTransfer.setData("UUID", _file.UUID);
 			console.log(_file);
+			isDragging = true;
+		}
+		img.elt.ondragend = () => {
+			isDragging = false
 		}
 		let _get = () => { return _file.data }
-		img.mousePressed(() => {
-			console.log(mouseButton);
+		img.mouseReleased(() => {
+			if (isDragging) return;
 			if (mouseButton === "right") {
 				content.changeName(_file);
 			} else {
-				window.mouseReleased = () => {
-					window.mouseReleased = () => { }
-					let popup = window.open('imagePopup.html', '_blank', 'width=400,height=400');
-					popup._ImageData = () => {
-						return _get();
-					}
-					window.jsonImage = (text: string) => {
-						console.warn(text);
-						forceBrowserUpdate = true;
-						//_file.loadFile(addGameFile(val.imageb64,'.img'));
-						_file.data = text;
-						//Remove Sprite definition so it reloads it correctly
-						_file.customData = undefined;
-						console.log(_file.whoUses);
-						for (let uuid in _file.whoUses) {
-							let _sprite = _file.whoUses[uuid];
-							console.log(_sprite);
-							_sprite.loadFile(_file);
-							console.log(_sprite);
-						}
-						_get = () => { return text };
-					};
+				let popup = window.open('imagePopup.html', '_blank', 'width=400,height=400');
+				popup._ImageData = () => {
+					return _get();
 				}
+				window.jsonImage = (text: string) => {
+					console.warn(text);
+					forceBrowserUpdate = true;
+					//_file.loadFile(addGameFile(val.imageb64,'.img'));
+					_file.data = text;
+					//Remove Sprite definition so it reloads it correctly
+					_file.customData = undefined;
+					console.log(_file.whoUses);
+					for (let uuid in _file.whoUses) {
+						let _sprite = _file.whoUses[uuid];
+						console.log(_sprite);
+						_sprite.loadFile(_file);
+						console.log(_sprite);
+					}
+					_get = () => { return text };
+				};
 			}
 		});
 		img.size(140, 140);
@@ -467,7 +471,6 @@ class gameSprite extends Component {
 		}
 		inp.elt.ondragover = (event) => {
 			event.preventDefault();
-			window.mouseReleased = () => { }
 			//console.warn(event.dataTransfer.getData("UUID"));
 		}
 		return inp;

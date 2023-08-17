@@ -4,6 +4,7 @@ class Engine {
     static componentList: { [x: string]: Component };
     static fileTypeList: { [x: string]: string };
     constructor() {
+        this.physics = engine?.physics ? true : false;
         this.scene = [];
         this.zoom = 1;
         this.currentScene;
@@ -12,9 +13,9 @@ class Engine {
         this.usedUUID = [];
         this.hasUUID = false;
         this.assignedUUID = "";
-        this.camera = engine?.camera?engine.camera:new Camera(0, 0);
+        this.camera = engine?.camera ? engine.camera : new Camera(0, 0);
         this.gui = createGraphics(windowWidth, windowHeight);
-        this.guiObjects = Object.assign({},engine?.guiObjects)
+        this.guiObjects = Object.assign({}, engine?.guiObjects)
         this.mobile = navigator.userAgent.includes("Mobile");
         if (this.mobile) {
             //Default mouseButton to be left
@@ -202,11 +203,11 @@ class Engine {
             GUIElement.touchEnded();
         }
     }
-    updateGui(display:boolean = true) {
+    updateGui(display: boolean = true) {
         for (let uuid in this.guiObjects) {
             let GUIElement = this.guiObjects[uuid];
             GUIElement.update();
-            if(display)GUIElement.display();
+            if (display) GUIElement.display();
         }
     }
 }
