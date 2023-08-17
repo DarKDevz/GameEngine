@@ -45,13 +45,13 @@ var boxes = new Proxy(temp, {
 });
 Object.defineProperty(window, "activeLevel", {
     set(value) {
-        engine.activeScene = value;
+        engine.currentScene = value;
         console.error("activeLevel variable is deprecated, use engine.activeScene instead");
         return true;
     },
     get() {
         console.error("activeLevel variable is deprecated, use engine.activeScene instead");
-        return engine.activeScene;
+        return engine.currentScene;
     }
 });
 Object.defineProperty(window, "deleteGameFile", {

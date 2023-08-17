@@ -6,7 +6,7 @@ class Engine {
     constructor() {
         this.scene = [];
         this.zoom = 1;
-        this.activeScene;
+        this.currentScene;
         this.files = {};
         this.uuidList = {};
         this.usedUUID = [];
@@ -59,6 +59,9 @@ class Engine {
             y: (mouseY * mult + this.cameraPos.y - (height / 2 * mult))
         };
     }
+    get activeScene() {
+        return this.getActiveScene();
+    }
     get cameraPos() {
         return this.camera.currentPos;
     }
@@ -79,22 +82,25 @@ class Engine {
         window.draw ??= this.draw.bind(this);
         window.windowResized ??= () => this.resize();
     }
-    setup() { }
+    setup() {
+        canvas.oncontextmenu = function (e) {
+            e.preventDefault();
+        };
+    }
     draw() {
         this.gui.clear();
         push();
         background(150, 230, 240);
-        let scene = this.getActiveScene();
         //Update
         player.update();
         //Early Update
-        scene.earlyUpdate();
+        this.activeScene?.earlyUpdate();
         player.camera();
         player.checkCollisions();
-        scene.display();
+        this.activeScene?.display();
         player.display();
         //Late Update
-        scene.lateUpdate();
+        this.activeScene?.lateUpdate();
         pop();
         this.gui.fill(0);
         this.gui.text("FPS: " + round(frameRate() / 10) * 10, 50, 50);
@@ -163,7 +169,7 @@ class Engine {
         return this.uuidList[UUID];
     }
     getActiveScene() {
-        return this.scene[this.activeScene];
+        return this.scene[this.currentScene];
     }
     changeUUID(ogUUId, newUUID) {
         let ogVal = this.uuidList[ogUUId];
@@ -187,6 +193,18 @@ class Engine {
         }
         this.usedUUID.push(UUID);
         return UUID;
+    }
+    touchStarted() {
+        for (let uuid in this.guiObjects) {
+            let GUIElement = this.guiObjects[uuid];
+            GUIElement.touchStarted();
+        }
+    }
+    touchEnded() {
+        for (let uuid in this.guiObjects) {
+            let GUIElement = this.guiObjects[uuid];
+            GUIElement.touchEnded();
+        }
     }
     updateGui(display = true) {
         for (let uuid in this.guiObjects) {

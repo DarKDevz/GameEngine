@@ -403,7 +403,7 @@ class gameSprite extends Component {
 				content.changeName(_file);
 			} else {
 				window.mouseReleased = () => {
-					this.mouseReleased = () => { }
+					window.mouseReleased = () => { }
 					let popup = window.open('imagePopup.html', '_blank', 'width=400,height=400');
 					popup._ImageData = () => {
 						return _get();

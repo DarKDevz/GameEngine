@@ -1,7 +1,7 @@
 var editor: Editor;
 var forceMenuUpdate = false,
     forceBrowserUpdate = false,
-    lastWasPressed = false,
+    lastWasPressed:any = false,
     overUI = false,
     Pressed = lastWasPressed,
     button = null,
@@ -60,7 +60,7 @@ class Editor {
         return _;
     }
     startSelect() {
-        if (lastWasPressed != Pressed && Pressed && mouseButton === LEFT) {
+        if (lastWasPressed !== 'startedOverUi'&& lastWasPressed != Pressed && Pressed && mouseButton === LEFT) {
             this.selectionBox.push(this.mouseCoords().array());
             this.startPos = this.mouseCoords();
         }
@@ -145,7 +145,10 @@ class Editor {
             this.selectionBox[1][1] - this.selectionBox[0][1]);
     }
     onUpdate() {
-        if (!overUI) {
+        if(mouseIsPressed&&overUI) {
+            lastWasPressed = 'startedOverUi'
+        }
+        if (!overUI&&lastWasPressed!=='startedOverUi') {
             lastWasPressed = Pressed;
             Pressed = mouseIsPressed && !this.levelMode;
         }
@@ -158,15 +161,19 @@ class Editor {
             this.moveScreen()
         }
         if (!this.levelMode && lastWasPressed != Pressed && !mouseIsPressed && !overUI) {
+            if(lastWasPressed==='startedOverUi') {
+                lastWasPressed = false;
+            }else {
             this.releaseSelectBox();
+            }
         } else if (Pressed && this.selectionBox[0] && !this.selectionBox[2]) {
             this.mouseDown();
         }
         //If switching scenes remove selected
-        if (lastScene != engine.activeScene) {
+        if (lastScene != engine.currentScene) {
             this.removeSelection()
         }
-        lastScene = engine.activeScene;
+        lastScene = engine.currentScene;
 
         for (let uuid of selectedObjects) {
             let tempBox = engine.getfromUUID(uuid);
@@ -566,7 +573,7 @@ class Editor {
             }
         });
 
-        lastScene = engine.activeScene;
+        lastScene = engine.currentScene;
         this.cameraPos = createVector(0, 0);
     }
     readFileAsDataURL(file: Blob): Promise<string> {

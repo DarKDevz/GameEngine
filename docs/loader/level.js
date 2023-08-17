@@ -331,12 +331,12 @@ class Level {
         player.colliding = false;
         player.collidedId = null;
         player.vel = createVector(0, 0);
-        if (engine.activeScene !== undefined) {
+        if (engine.currentScene !== undefined) {
             for (let box of engine.getActiveScene().boxes) {
                 box.removeBody();
             }
         }
-        engine.activeScene = this.ind;
+        engine.currentScene = this.ind;
         //Call init function of each;
         this.initiateBoxes();
         // let body = new p2.Body({mass:0,position:[0,-this.maxPos]})
@@ -394,7 +394,7 @@ class Level {
         inputField.parent(sceneBtn);
         openerState[this.ind] ??= { value: false };
         headerText.doubleClicked(() => {
-            if (engine.activeScene !== this.ind) {
+            if (engine.currentScene !== this.ind) {
                 this.loadLevel();
                 editor.setCameraPos(this.pos);
             }
@@ -404,13 +404,13 @@ class Level {
             let _box = createDiv(box.constructor.name);
             _box.style("cursor: pointer; width: fit-content;");
             _box.mousePressed(() => {
-                if (engine.activeScene === this.ind) {
+                if (engine.currentScene === this.ind) {
                     editor.setSelection([box.uuid]);
                     editor.setCameraPos(box);
                 }
             });
             _box.doubleClicked(() => {
-                if (engine.activeScene !== this.ind) {
+                if (engine.currentScene !== this.ind) {
                     this.loadLevel();
                     setTimeout(() => {
                         editor.setSelection([box.uuid]);

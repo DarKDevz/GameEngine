@@ -31,11 +31,11 @@ window.draw= function () {
     background(150, 230, 240);
     /*-------------PLAYER AND LEVEL DRAWING-----------------*/
     //Early Update
-    engine.getActiveScene().earlyUpdate(false);
-    engine.getActiveScene().display(true);
-    engine.getActiveScene().customDraw(editor.levelMode);
+    engine.activeScene?.earlyUpdate(false);
+    engine.activeScene?.display(true);
+    engine.activeScene?.customDraw(editor.levelMode);
     //Late Update
-    engine.getActiveScene().lateUpdate(false);
+    engine.activeScene?.lateUpdate(false);
     /*-------------PLAYER AND LEVEL DRAWING-----------------*/
     //Editor things
     editor.onUpdate()

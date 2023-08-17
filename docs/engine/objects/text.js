@@ -69,6 +69,8 @@ class GUIElement {
             }
         }
     }
+    touchStarted() { }
+    touchEnded() { }
     display(...args) { }
     update(...args) { }
 }
@@ -178,7 +180,7 @@ class Joystick extends GUIElement {
         engine.gui.ellipse(this.stickPosition.x, this.stickPosition.y, this.stickSize);
         engine.gui.fill(0);
     }
-    handlePress() {
+    touchStarted() {
         for (let touch of touches) {
             if (touch) {
                 const distance = this.position.dist(createVector(touch.x, touch.y));
@@ -189,7 +191,7 @@ class Joystick extends GUIElement {
             }
         }
     }
-    handleRelease() {
+    touchEnded() {
         for (let touch of touches) {
             if (touch) {
                 const distance = this.position.dist(createVector(touch.x, touch.y));
@@ -203,22 +205,20 @@ class Joystick extends GUIElement {
         this.stickPosition = this.position.copy();
     }
 }
-function touchStarted() {
-    stick?.handlePress();
+function touchStarted(e) {
+    engine.touchStarted();
     engine.updateGui(false);
     if (engine.mobile) {
         fullscreen(true);
     }
-    if (!stick)
-        return;
-    return false; // Prevent default
+    if (e.srcElement === canvas)
+        return false;
 }
-function touchEnded() {
-    if (!stick)
-        return;
-    stick.handleRelease();
+function touchEnded(e) {
+    engine.touchEnded();
     for (let touch of touches) {
         touch.used = undefined;
     }
-    return false; // Prevent default
+    if (e.srcElement === canvas)
+        return false;
 }

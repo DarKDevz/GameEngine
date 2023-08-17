@@ -149,9 +149,6 @@ async function createZip() {
             createCanvas(windowWidth, windowHeight);
             noSmooth();
             //Remove right click default behaviour
-            canvas.oncontextmenu = function (e) {
-                e.preventDefault();
-            }
             engine.setup();
         }
 

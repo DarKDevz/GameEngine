@@ -176,7 +176,7 @@ interface gameSprite {
 type World = Box2D.Dynamics.b2World;
 interface Engine {
     scene: Level[]
-    activeScene: number
+    currentScene: number
     files: { [x: string]: gameFile }
     uuidList: { [x: UUID]: GameObject }
     usedUUID: UUID[]
