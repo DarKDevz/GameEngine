@@ -34,12 +34,11 @@ class TextObject extends GameObject {
         text(this.t, this.x, this.y);
     }
 }
-class GUIElement extends GameEvents {
+class GUIElement extends GameObject {
     size;
-    constructor() {
-        super();
-        this.id;
-        this.position = createVector(0, 0);
+    constructor(x, y) {
+        super(x, y);
+        this.position = createVector(x, y);
         this.size = 5;
         this.mobileOnly = true;
         this.add();
@@ -48,17 +47,26 @@ class GUIElement extends GameEvents {
         let dist = coords.dist(this.position);
         return dist < this.size;
     }
+    getValuesName() {
+        return ["Mobile Button", "GUI Size"];
+    }
+    getValues() {
+        return [this.mobileOnly, this.size];
+    }
+    getActualValuesName() {
+        return ["mobileOnly", "size"];
+    }
     resize(ww, wh) {
     }
     add() {
         if (this.id !== undefined) {
             this.remove();
         }
-        this.id = engine.generateUUID();
-        engine.guiObjects[this.id] = this;
+        engine.guiObjects[this.uuid] = this;
     }
     remove() {
-        engine.guiObjects[this.id] = undefined;
+        engine.guiObjects[this.uuid] = undefined;
+        engine.uuidList[this.uuid] = undefined;
     }
     setMousePressed() {
         if (engine.mobile) {
@@ -85,7 +93,7 @@ class Button extends GUIElement {
     cb;
     pressed;
     constructor(x, y, radius, pressed, notPressed) {
-        super();
+        super(x, y);
         this.position = createVector(x, y);
         this.cb = [pressed, notPressed];
         this.size = radius;
@@ -128,7 +136,7 @@ class Joystick extends GUIElement {
     isDragging;
     dir;
     constructor(x, y, size, stickSize, direction) {
-        super();
+        super(x, y);
         this.size = size;
         this.stickSize = stickSize;
         this.position = createVector(x, y);
@@ -183,6 +191,15 @@ class Joystick extends GUIElement {
         engine.gui.fill(150, 50);
         engine.gui.ellipse(this.stickPosition.x, this.stickPosition.y, this.stickSize);
         engine.gui.fill(0);
+    }
+    getValues() {
+        return super.getValues().concat(this.stickSize);
+    }
+    getActualValuesName() {
+        return super.getActualValuesName().concat("stickSize");
+    }
+    getValuesName() {
+        return super.getValuesName().concat("Size of stick");
     }
     touchStarted() {
         for (let touch of touches) {

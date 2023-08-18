@@ -196,7 +196,7 @@ interface Engine extends GameEvents{
     mobile: boolean
     guiObjects: { [x: UUID]: GUIElement }
 }
-interface GUIElement extends GameEvents{
+interface GUIElement extends GameObject{
     id: UUID
     mobileOnly: boolean;
     position: Vec

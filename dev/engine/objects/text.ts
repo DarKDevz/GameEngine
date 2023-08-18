@@ -34,12 +34,11 @@ class TextObject extends GameObject {
     }
 
 }
-class GUIElement extends GameEvents {
+class GUIElement extends GameObject {
     size: number
-    constructor() {
-        super()
-        this.id;
-        this.position = createVector(0, 0);
+    constructor(x: number,y: number) {
+        super(x,y)
+        this.position = createVector(x, y);
         this.size = 5;
         this.mobileOnly = true;
         this.add();
@@ -48,6 +47,15 @@ class GUIElement extends GameEvents {
         let dist = coords.dist(this.position)
         return dist < this.size;
     }
+    getValuesName(): string[] {
+        return ["Mobile Button", "GUI Size"]
+    }
+    getValues(): any[] {
+        return [this.mobileOnly,this.size]
+    }
+    getActualValuesName(): string[] {
+        return ["mobileOnly","size"]
+    }
     resize(ww, wh) {
 
     }
@@ -55,11 +63,11 @@ class GUIElement extends GameEvents {
         if (this.id !== undefined) {
             this.remove()
         }
-        this.id = engine.generateUUID()
-        engine.guiObjects[this.id] = this;
+        engine.guiObjects[this.uuid] = this;
     }
     remove() {
-        engine.guiObjects[this.id] = undefined;
+        engine.guiObjects[this.uuid] = undefined;
+        engine.uuidList[this.uuid] = undefined;
     }
     setMousePressed() {
         if (engine.mobile) {
@@ -86,7 +94,7 @@ class Button extends GUIElement {
     declare size: number;
     pressed: boolean
     constructor(x: number, y: number, radius: number, pressed: Function, notPressed: Function) {
-        super()
+        super(x,y)
         this.position = createVector(x, y)
         this.cb = [pressed, notPressed];
         this.size = radius
@@ -130,7 +138,7 @@ class Joystick extends GUIElement {
     isDragging: boolean;
     dir: { [x: string]: any }
     constructor(x: number, y: number, size: number, stickSize: number, direction: { [x: string]: any; }) {
-        super()
+        super(x,y)
         this.size = size;
         this.stickSize = stickSize;
         this.position = createVector(x, y);
@@ -185,7 +193,15 @@ class Joystick extends GUIElement {
         engine.gui.ellipse(this.stickPosition.x, this.stickPosition.y, this.stickSize);
         engine.gui.fill(0)
     }
-
+    getValues(): any[] {
+        return super.getValues().concat(this.stickSize)
+    }
+    getActualValuesName(): string[] {
+        return super.getActualValuesName().concat("stickSize")
+    }
+    getValuesName(): string[] {
+        return super.getValuesName().concat("Size of stick")
+    }
     touchStarted() {
         for (let touch of touches) {
             if (touch) {

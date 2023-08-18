@@ -149,7 +149,7 @@ class Editor {
         for(let UUID in engine.guiObjects) {
             let GUIElement = engine.guiObjects[UUID];
             if(GUIElement.collidesPoint(coords)) {
-                console.log(GUIElement);
+                selectedObjects = [UUID]
             }
         }
     }
