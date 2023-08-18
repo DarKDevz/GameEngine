@@ -1,9 +1,10 @@
 var engine;
-class Engine {
+class Engine extends GameEvents {
     static removeListeners;
     static componentList;
     static fileTypeList;
     constructor() {
+        super();
         this.physics = engine?.physics ? true : false;
         this.scene = [];
         this.zoom = 1;
@@ -22,7 +23,7 @@ class Engine {
             mouseButton = 'left';
         }
         this.world = new b2World(new b2Vec2(0, 100) //gravity
-            , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
+        , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
         this.componentList = Engine.componentList;
         window.keyPressed = this.keyPress.bind(this);
         // this.body = new p2.Body({ mass: 1 });
@@ -31,10 +32,10 @@ class Engine {
     resize(ww = windowWidth, wh = windowHeight) {
         resizeCanvas(ww, wh);
         engine.gui.resizeCanvas(ww, wh);
-        this.getActiveScene().resize(ww, wh);
+        this.getActiveScene()?.resize(ww, wh);
         for (let uuid in this.guiObjects) {
             let GUIElement = this.guiObjects[uuid];
-            GUIElement.resize(ww, wh);
+            GUIElement?.resize(ww, wh);
         }
     }
     mouseScreen() {
@@ -71,7 +72,7 @@ class Engine {
             this.camera.follow(obj);
     }
     keyPress(key) {
-        this.getActiveScene().keyPress(key);
+        this.getActiveScene()?.keyPress(key);
     }
     loadFromObject(obj, autoEvents = false) {
         ScenesfromObject(obj);
@@ -111,7 +112,7 @@ class Engine {
         box.init();
         console.log(box.init);
         box.typeId = doId ? box.typeId : undefined;
-        this.getActiveScene().boxes.push(box);
+        this.getActiveScene()?.boxes.push(box);
     }
     addScriptByName(name, vals, obj) {
         let params = {

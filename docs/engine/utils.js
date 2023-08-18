@@ -1,3 +1,23 @@
+class GameEvents {
+    constructor() { }
+    globalDefine() { }
+    deviceMoved() { }
+    deviceTurned() { }
+    deviceShaken() { }
+    doubleClicked() { }
+    mousePressed() { }
+    mouseReleased() { }
+    mouseMoved() { }
+    mouseDragged() { }
+    mouseClicked() { }
+    mouseWheel() { }
+    touchStarted() { }
+    touchMoved() { }
+    touchEnded() { }
+    keyPressed() { }
+    keyReleased() { }
+    keyTyped() { }
+}
 var overUI = false;
 function OpenDialog(MainDiv, OnExit = () => { }, headerText = createDiv("Dialog Window")) {
     let Holder = createDiv();

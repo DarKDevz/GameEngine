@@ -220,9 +220,11 @@ class Level {
         line(this.pos.x, this.pos.y, this.pos.x + 25, this.pos.y);
         stroke(0, 255, 0);
         line(this.pos.x, this.pos.y, this.pos.x, this.pos.y + 25);
-        stroke(255, 0, 0);
-        line(engine.cameraPos.x, this.maxPos, engine.cameraPos.x + width, this.maxPos);
         stroke(0);
+        engine.gui.translate(0, -engine.cameraPos.y + height / 2);
+        engine.gui.stroke(255, 0, 0);
+        engine.gui.line(0, this.maxPos, width, this.maxPos);
+        engine.gui.resetMatrix();
     }
     display(OnlyDraw = false) {
         translate(width / 2, height / 2);

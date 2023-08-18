@@ -1,5 +1,6 @@
-class GameObject {
+class GameObject extends GameEvents{
     constructor(x: number, y: number, tag?: string) {
+        super()
         this.x = x;
         this.y = y;
         this.z = 0;

@@ -34,9 +34,10 @@ class TextObject extends GameObject {
         text(this.t, this.x, this.y);
     }
 }
-class GUIElement {
+class GUIElement extends GameEvents {
     id;
     constructor() {
+        super();
         this.id;
         this.add();
     }
@@ -208,7 +209,7 @@ class Joystick extends GUIElement {
 function touchStarted(e) {
     engine.touchStarted();
     engine.updateGui(false);
-    if (engine.mobile) {
+    if (engine.mobile && !fullscreen()) {
         fullscreen(true);
     }
     if (e.srcElement === canvas)

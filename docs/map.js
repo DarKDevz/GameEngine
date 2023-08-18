@@ -24,10 +24,13 @@ window.setup = function () {
     PanelsInit();
     engine.cameraPos = editor.cameraPos;
     engine.camera.isLocked = true;
+    windowResized();
 };
 window.draw = function () {
     //engine.load();
     clear();
+    engine.gui.clear();
+    push();
     background(150, 230, 240);
     /*-------------PLAYER AND LEVEL DRAWING-----------------*/
     //Early Update
@@ -39,4 +42,6 @@ window.draw = function () {
     /*-------------PLAYER AND LEVEL DRAWING-----------------*/
     //Editor things
     editor.onUpdate();
+    pop();
+    image(engine.gui, 0, 0, width, height);
 };

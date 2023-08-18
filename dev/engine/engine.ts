@@ -1,9 +1,10 @@
 var engine: Engine;
-class Engine {
+class Engine extends GameEvents{
     static removeListeners: Function[];
     static componentList: { [x: string]: Component };
     static fileTypeList: { [x: string]: string };
     constructor() {
+        super()
         this.physics = engine?.physics ? true : false;
         this.scene = [];
         this.zoom = 1;
@@ -31,10 +32,10 @@ class Engine {
     resize(ww = windowWidth, wh = windowHeight) {
         resizeCanvas(ww, wh);
         engine.gui.resizeCanvas(ww, wh);
-        this.getActiveScene().resize(ww, wh);
+        this.getActiveScene()?.resize(ww, wh);
         for (let uuid in this.guiObjects) {
             let GUIElement = this.guiObjects[uuid];
-            GUIElement.resize(ww, wh);
+            GUIElement?.resize(ww, wh);
         }
     }
     mouseScreen(): { x: number, y: number } {
@@ -70,7 +71,7 @@ class Engine {
             this.camera.follow(obj);
     }
     keyPress(key: Event) {
-        this.getActiveScene().keyPress(key);
+        this.getActiveScene()?.keyPress(key);
     }
     loadFromObject(obj: Object, autoEvents = false) {
         ScenesfromObject(obj);
@@ -110,7 +111,7 @@ class Engine {
         box.init()
         console.log(box.init);
         box.typeId = doId ? box.typeId : undefined;
-        this.getActiveScene().boxes.push(box);
+        this.getActiveScene()?.boxes.push(box);
     }
     addScriptByName(name: string, vals: Object, obj: GameObject) {
         let params = {
