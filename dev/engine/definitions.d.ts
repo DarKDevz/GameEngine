@@ -80,7 +80,7 @@ interface Editor {
     forceMenuUpdate: boolean;
     tryOffset: { [x: UUID]: xyObject }
 }
-interface GameObject {
+interface GameObject extends GameEvents{
     x: number;
     y: number;
     z: number;
@@ -131,6 +131,9 @@ interface xywhObject extends xyObject {
     width: number,
     height: number
 }
+interface GameEvents {
+    entryPoints: string[];
+}
 interface Level {
     toJSON(): any;
     extrasJson(): any;
@@ -174,7 +177,7 @@ interface gameSprite {
     ownObject: GameObject
 }
 type World = Box2D.Dynamics.b2World;
-interface Engine {
+interface Engine extends GameEvents{
     scene: Level[]
     currentScene: number
     files: { [x: string]: gameFile }
@@ -192,6 +195,11 @@ interface Engine {
     gui: ReturnType<typeof createGraphics>
     mobile: boolean
     guiObjects: { [x: UUID]: GUIElement }
+}
+interface GUIElement extends GameEvents{
+    id: UUID
+    mobileOnly: boolean;
+    position: Vec
 }
 interface Camera {
     target: any;

@@ -183,8 +183,9 @@ function JsonMap(file: { data: any }) {
         ScenesfromObject(JSON.parse(file.data))
     }
 }
-class Level {
+class Level extends GameEvents {
     constructor(arr: GameObject[], pos: Vec, maxPos: number) {
+        super()
         let eventify = function (arr, callback) {
             arr.push = function (e) {
                 let ret = Array.prototype.push.call(arr, e);
@@ -218,10 +219,11 @@ class Level {
         stroke(0, 255, 0);
         line(this.pos.x, this.pos.y, this.pos.x, this.pos.y + 25);
         stroke(0);
-        engine.gui.translate(0, -engine.cameraPos.y+height/2);
+        engine.gui.translate(0, -engine.cameraPos.y + height / 2);
         engine.gui.stroke(255, 0, 0);
         engine.gui.line(0, this.maxPos, width, this.maxPos);
         engine.gui.resetMatrix()
+        engine.gui.stroke(0);
     }
     display(OnlyDraw = false) {
         translate(width / 2, height / 2);
@@ -276,12 +278,6 @@ class Level {
             text(engine.errorText, 50 - width / 2, 50 - height / 2)
         }
         translate(-cameraPos.x, -cameraPos.y)
-    }
-    keyPress(event: Event, shouldRun = true) {
-        if (!shouldRun) return;
-        for (let t_box of this.boxes) {
-            t_box.keyPress(event);
-        }
     }
     lateUpdate(shouldRun = true) {
         if (!shouldRun) return 1;
@@ -443,6 +439,102 @@ class Level {
         }
         sceneBtn.parent(leftDiv);
         sceneHolder.push(sceneBtn);
+    }
+    deviceMoved(e: Event, noRun = false) {
+        if (noRun) return;
+        for (let box of this.boxes) {
+            box.deviceMoved(e);
+        }
+    }
+    deviceTurned(e: Event, noRun = false) {
+        if (noRun) return;
+        for (let box of this.boxes) {
+            box.deviceTurned(e);
+        }
+    }
+    deviceShaken(e: Event, noRun = false) {
+        if (noRun) return;
+        for (let box of this.boxes) {
+            box.deviceShaken(e);
+        }
+    }
+    doubleClicked(e: Event, noRun = false) {
+        if (noRun) return;
+        for (let box of this.boxes) {
+            box.doubleClicked(e);
+        }
+    }
+    mousePressed(e: Event, noRun = false) {
+        if (noRun) return;
+        for (let box of this.boxes) {
+            box.mousePressed(e);
+        }
+    }
+    mouseReleased(e: Event, noRun = false) {
+        if (noRun) return;
+        for (let box of this.boxes) {
+            box.mouseReleased(e);
+        }
+    }
+    mouseMoved(e: Event, noRun = false) {
+        if (noRun) return;
+        for (let box of this.boxes) {
+            box.mouseMoved(e);
+        }
+    }
+    mouseDragged(e: Event, noRun = false) {
+        if (noRun) return;
+        for (let box of this.boxes) {
+            box.mouseDragged(e);
+        }
+    }
+    mouseClicked(e: Event, noRun = false) {
+        if (noRun) return;
+        for (let box of this.boxes) {
+            box.mouseClicked(e);
+        }
+    }
+    mouseWheel(e: Event, noRun = false) {
+        if (noRun) return;
+        for (let box of this.boxes) {
+            box.mouseWheel(e);
+        }
+    }
+    touchStarted(e: Event, noRun = false) {
+        if (noRun) return;
+        for (let box of this.boxes) {
+            box.touchStarted(e);
+        }
+    }
+    touchMoved(e: Event, noRun = false) {
+        if (noRun) return;
+        for (let box of this.boxes) {
+            box.touchMoved(e);
+        }
+    }
+    touchEnded(e: Event, noRun = false) {
+        if (noRun) return;
+        for (let box of this.boxes) {
+            box.touchEnded(e);
+        }
+    }
+    keyPressed(e: Event, noRun = false) {
+        if (noRun) return;
+        for (let box of this.boxes) {
+            box.keyPressed(e);
+        }
+    }
+    keyReleased(e: Event, noRun = false) {
+        if (noRun) return;
+        for (let box of this.boxes) {
+            box.keyReleased(e);
+        }
+    }
+    keyTyped(e: Event, noRun = false) {
+        if (noRun) return;
+        for (let box of this.boxes) {
+            box.keyTyped(e);
+        }
     }
 }
 

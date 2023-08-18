@@ -36,7 +36,7 @@ window.draw = function () {
     //Early Update
     engine.activeScene?.earlyUpdate(false);
     engine.activeScene?.display(true);
-    engine.activeScene?.customDraw(editor.levelMode);
+    engine.customDraw(editor.levelMode);
     //Late Update
     engine.activeScene?.lateUpdate(false);
     /*-------------PLAYER AND LEVEL DRAWING-----------------*/

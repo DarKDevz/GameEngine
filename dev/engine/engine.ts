@@ -1,10 +1,11 @@
 var engine: Engine;
-class Engine extends GameEvents{
+class Engine extends GameEvents {
     static removeListeners: Function[];
     static componentList: { [x: string]: Component };
     static fileTypeList: { [x: string]: string };
     constructor() {
         super()
+        this.globalDefine(true);
         this.physics = engine?.physics ? true : false;
         this.scene = [];
         this.zoom = 1;
@@ -25,7 +26,6 @@ class Engine extends GameEvents{
         this.world = new b2World(new b2Vec2(0, 100)    //gravity
             , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
         this.componentList = Engine.componentList
-        window.keyPressed = this.keyPress.bind(this);
         // this.body = new p2.Body({ mass: 1 });
         // this.world.addBody(this.body);
     }
@@ -70,8 +70,48 @@ class Engine extends GameEvents{
         this.camera.isLocked ? 0 :
             this.camera.follow(obj);
     }
-    keyPress(key: Event) {
-        this.getActiveScene()?.keyPress(key);
+    /*all events are here */
+    deviceMoved(e: Event) {
+        this.activeScene?.deviceMoved(e, Boolean(window?.editor));
+    }
+    deviceTurned(e: Event) {
+        this.activeScene?.deviceTurned(e, Boolean(window?.editor));
+    }
+    deviceShaken(e: Event) {
+        this.activeScene?.deviceShaken(e, Boolean(window?.editor));
+    }
+    doubleClicked(e: Event) {
+        this.activeScene?.doubleClicked(e, Boolean(window?.editor));
+    }
+    mousePressed(e: Event) {
+        this.activeScene?.mousePressed(e, Boolean(window?.editor));
+    }
+    mouseReleased(e: Event) {
+        this.activeScene?.mouseReleased(e, Boolean(window?.editor));
+    }
+    mouseMoved(e: Event) {
+        this.activeScene?.mouseMoved(e, Boolean(window?.editor));
+    }
+    mouseDragged(e: Event) {
+        this.activeScene?.mouseDragged(e, Boolean(window?.editor));
+    }
+    mouseClicked(e: Event) {
+        this.activeScene?.mouseClicked(e, Boolean(window?.editor));
+    }
+    mouseWheel(e: Event) {
+        this.activeScene?.mouseWheel(e, Boolean(window?.editor));
+    }
+    touchMoved(e: Event) {
+        this.activeScene?.touchMoved(e, Boolean(window?.editor));
+    }
+    keyPressed(e: Event) {
+        this.activeScene?.keyPressed(e, Boolean(window?.editor));
+    }
+    keyReleased(e: Event) {
+        this.activeScene?.keyReleased(e, Boolean(window?.editor));
+    }
+    keyTyped(e: Event) {
+        this.activeScene?.keyTyped(e, Boolean(window?.editor));
     }
     loadFromObject(obj: Object, autoEvents = false) {
         ScenesfromObject(obj);
@@ -192,23 +232,51 @@ class Engine extends GameEvents{
         this.usedUUID.push(UUID);
         return UUID;
     }
-    touchStarted() {
+    touchStarted(e) {
         for (let uuid in this.guiObjects) {
             let GUIElement = this.guiObjects[uuid];
             GUIElement.touchStarted();
         }
+        this.updateGui(false)
+        this.activeScene?.touchStarted(e, Boolean(window?.editor));
+        if (e.srcElement === canvas) return false;
     }
-    touchEnded() {
+    touchEnded(e) {
         for (let uuid in this.guiObjects) {
             let GUIElement = this.guiObjects[uuid];
             GUIElement.touchEnded();
         }
+        for (let touch of touches) {
+            touch.used = undefined;
+        }
+        if (!fullscreen()) {
+            fullscreen(true)
+        }
+        this.activeScene?.touchEnded(e, Boolean(window?.editor));
+        if (e.srcElement === canvas) return false;
     }
-    updateGui(display: boolean = true) {
+    updateGui(display: boolean = true, forceDraw: boolean = false, update: boolean = true) {
         for (let uuid in this.guiObjects) {
             let GUIElement = this.guiObjects[uuid];
-            GUIElement.update();
-            if (display) GUIElement.display();
+            if(GUIElement.mobileOnly) {
+                if(engine.mobile) {
+                    if (update) GUIElement.update();
+                    if (display) GUIElement.display();
+                }else if(forceDraw) {
+                    if (update) GUIElement.update();
+                    if (display) GUIElement.display();
+                }
+            }
+            if (!GUIElement.mobileOnly) {
+                if (update) GUIElement.update();
+                if (display) GUIElement.display();
+            }
+        }
+    }
+    customDraw(doDraw:boolean) {
+        if(doDraw) {
+            this.activeScene?.customDraw(true);
+            this.updateGui(true,true,false);
         }
     }
 }

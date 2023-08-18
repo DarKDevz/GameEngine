@@ -110,6 +110,15 @@ class Editor {
         }
         rect(this.selectionBox[0][0], this.selectionBox[0][1], this.selectionBox[1][0] - this.selectionBox[0][0], this.selectionBox[1][1] - this.selectionBox[0][1]);
     }
+    pressedLevelMode() {
+        let coords = createVector(mouseX, mouseY);
+        for (let UUID in engine.guiObjects) {
+            let GUIElement = engine.guiObjects[UUID];
+            if (GUIElement.collidesPoint(coords)) {
+                console.log(GUIElement);
+            }
+        }
+    }
     onUpdate() {
         if (mouseIsPressed && overUI) {
             lastWasPressed = 'startedOverUi';
@@ -136,6 +145,9 @@ class Editor {
         }
         else if (Pressed && this.selectionBox[0] && !this.selectionBox[2]) {
             this.mouseDown();
+        }
+        if (mouseIsPressed && lastWasPressed !== 'startedOverUI' && this.levelMode) {
+            this.pressedLevelMode();
         }
         //If switching scenes remove selected
         if (lastScene != engine.currentScene) {

@@ -185,8 +185,9 @@ function JsonMap(file) {
         ScenesfromObject(JSON.parse(file.data));
     }
 }
-class Level {
+class Level extends GameEvents {
     constructor(arr, pos, maxPos) {
+        super();
         let eventify = function (arr, callback) {
             arr.push = function (e) {
                 let ret = Array.prototype.push.call(arr, e);
@@ -225,6 +226,7 @@ class Level {
         engine.gui.stroke(255, 0, 0);
         engine.gui.line(0, this.maxPos, width, this.maxPos);
         engine.gui.resetMatrix();
+        engine.gui.stroke(0);
     }
     display(OnlyDraw = false) {
         translate(width / 2, height / 2);
@@ -280,13 +282,6 @@ class Level {
             text(engine.errorText, 50 - width / 2, 50 - height / 2);
         }
         translate(-cameraPos.x, -cameraPos.y);
-    }
-    keyPress(event, shouldRun = true) {
-        if (!shouldRun)
-            return;
-        for (let t_box of this.boxes) {
-            t_box.keyPress(event);
-        }
     }
     lateUpdate(shouldRun = true) {
         if (!shouldRun)
@@ -449,6 +444,118 @@ class Level {
         }
         sceneBtn.parent(leftDiv);
         sceneHolder.push(sceneBtn);
+    }
+    deviceMoved(e, noRun = false) {
+        if (noRun)
+            return;
+        for (let box of this.boxes) {
+            box.deviceMoved(e);
+        }
+    }
+    deviceTurned(e, noRun = false) {
+        if (noRun)
+            return;
+        for (let box of this.boxes) {
+            box.deviceTurned(e);
+        }
+    }
+    deviceShaken(e, noRun = false) {
+        if (noRun)
+            return;
+        for (let box of this.boxes) {
+            box.deviceShaken(e);
+        }
+    }
+    doubleClicked(e, noRun = false) {
+        if (noRun)
+            return;
+        for (let box of this.boxes) {
+            box.doubleClicked(e);
+        }
+    }
+    mousePressed(e, noRun = false) {
+        if (noRun)
+            return;
+        for (let box of this.boxes) {
+            box.mousePressed(e);
+        }
+    }
+    mouseReleased(e, noRun = false) {
+        if (noRun)
+            return;
+        for (let box of this.boxes) {
+            box.mouseReleased(e);
+        }
+    }
+    mouseMoved(e, noRun = false) {
+        if (noRun)
+            return;
+        for (let box of this.boxes) {
+            box.mouseMoved(e);
+        }
+    }
+    mouseDragged(e, noRun = false) {
+        if (noRun)
+            return;
+        for (let box of this.boxes) {
+            box.mouseDragged(e);
+        }
+    }
+    mouseClicked(e, noRun = false) {
+        if (noRun)
+            return;
+        for (let box of this.boxes) {
+            box.mouseClicked(e);
+        }
+    }
+    mouseWheel(e, noRun = false) {
+        if (noRun)
+            return;
+        for (let box of this.boxes) {
+            box.mouseWheel(e);
+        }
+    }
+    touchStarted(e, noRun = false) {
+        if (noRun)
+            return;
+        for (let box of this.boxes) {
+            box.touchStarted(e);
+        }
+    }
+    touchMoved(e, noRun = false) {
+        if (noRun)
+            return;
+        for (let box of this.boxes) {
+            box.touchMoved(e);
+        }
+    }
+    touchEnded(e, noRun = false) {
+        if (noRun)
+            return;
+        for (let box of this.boxes) {
+            box.touchEnded(e);
+        }
+    }
+    keyPressed(e, noRun = false) {
+        if (noRun)
+            return;
+        for (let box of this.boxes) {
+            box.keyPressed(e);
+        }
+    }
+    keyReleased(e, noRun = false) {
+        if (noRun)
+            return;
+        for (let box of this.boxes) {
+            box.keyReleased(e);
+        }
+    }
+    keyTyped(e, noRun = false) {
+        if (noRun)
+            return;
+        for (let box of this.boxes) {
+            box.keyTyped(e);
+        }
     }
 }
 function MapJson() {

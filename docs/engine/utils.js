@@ -1,22 +1,48 @@
 class GameEvents {
-    constructor() { }
-    globalDefine() { }
-    deviceMoved() { }
-    deviceTurned() { }
-    deviceShaken() { }
-    doubleClicked() { }
-    mousePressed() { }
-    mouseReleased() { }
-    mouseMoved() { }
-    mouseDragged() { }
-    mouseClicked() { }
-    mouseWheel() { }
-    touchStarted() { }
-    touchMoved() { }
-    touchEnded() { }
-    keyPressed() { }
-    keyReleased() { }
-    keyTyped() { }
+    constructor() {
+        this.entryPoints = [
+            'deviceMoved',
+            'deviceTurned',
+            'deviceShaken',
+            'doubleClicked',
+            'mousePressed',
+            'mouseReleased',
+            'mouseMoved',
+            'mouseDragged',
+            'mouseClicked',
+            'mouseWheel',
+            'touchStarted',
+            'touchMoved',
+            'touchEnded',
+            'keyPressed',
+            'keyReleased',
+            'keyTyped',
+        ];
+    }
+    globalDefine(hardDefined = false) {
+        for (let i of this.entryPoints) {
+            window[i] ??= this[i].bind(this);
+            if (hardDefined) {
+                window[i] = this[i].bind(this);
+            }
+        }
+    }
+    deviceMoved(...args) { }
+    deviceTurned(...args) { }
+    deviceShaken(...args) { }
+    doubleClicked(...args) { }
+    mousePressed(...args) { }
+    mouseReleased(...args) { }
+    mouseMoved(...args) { }
+    mouseDragged(...args) { }
+    mouseClicked(...args) { }
+    mouseWheel(...args) { }
+    touchStarted(...args) { }
+    touchMoved(...args) { }
+    touchEnded(...args) { }
+    keyPressed(...args) { }
+    keyReleased(...args) { }
+    keyTyped(...args) { }
 }
 var overUI = false;
 function OpenDialog(MainDiv, OnExit = () => { }, headerText = createDiv("Dialog Window")) {

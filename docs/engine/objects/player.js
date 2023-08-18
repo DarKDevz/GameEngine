@@ -26,28 +26,28 @@ class Player {
             "down": false
         };
         this.shouldJump = false;
-        if (engine.mobile) {
-            let baseSize = windowHeight / 3;
-            let stickSize = windowHeight / 6;
-            stick = new Joystick(windowHeight / 3 / 1.5, windowHeight - windowHeight / 3 / 1.5, windowHeight / 3, windowHeight / 6, this.dir);
-            stick.resize = (ww, wh) => {
-                stick.position.x = wh / 3 / 1.5;
-                stick.position.y = wh - wh / 3 / 1.5;
-                stick.baseSize = wh / 3;
-                stick.stickSize = wh / 6;
-            };
-            jumpBtn = new Button(windowWidth - windowHeight / 3 / 1.5, windowHeight - windowHeight / 3 / 1.5, windowHeight / 3, () => {
-                this.shouldJump = true;
-            }, () => {
-                this.shouldJump = false;
-            });
-            jumpBtn.resize = (ww, wh) => {
-                jumpBtn.position.x = ww - wh / 3 / 1.5;
-                jumpBtn.position.y = wh - wh / 3 / 1.5;
-                jumpBtn.size = wh / 3;
-            };
-            engine.camera.zoom = .7;
-        }
+        stick = new Joystick(windowHeight / 3 / 1.5, windowHeight - windowHeight / 3 / 1.5, windowHeight / 3, windowHeight / 6, this.dir);
+        stick.mobileOnly = true;
+        stick.resize = (ww, wh) => {
+            stick.position.x = wh / 3 / 1.5;
+            stick.position.y = wh - wh / 3 / 1.5;
+            stick.stickPosition.x = stick.position.x;
+            stick.stickPosition.y = stick.position.y;
+            stick.size = wh / 3;
+            stick.stickSize = wh / 6;
+        };
+        jumpBtn = new Button(windowWidth - windowHeight / 3 / 1.5, windowHeight - windowHeight / 3 / 1.5, windowHeight / 3, () => {
+            this.shouldJump = true;
+        }, () => {
+            this.shouldJump = false;
+        });
+        jumpBtn.resize = (ww, wh) => {
+            jumpBtn.position.x = ww - wh / 3 / 1.5;
+            jumpBtn.position.y = wh - wh / 3 / 1.5;
+            jumpBtn.size = wh / 3;
+        };
+        jumpBtn.mobileOnly = true;
+        engine.camera.zoom = .7;
         let bodyDef = new b2BodyDef;
         var fixDef = new b2FixtureDef;
         fixDef.density = 1.0;

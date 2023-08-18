@@ -35,11 +35,18 @@ class TextObject extends GameObject {
     }
 }
 class GUIElement extends GameEvents {
-    id;
+    size;
     constructor() {
         super();
         this.id;
+        this.position = createVector(0, 0);
+        this.size = 5;
+        this.mobileOnly = true;
         this.add();
+    }
+    collidesPoint(coords) {
+        let dist = coords.dist(this.position);
+        return dist < this.size;
     }
     resize(ww, wh) {
     }
@@ -70,15 +77,12 @@ class GUIElement extends GameEvents {
             }
         }
     }
-    touchStarted() { }
-    touchEnded() { }
     display(...args) { }
     update(...args) { }
 }
 class Button extends GUIElement {
     position;
     cb;
-    size;
     pressed;
     constructor(x, y, radius, pressed, notPressed) {
         super();
@@ -118,15 +122,14 @@ class Button extends GUIElement {
     }
 }
 class Joystick extends GUIElement {
-    baseSize;
     stickSize;
     position;
     stickPosition;
     isDragging;
     dir;
-    constructor(x, y, baseSize, stickSize, direction) {
+    constructor(x, y, size, stickSize, direction) {
         super();
-        this.baseSize = baseSize;
+        this.size = size;
         this.stickSize = stickSize;
         this.position = createVector(x, y);
         this.stickPosition = this.position.copy();
@@ -150,9 +153,9 @@ class Joystick extends GUIElement {
                 closestTouch.used = true;
                 // Constrain stick inside the base circle
                 const distance = this.position.dist(this.stickPosition);
-                if (distance > this.baseSize / 2) {
+                if (distance > this.size / 2) {
                     const direction = this.stickPosition.copy().sub(this.position);
-                    direction.setMag(this.baseSize / 2);
+                    direction.setMag(this.size / 2);
                     this.stickPosition = this.position.copy().add(direction);
                 }
                 const direction = this.stickPosition.copy().sub(this.position);
@@ -175,7 +178,7 @@ class Joystick extends GUIElement {
     display() {
         // Base circle
         engine.gui.fill(200, 50);
-        engine.gui.ellipse(this.position.x, this.position.y, this.baseSize);
+        engine.gui.ellipse(this.position.x, this.position.y, this.size);
         // Stick
         engine.gui.fill(150, 50);
         engine.gui.ellipse(this.stickPosition.x, this.stickPosition.y, this.stickSize);
@@ -185,7 +188,7 @@ class Joystick extends GUIElement {
         for (let touch of touches) {
             if (touch) {
                 const distance = this.position.dist(createVector(touch.x, touch.y));
-                if (distance < this.baseSize / 2) {
+                if (distance < this.size / 2) {
                     this.isDragging = true;
                     return;
                 }
@@ -196,7 +199,7 @@ class Joystick extends GUIElement {
         for (let touch of touches) {
             if (touch) {
                 const distance = this.position.dist(createVector(touch.x, touch.y));
-                if (distance < this.baseSize / 1.25) {
+                if (distance < this.size / 1.25) {
                     this.isDragging = true;
                     return;
                 }
@@ -205,21 +208,4 @@ class Joystick extends GUIElement {
         this.isDragging = false;
         this.stickPosition = this.position.copy();
     }
-}
-function touchStarted(e) {
-    engine.touchStarted();
-    engine.updateGui(false);
-    if (engine.mobile && !fullscreen()) {
-        fullscreen(true);
-    }
-    if (e.srcElement === canvas)
-        return false;
-}
-function touchEnded(e) {
-    engine.touchEnded();
-    for (let touch of touches) {
-        touch.used = undefined;
-    }
-    if (e.srcElement === canvas)
-        return false;
 }
