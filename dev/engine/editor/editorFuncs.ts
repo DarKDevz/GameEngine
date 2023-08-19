@@ -528,6 +528,7 @@ class Editor {
         for (let name of newList) {
             select.option(name)
         }
+        select.elt.title = "Select"
         let addFilebtn = createButton('add')
         addFilebtn.elt.title = "Add new component";
         addFilebtn.style('cursor:pointer')
@@ -645,6 +646,12 @@ class Editor {
                         info.push(components.shouldUpdateMenu);
                     }
                 }
+                if(!tempBox?.noComponent) {
+                    info.push(objectId)
+                    info.push("AddComponent")
+                    info.push(0)
+                    info.push(0)
+                }
             }
         }
         if ((lastInfo.length !== info.length)) {
@@ -673,7 +680,7 @@ class Editor {
         console.table(info);
         for (let i = 0; i < info.length; i += 4) {
             //console.log(info[i]);
-            if (info[i + 1] === "noMenu" || info[i + 1] === "component" || info[i + 1] === "CustomButton") {
+            if (info[i + 1] === "noMenu" || info[i + 1] === "component" || info[i + 1] === "AddComponent") {
                 //console.log("works");
                 if (info[i + 1] === "noMenu") { // if (boxes[info[i]].components[info[i + 2]]) {
                     //     boxes[info[i]].components[info[i + 2]].MenuEdit('sideMenu');
@@ -682,7 +689,7 @@ class Editor {
                     if (engine.getfromUUID(info[i]).components[info[i + 2]]) {
                         engine.getfromUUID(info[i]).components[info[i + 2]].MenuEdit('sideMenu');
                     }
-                } else if(!engine.getfromUUID(info[i])?.noComponents){
+                } else {
                     let divHolder = createDiv();
                     let ComponentSelect = createSelect();
                     for (const [key, value] of Object.entries(engine.componentList)) {

@@ -597,6 +597,12 @@ class Editor {
                         info.push(components.shouldUpdateMenu);
                     }
                 }
+                if(!tempBox?.noComponent) {
+                    info.push(objectId)
+                    info.push("CustomButton")
+                    info.push(0)
+                    info.push(0)
+                }
             }
         }
         if ((lastInfo.length !== info.length)) {
@@ -636,7 +642,7 @@ class Editor {
                         engine.getfromUUID(info[i]).components[info[i + 2]].MenuEdit('sideMenu');
                     }
                 }
-                else if (!engine.getfromUUID(info[i])?.noComponents) {
+                else  {
                     let divHolder = createDiv();
                     let ComponentSelect = createSelect();
                     for (const [key, value] of Object.entries(engine.componentList)) {

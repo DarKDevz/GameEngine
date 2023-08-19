@@ -7,6 +7,9 @@ class Bullet extends GameObject {
         this.id = selfId;
         this.startDate = Date.now();
     }
+    getSpeed(): number {
+        return 3
+    }
     getCollisionVectors() {
         return [this, this.r * 2]
     }
@@ -60,7 +63,7 @@ class Bullet extends GameObject {
         stroke(0);
     }
     lateUpdate() {
-        const speed = 3; // Adjust the speed as needed
+        const speed = this.getSpeed(); // Adjust the speed as needed
         let speedx = speed;
         let speedy = speed;
         this.oldX = this.x;
