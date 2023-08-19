@@ -529,6 +529,7 @@ class Editor {
             select.option(name)
         }
         let addFilebtn = createButton('add')
+        addFilebtn.elt.title = "Add new component";
         addFilebtn.style('cursor:pointer')
         addFilebtn.mousePressed(() => {
             let file = addGameFile('', select.value().toString(), {})
@@ -565,14 +566,17 @@ class Editor {
         copyButton = createButton('Copy').class('allButtons');
         copyButton.mousePressed(this.copyObject.bind(this));
         copyButton.parent('actionMenu');
+        copyButton.elt.title = "Copy Object(s)"
         this.uiElement(copyButton);
         removeButton = createButton('Remove').class('allButtons');
         removeButton.mousePressed(this.removeMapObject.bind(this));
         removeButton.parent('actionMenu');
+        removeButton.elt.title = "Remove Object(s)"
         this.uiElement(removeButton);
         levelButton = createButton('Level').class('allButtons');
         levelButton.mousePressed(this.levelScreen.bind(this));
         levelButton.parent('actionMenu');
+        levelButton.elt.title = "Show/Hide UI and Scene Variables"
         this.uiElement(levelButton);
 
         button.mousePressed(() => {
@@ -688,6 +692,7 @@ class Editor {
                     ComponentSelect.style('cursor: pointer;')
                     ComponentSelect.parent(divHolder);
                     let addButton = createButton("Add");
+                    addButton.elt.title = "Add component"
                     divHolder.elt.ondrop = (event: { dataTransfer: DataTransfer }) => {
                         //console.log(event);
                         if (event.dataTransfer.getData("UUID") === "") return;
@@ -778,19 +783,15 @@ function accordionMenu(headerText, inputField, name, Opened = { value: false }):
 }
 //UtilFunc
 function addEditableScript(name, set, get, parentName: string | Div = "sideMenu", additionalDiv = [],
-    replaceButton: any = false, opener) {
+    replaceButton: Div, opener) {
     let divHolder = createDiv();
     let headerText = createSpan("Script Component").parent(divHolder);
     let _get = get;
     let inputField = createDiv();
     inputField.child(...additionalDiv);
     let inp;
-    if (replaceButton) {
         inp = replaceButton;
-    } else {
-        let _span = createSpan(name + ": ").parent(inputField);
-        inp = createButton("Script").parent(inputField);
-    }
+        inp.elt.title = "Script Editor"
     inp.mousePressed(() => {
         var popupWindow = window.open("popup.html", "Popup Window", "width=400,height=300");
         window.scriptData = function () {
@@ -815,7 +816,7 @@ function addEditableScript(name, set, get, parentName: string | Div = "sideMenu"
 function addEditableSprite(name, set, get,
     parentName: string | Div = "sideMenu",
     additionalDivs = [],
-    replaceButton: any = false,
+    replaceButton: Div,
     opener
 ) {
     let divHolder = createDiv();
@@ -823,13 +824,8 @@ function addEditableSprite(name, set, get,
     let _get = get;
     let inputField = createDiv();
     inputField.child(...additionalDivs);
-    let inp: any
-    if (replaceButton) {
-        inp = replaceButton;
-    } else {
-        let _span = createSpan(name + ": ").parent(inputField);
-        inp = createButton("Sprite").parent(inputField);
-    }
+    let inp = replaceButton;
+    inp.elt.title = "Sprite Editor"
     accordionMenu(headerText, inputField, "Sprite Component", opener);
     inp.mousePressed(() => {
 
@@ -845,7 +841,7 @@ function addEditableSprite(name, set, get,
         };
     });
 
-    inp.size(177, 'fit-content');
+    inp.size(177, "auto");
     let infoId = infoDivs.push(divHolder);
     infoDivs[infoId - 1].parent(parentName);
     inputField.parent(divHolder);

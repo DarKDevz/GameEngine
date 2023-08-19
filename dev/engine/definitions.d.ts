@@ -171,7 +171,7 @@ interface gameScript extends Component {
 }
 interface gameSprite {
     fileType: string;
-    fileData: gameFile;
+    file: gameFile;
     _src: { imageb64: string; };
     sprite: any;
     ownObject: GameObject

@@ -369,14 +369,14 @@ class gameSprite extends Component {
         this.fileType = ".img";
         obj.sprites.push(this);
         if (fileUUID !== '') {
-            this.fileData = engine.files[fileUUID];
-            this.fileData.type = ".img";
-            this.fileData.addUser(this, obj.uuid);
+            this.file = engine.files[fileUUID];
+            this.file.type = ".img";
+            this.file.addUser(this, obj.uuid);
         }
         else {
             //Support for Old Loading Images
-            this.fileData = addGameFile(src.imageb64, ".img");
-            this.fileData.addUser(this, obj.uuid);
+            this.file = addGameFile(src.imageb64, ".img");
+            this.file.addUser(this, obj.uuid);
         }
         this.ownObject = obj;
         //console.log(src);
@@ -403,24 +403,23 @@ class gameSprite extends Component {
         return this._src;
     }
     ContentBrowser(file, Panel) {
-        let _file = file;
         let isDragging = false;
-        let img = createImg(_file.data, "Not Loading").parent(Panel.HUD);
+        let img = createImg(file.data, "Not Loading").parent(Panel.HUD);
         img.elt.draggable = "true";
         img.elt.ondragstart = (event) => {
-            event.dataTransfer.setData("UUID", _file.UUID);
-            console.log(_file);
+            event.dataTransfer.setData("UUID", file.UUID);
+            console.log(file);
             isDragging = true;
         };
         img.elt.ondragend = () => {
             isDragging = false;
         };
-        let _get = () => { return _file.data; };
+        let _get = () => { return file.data; };
         img.mouseReleased(() => {
             if (isDragging)
                 return;
             if (mouseButton === "right") {
-                content.changeName(_file);
+                content.changeName(file);
             }
             else {
                 let popup = window.open('imagePopup.html', '_blank', 'width=400,height=400');
@@ -431,14 +430,14 @@ class gameSprite extends Component {
                     console.warn(text);
                     forceBrowserUpdate = true;
                     //_file.loadFile(addGameFile(val.imageb64,'.img'));
-                    _file.data = text;
+                    file.data = text;
                     //Remove Sprite definition so it reloads it correctly
-                    _file.customData = undefined;
-                    console.log(_file.whoUses);
-                    for (let uuid in _file.whoUses) {
-                        let _sprite = _file.whoUses[uuid];
+                    file.customData = undefined;
+                    console.log(file.whoUses);
+                    for (let uuid in file.whoUses) {
+                        let _sprite = file.whoUses[uuid];
                         console.log(_sprite);
-                        _sprite.loadFile(_file);
+                        _sprite.loadFile(file);
                         console.log(_sprite);
                     }
                     _get = () => { return text; };
@@ -465,11 +464,11 @@ class gameSprite extends Component {
                 this.loadFile(addGameFile(val.imageb64, '.img'));
             }
             return actValue;
-        }, () => this.fileData.data, parent, [divHolder], divHolder, shouldOpen);
+        }, () => this.file.data, parent, [divHolder], divHolder, shouldOpen);
     }
     AddFileEdit() {
-        let buttonName = this.fileData.name;
-        let inp = createButton(buttonName + this.fileData.type);
+        let buttonName = this.file.name;
+        let inp = createButton(buttonName + this.file.type);
         inp.elt.ondrop = (event) => {
             console.log(event);
             console.warn(event.dataTransfer.getData("UUID"));
@@ -489,22 +488,22 @@ class gameSprite extends Component {
         return inp;
     }
     deleteUser(shouldDelete = true) {
-        this.fileData.removeUser(this.ownObject.uuid, shouldDelete);
+        this.file.removeUser(this.ownObject.uuid, shouldDelete);
     }
     loadFile(file) {
         //Remove Og File
-        if (this.fileData.UUID !== file.UUID) {
+        if (this.file.UUID !== file.UUID) {
             this.deleteUser();
         }
-        this.fileData = file;
+        this.file = file;
         //Include Ourselfs as a user
-        this.fileData.addUser(this, this.ownObject.uuid);
+        this.file.addUser(this, this.ownObject.uuid);
         //Will load all sprites and not initialize correctly
         //Load Sprite automatically
-        if (!this.fileData.customData) {
-            this.fileData.customData = loadImage(this.fileData.data.toString());
+        if (!this.file.customData) {
+            this.file.customData = loadImage(this.file.data.toString());
         }
-        this.setSprite(this.fileData.customData);
+        this.setSprite(this.file.customData);
         forceMenuUpdate = true;
         forceBrowserUpdate = true;
     }
@@ -512,17 +511,16 @@ class gameSprite extends Component {
         return this.sprite.get(...arguments);
     }
     reloadImage() {
-        let _img = this.src;
         //console.log(_img);
         //Check if file has already loaded image, then get reference
         var _sprite;
-        if (this.fileData.customData !== undefined) {
-            _sprite = this.fileData.customData;
+        if (this.file.customData !== undefined) {
+            _sprite = this.file.customData;
         }
         else {
-            _sprite = loadImage(this.fileData.data.toString(), () => {
+            _sprite = loadImage(this.file.data.toString(), () => {
                 //console.error("Image has been loaded");
-                for (let objId in this.fileData.whoUses) {
+                for (let objId in this.file.whoUses) {
                     if (!engine.uuidList[objId].imageInitialized) {
                         engine.uuidList[objId].init();
                         engine.uuidList[objId].imageInitialized = true;
@@ -535,7 +533,7 @@ class gameSprite extends Component {
         //engine.getActiveScene().initiateBoxes();
     }
     setSprite(sprite) {
-        this.fileData.customData = sprite;
+        this.file.customData = sprite;
         this.sprite = sprite;
         if (typeof this.ownObject.sprite !== 'object') {
             let _og = this.ownObject.sprite;
@@ -555,7 +553,7 @@ class gameSprite extends Component {
             name: this.componentName,
             params: {
                 src: { ...this._src },
-                fileUUID: this.fileData.UUID
+                fileUUID: this.file.UUID
             }
         };
         return _return;
