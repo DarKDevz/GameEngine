@@ -333,7 +333,8 @@ class Editor {
             });
         }
         else {
-            this.forceMenuUpdate = true;
+            this.removeSelection();
+            info = [];
         }
     }
     pasteObjects() {
@@ -592,10 +593,6 @@ class Editor {
                         info.push(components.shouldUpdateMenu);
                     }
                 }
-                info.push(objectId);
-                info.push("CustomButton");
-                info.push(0);
-                info.push(0);
             }
         }
         if ((lastInfo.length !== info.length)) {
@@ -635,7 +632,7 @@ class Editor {
                         engine.getfromUUID(info[i]).components[info[i + 2]].MenuEdit('sideMenu');
                     }
                 }
-                else {
+                else if (!engine.getfromUUID(info[i])?.noComponents) {
                     let divHolder = createDiv();
                     let ComponentSelect = createSelect();
                     for (const [key, value] of Object.entries(engine.componentList)) {
@@ -673,7 +670,6 @@ class Editor {
                     };
                     divHolder.elt.ondragover = (event) => {
                         event.preventDefault();
-                        window.mouseReleased = () => { };
                         //console.warn(event.dataTransfer.getData("UUID"));
                     };
                     addButton.mousePressed(() => {

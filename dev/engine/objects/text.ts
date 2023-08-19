@@ -42,6 +42,7 @@ class GUIElement extends GameObject {
         this.size = 5;
         this.mobileOnly = true;
         this.add();
+        this.noComponents = true;
     }
     collidesPoint(coords) {
         let dist = coords.dist(this.position)
