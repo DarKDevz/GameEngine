@@ -1,0 +1,62 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ball Blast</title>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+    <script src="MapData.txt"></script>
+    <script src="libs/p5.min.js"></script>
+    <script src="engine/collision/Box2D.js"></script>
+    <script src="engine/utils.js"></script>
+    <script src="engine/engine.js"></script>
+    <script src="engine/collision/p5.collide.js"></script>
+    <script src="engine/collision/handler.js"></script>
+    <script src="engine/objects/collision.js"></script>
+    <script src="engine/components/component.js"></script>
+    <script src="engine/components/scriptComponent.js"></script>
+    <script src="engine/objects/object.js"></script>
+    <script src="engine/objects/contactListener.js"></script>
+    <script src="engine/objects/box.js"></script>
+    <script src="engine/objects/player.js"></script>
+    <script src="engine/objects/end.js"></script>
+    <script src="engine/objects/text.js"></script>
+    <script src="engine/objects/enemyBox.js"></script>
+    <script src="engine/objects/interactive.js"></script>
+    <script src="engine/objects/bullet.js"></script>
+    <script src="engine/objects/movingPlatform.js"></script>
+    <script src="loader/level.js"></script>
+    <script src="loader/support.js"></script>
+    <script>
+let lowestFrameRate = 60;
+async function preload() {
+    engine = new Engine();
+    player = new Player();
+    const response = await fetch("./examples/BallBlast.json");
+    const data = await response.json();
+    engine.loadFromObject(data, true);
+};
+function setup() {
+    createCanvas(windowWidth, windowHeight);
+    noSmooth();
+    //Remove right click default behaviour
+    canvas.oncontextmenu = function (e) {
+        e.preventDefault();
+    };
+    engine.setup();
+};
+
+    </script>
+</head>
+
+<body>
+    <main>
+    </main>
+</body>
+
+</html>
