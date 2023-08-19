@@ -165,13 +165,13 @@ interface gameScript extends Component {
     id: any;
     overrides: any;
     newOverrides: any;
-    file: any;
+    file: gameFile;
     _src: any;
     ownObject: GameObject
 }
 interface gameSprite {
     fileType: string;
-    fileData: { customData: ReturnType<typeof loadImage>, [x: string]: any };
+    fileData: gameFile;
     _src: { imageb64: string; };
     sprite: any;
     ownObject: GameObject

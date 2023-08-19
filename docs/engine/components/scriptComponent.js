@@ -240,8 +240,7 @@ class gameScript extends Component {
         }
     }
     AddFileEdit(parent) {
-        let alreadyHasName = this.file.references.name;
-        let buttonName = alreadyHasName ? alreadyHasName : this.file.UUID;
+        let buttonName = this.file.name;
         let inp = createButton(buttonName + this.file.type).parent(parent);
         inp.elt.ondrop = (event) => {
             //console.log(event);
@@ -270,8 +269,7 @@ class gameScript extends Component {
                 script.loadFile(file);
             }
         };
-        let alreadyHasName = _file.references.name;
-        let buttonName = alreadyHasName ? alreadyHasName : _file.UUID;
+        let buttonName = _file.name;
         buttonName = buttonName + typeOfFile;
         let isDragging = false;
         let inp = createButton(buttonName).parent(Panel.HUD);
@@ -470,8 +468,7 @@ class gameSprite extends Component {
         }, () => this.fileData.data, parent, [divHolder], divHolder, shouldOpen);
     }
     AddFileEdit() {
-        let alreadyHasName = this.fileData.references.name;
-        let buttonName = alreadyHasName ? alreadyHasName : this.fileData.UUID;
+        let buttonName = this.fileData.name;
         let inp = createButton(buttonName + this.fileData.type);
         inp.elt.ondrop = (event) => {
             console.log(event);
@@ -518,11 +515,12 @@ class gameSprite extends Component {
         let _img = this.src;
         //console.log(_img);
         //Check if file has already loaded image, then get reference
+        var _sprite;
         if (this.fileData.customData !== undefined) {
-            var _sprite = this.fileData.customData;
+            _sprite = this.fileData.customData;
         }
         else {
-            var _sprite = loadImage(this.fileData.data.toString(), () => {
+            _sprite = loadImage(this.fileData.data.toString(), () => {
                 //console.error("Image has been loaded");
                 for (let objId in this.fileData.whoUses) {
                     if (!engine.uuidList[objId].imageInitialized) {
@@ -589,6 +587,9 @@ class gameFile extends Component {
         this.data = parsedImage;
         engine.files[UUID] = this;
         this.whoUses = {};
+    }
+    get name() {
+        return this.references?.name ? this.references.name : this.UUID;
     }
     editReference(name, value) {
         this.references[name] = value;

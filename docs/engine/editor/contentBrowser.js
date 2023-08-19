@@ -2,10 +2,8 @@ var oldScroll = 0;
 var content = {};
 //Browser Panel Stuff
 content.changeName = function (_file, tryRename) {
-    let alreadyHasName = _file.references.name;
-    alreadyHasName = alreadyHasName ? alreadyHasName : _file.UUID;
-    let newName = tryRename ? tryRename : prompt("Change file name", alreadyHasName);
-    if (newName === null || newName === alreadyHasName) {
+    let newName = tryRename ? tryRename : prompt("Change file name", _file.name);
+    if (newName === null || newName === _file.name) {
         //Client has escaped
         return;
     }
