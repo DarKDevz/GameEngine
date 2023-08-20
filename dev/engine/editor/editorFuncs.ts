@@ -483,9 +483,16 @@ class Editor {
         exampleButton = this.fromReference("newButton");
         exampleButton.mousePressed(() => {
             let emptyExample = {
+            version:1.3,
+            file:[],
+            GUI:{default:true},
+            scenes:{
+                "0":{
+                    Data:[[0, 100, 100, 500, 50]],
+                    sceneData:[0, 400, -10, 500],
+                }
             }
-            emptyExample["0"] = [[0, 100, 100, 500, 50]]
-            emptyExample["0l"] = [0, 400, -10, 500];
+            }
             engine = new Engine();
             ScenesfromObject(emptyExample)
             for (let func of Engine.removeListeners) {

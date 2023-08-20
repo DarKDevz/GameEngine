@@ -99,77 +99,110 @@ function ScenesfromObject(levelsObject) {
                     file[UUID].references ??= {};
                     addGameFile(file[UUID].data, file[UUID].type, file[UUID].references);
                 }
-                else {
-                    addGameFile(file[UUID]);
-                }
             }
         }
         delete newLevels.file;
     }
     if (newLevels.version) {
         console.log(`%cEngine Version:${newLevels.version}`, "color:purple");
-        delete newLevels.version;
+        if (newLevels.version < 1.3) {
+            delete newLevels.version;
+            for (let level_id in newLevels) {
+                //console.log(level_id);
+                if (!level_id.includes("l") && !level_id.includes('c')) {
+                    let newLevel = newLevels[level_id];
+                    let t_boxes = [];
+                    for (let object of newLevel) {
+                        let _objInd = object.shift();
+                        t_boxes.push(addObj(_objInd, object, level_id));
+                    }
+                    t_levels[level_id] = t_boxes;
+                    if (!newLevels[level_id + "l"]) {
+                        addLevel(t_boxes, createVector(400, -10));
+                    }
+                }
+                else if (level_id.includes("l")) {
+                    let extras = newLevels[level_id];
+                    //console.log(newLevels[level_id]);
+                    addLevel(t_levels[extras[0]], createVector(extras[1], extras[2]), extras[3]);
+                }
+                else {
+                    for (let ObjwithComponents of newLevels[level_id]) {
+                        //console.log(_components);
+                        for (let BoxId in ObjwithComponents) {
+                            let components = ObjwithComponents[BoxId];
+                            if (BoxId === "UUID") {
+                                for (let box in components) {
+                                    let ogUUID = engine.scene[level_id.slice(0, -1)].boxes[box].uuid;
+                                    engine.changeUUID(ogUUID, components[box]);
+                                }
+                                //console.warn("UUID found:",engine.scene[level_id.slice(0, -1)].boxes);
+                            }
+                            else if (BoxId === "file") {
+                                console.warn(components);
+                            }
+                            else {
+                                let _componentList = [];
+                                for (let component of components) {
+                                    var level = engine.scene[level_id.slice(0, -1)];
+                                    var box = level.boxes[BoxId];
+                                    //box.scene = level.ind;
+                                    var componentConstructor = Engine.componentList[component.name];
+                                    var paramObj = { obj: box };
+                                    for (let _param in component.params) {
+                                        paramObj[_param] = component.params[_param];
+                                    }
+                                    //paramObj.fn = component.params.fn
+                                    var newComponent = new componentConstructor({ ...paramObj });
+                                    _componentList.push(newComponent);
+                                    if (newComponent.fileType === ".img") {
+                                        newComponent.reloadImage();
+                                    }
+                                    //console.log(newComponent);
+                                }
+                                var box = level.boxes[BoxId];
+                                box.components = _componentList;
+                            }
+                        }
+                    }
+                    //console.log(newLevels[level_id]);
+                }
+            }
+            engine.scene[0].loadLevel();
+            return;
+        }
     }
-    for (let level_id in newLevels) {
-        //console.log(level_id);
-        if (!level_id.includes("l") && !level_id.includes('c')) {
-            let newLevel = newLevels[level_id];
-            let t_boxes = [];
-            for (let object of newLevel) {
-                let _objInd = object.shift();
-                t_boxes.push(addObj(_objInd, object, level_id));
-            }
-            t_levels[level_id] = t_boxes;
-            if (!newLevels[level_id + "l"]) {
-                addLevel(t_boxes, createVector(400, -10));
-            }
-        }
-        else if (level_id.includes("l")) {
-            let extras = newLevels[level_id];
-            //console.log(newLevels[level_id]);
-            addLevel(t_levels[extras[0]], createVector(extras[1], extras[2]), extras[3]);
-        }
-        else {
-            for (let ObjwithComponents of newLevels[level_id]) {
-                //console.log(_components);
-                for (let BoxId in ObjwithComponents) {
-                    let components = ObjwithComponents[BoxId];
-                    if (BoxId === "UUID") {
-                        for (let box in components) {
-                            let ogUUID = engine.scene[level_id.slice(0, -1)].boxes[box].uuid;
-                            engine.changeUUID(ogUUID, components[box]);
-                        }
-                        //console.warn("UUID found:",engine.scene[level_id.slice(0, -1)].boxes);
+    for (let sceneInd in levelsObject.scenes) {
+        let scene = levelsObject.scenes[sceneInd];
+        let t_boxes = [];
+        for (let ind in scene.Data) {
+            let object = scene.Data[ind];
+            let typeOfObj = object.shift();
+            let obj = addObj(typeOfObj, object, sceneInd);
+            let _componentList = [];
+            if (scene?.componentData?.length === 1 && scene?.componentData[0][ind]) {
+                let componentList = scene.componentData[0][ind];
+                for (let component of componentList) {
+                    var level = engine.scene[sceneInd];
+                    //box.scene = level.ind;
+                    var componentConstructor = Engine.componentList[component.name];
+                    var paramObj = { obj: obj };
+                    for (let _param in component.params) {
+                        paramObj[_param] = component.params[_param];
                     }
-                    else if (BoxId === "file") {
-                        console.warn(components);
-                    }
-                    else {
-                        let _componentList = [];
-                        for (let component of components) {
-                            var level = engine.scene[level_id.slice(0, -1)];
-                            var box = level.boxes[BoxId];
-                            //box.scene = level.ind;
-                            var componentConstructor = Engine.componentList[component.name];
-                            var paramObj = { obj: box };
-                            for (let _param in component.params) {
-                                paramObj[_param] = component.params[_param];
-                            }
-                            //paramObj.fn = component.params.fn
-                            var newComponent = new componentConstructor({ ...paramObj });
-                            _componentList.push(newComponent);
-                            if (newComponent.fileType === ".img") {
-                                newComponent.reloadImage();
-                            }
-                            //console.log(newComponent);
-                        }
-                        var box = level.boxes[BoxId];
-                        box.components = _componentList;
+                    //paramObj.fn = component.params.fn
+                    var newComponent = new componentConstructor({ ...paramObj });
+                    _componentList.push(newComponent);
+                    if (newComponent.fileType === ".img") {
+                        newComponent.reloadImage();
                     }
                 }
             }
-            //console.log(newLevels[level_id]);
+            obj.components = _componentList;
+            t_boxes.push(obj);
         }
+        t_levels[sceneInd] = t_boxes;
+        addLevel(t_boxes, createVector(scene.sceneData[1], scene.sceneData[2]), scene.sceneData[3]);
     }
     engine.scene[0].loadLevel();
 }
@@ -559,7 +592,7 @@ class Level extends GameEvents {
     }
 }
 function MapJson() {
-    let mapData = {};
+    let mapData;
     mapData = {};
     let fileList = [];
     for (let fileId in engine.files) {
@@ -568,21 +601,24 @@ function MapJson() {
         obj[fileId] = { data: file.data.replaceAll('"', "'"), type: file.type, references: file.references };
         fileList.push(obj);
     }
-    mapData["version"] = 1.2;
-    mapData["file"] = fileList;
+    mapData.version = 1.3;
+    mapData.file = fileList;
+    mapData.scenes = {};
     for (let level of engine.scene) {
-        mapData[level.ind] = level.toJSON();
+        mapData.scenes[level.ind] = {};
+        mapData.scenes[level.ind]["Data"] = level.toJSON();
     }
     for (let level of engine.scene) {
-        mapData[level.ind + "l"] = level.extrasJson();
+        mapData.scenes[level.ind]["sceneData"] = level.extrasJson();
     }
     for (let level of engine.scene) {
         let components = level.componentsJson();
         if (components) {
-            mapData[level.ind + "c"] = components;
+            mapData.scenes[level.ind]["componentData"] = components;
         }
     }
-    engine.getActiveScene().loadLevel;
+    mapData.GUI = {};
+    mapData.GUI.default = true;
     return JSON.stringify(mapData);
 }
 function addLevel(arr, pos, maxPos = 500) {

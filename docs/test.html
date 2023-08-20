@@ -4,64 +4,83 @@
 <head>
     <title>Script Exporter</title>
     <script src="libs/jszip.min.js"></script>
+    <script src="libs/p5.js"></script>
     <script>
-        async function createZip() {
-            var zip = new JSZip();
-            var scriptTags = [
-                { path: 'libs/p5.min.js' },
-                { path: 'engine/collision/Box2D.js' },
-                { path: 'engine/utils.js' },
-                { path: 'engine/engine.js' },
-                { path: 'engine/collision/p5.collide.js' },
-                { path: 'engine/collision/handler.js' },
-                { path: 'engine/objects/collision.js' },
-                { path: 'engine/components/component.js' },
-                { path: 'engine/components/scriptComponent.js' },
-                { path: 'engine/objects/object.js' },
-                { path: 'engine/objects/contactListener.js' },
-                { path: 'engine/objects/box.js' },
-                { path: 'engine/objects/player.js' },
-                { path: 'engine/objects/end.js' },
-                { path: 'engine/objects/text.js' },
-                { path: 'engine/objects/enemyBox.js' },
-                { path: 'engine/objects/interactive.js' },
-                { path: 'engine/objects/bullet.js' },
-                { path: 'engine/objects/movingPlatform.js' },
-                { path: 'loader/level.js' },
-                { path: 'loader/support.js' },
-                { path: 'index.html'}
-            ];
-            const regex = /<!-- .*<\/script>/gms;
+        var pRenderer;
+        function setup() {
+        createCanvas(windowWidth, windowHeight)
+        pRenderer = new ParticleRenderer()
 
-            // Fetch and add script files to the zip
-            await Promise.all(scriptTags.map(async function (scriptInfo) {
-                var response = await fetch(scriptInfo.path);
-                var scriptContent = await response.text();
-                if(scriptInfo.path.endsWith(".html")) {
-                    scriptContent = scriptContent.replace(regex, '');
+        }
+        function windowResized() {
+            resizeCanvas(windowWidth,windowHeight);
+            pRenderer.settings.pos = createVector(width/2,height/2)
+        }
+        function draw() {
+            clear()
+            pRenderer.display()
+            pRenderer.update()
+        }
+        class Particle{
+            constructor(settings) {
+                this.lifeTime = settings.lifeTime;
+                this.dir = createVector(random(...settings.rDirX),random(...settings.rDirY))
+                this.pos = settings.pos.copy();
+                this.gX = settings.gDir[0];
+                this.gY = settings.gDir[1];
+                this.velocity = settings.velocity;
+                this.toBeRemoved = false;
+                this.creation = frameCount;
+                this.dir.setMag(settings.velocity);
+            }
+            update() {
+                if(frameCount-this.creation>this.lifeTime) {
+                    this.toBeRemoved = true;
+                }else {
+                    this.dir.x += this.gX*this.velocity;
+                    this.dir.y += this.gY*this.velocity;
+                    this.pos.x += this.dir.x;
+                    this.pos.y += this.dir.y;
                 }
-                console.log(scriptContent);
-                zip.file(scriptInfo.path, scriptContent);
-            }));
-
-            // Generate the zip
-            zip.generateAsync({ type: 'blob' })
-                .then(function (content) {
-                    // Create a download link for the zip file
-                    var link = document.createElement('a');
-                    link.href = URL.createObjectURL(content);
-                    link.download = 'scripts.zip';
-                    link.textContent = 'Download Zip';
-
-                    // Append the link to the document
-                    document.body.appendChild(link);
-                });
+            }
+            display() {
+                fill(255,0,0);
+                circle(this.pos.x,this.pos.y,50);
+            }
+        }
+        class ParticleRenderer {
+            constructor() {
+                this.settings = {
+                    lifeTime:255,
+                    rDirX:[-1,1],
+                    rDirY:[-1,1],
+                    gDir:[-.5,0],
+                    velocity:5,
+                    pos:createVector(width/2,height/2)
+                }
+                this.particles = []
+            }
+            update() {
+                this.particles.push(new Particle(this.settings))
+                for(let i = this.particles.length; i--; i>=0) {
+                    let particle = this.particles[i];
+                    if(particle.toBeRemoved) {
+                        this.particles.splice(i,1);
+                    }
+                }
+            }
+            display() {
+                for(let i = this.particles.length; i--; i>=0) {
+                    let particle = this.particles[i];
+                    particle.update()
+                    particle.display()
+                }
+            }
         }
     </script>
 </head>
 
 <body>
-    <button onclick="createZip()">Generate Zip</button>
 </body>
 
 </html>

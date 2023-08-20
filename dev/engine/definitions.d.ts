@@ -19,6 +19,29 @@ interface Window {
 interface Array<T> {
     equals(arg0: Array<T>): boolean;
 }
+interface ImportInterface {
+    version: number
+    file: {[x:UUID]:FileConstructor}[]
+    GUI: { default: boolean }
+    scenes: {
+        [x: number]: SceneConstructor
+    }
+}
+interface FileConstructor { references: {}, data: string, type: string }
+interface SceneConstructor {
+    Data: any[],
+    sceneData: number[],
+    componentData?: [listOfComponents]
+}
+interface listOfComponents{
+    [x: string]: componentConstructor[]
+    [Symbol.iterator]():{
+        next():{value:componentConstructor}
+    }
+}
+interface componentConstructor {
+        name: string, params: { fileUUID: UUID, vals: any }
+}
 type SpecialFunc = {
     (...anything: any): any
     [x: string]: any;

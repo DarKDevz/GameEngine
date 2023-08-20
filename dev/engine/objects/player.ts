@@ -47,7 +47,7 @@ class Player {
             jumpBtn.size = wh / 3
         }
         jumpBtn.mobileOnly = true;
-        engine.camera.zoom = .7;
+        if(engine.mobile)engine.camera.zoom = .7;
         let bodyDef = new b2BodyDef;
         var fixDef = new b2FixtureDef;
         fixDef.density = 1.0;

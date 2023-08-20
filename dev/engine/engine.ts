@@ -113,7 +113,7 @@ class Engine extends GameEvents {
     keyTyped(e: Event) {
         this.activeScene?.keyTyped(e, Boolean(window?.editor));
     }
-    loadFromObject(obj: Object, autoEvents = false) {
+    loadFromObject(obj: ImportInterface, autoEvents = false) {
         ScenesfromObject(obj);
         if (autoEvents) {
             this.Initiate();
