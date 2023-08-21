@@ -32,40 +32,19 @@
         import { autocompletion } from "./utils/@codemirror-autocomplete.js"
         import { javascript, scopeCompletionSource, javascriptLanguage } from "./utils/@codemirror-lang-javascript.js"
         import { oneDark } from "./utils/one-dark.js"
-        window.test2 = javascriptLanguage;
-        const completions = [
-            { label: "update", apply: "this.update = function() {\n\n}", type: "macro" },
-            { label: "display", apply: "this.display = function() {\n\n}", type: "macro" },
-            { label: "draw", apply: "this.draw = function() {\n\n}", type: "macro" },
-            { label: "init", apply: "this.init = function() {\n\n}", type: "macro" },
-            { label: "park", type: "constant", info: "Test completion" },
-        ]
-
-        function myCompletions(context) {
-            let before = context.matchBefore(/\w+/)
-            // If completion wasn't explicitly started and there
-            // is no word before the cursor, don't open completions.
-            if (!context.explicit && !before) return null
-            return {
-                from: before ? before.from : context.pos,
-                options: completions,
-                validFor: /^\w*$/
-            }
-        }
         globalThis.engine = {
-            scene: [],currentScene: 0,files: {},uuidList: {},usedUUID: [],hasUUID: false,assignedUUID: "",world: {},componentList: {},removeListeners: [],physics: false,errorText: "",zoom: 1,camera: {},gui: {},mobile: false,guiObjects: {},Initiate:()=>{},activeScene:()=>{},addObj:()=>{},addScriptByName:()=>{},assignUUID:()=>{},cameraPos:()=>{},changeUUID:()=>{},constructor:()=>{},customDraw:()=>{},customFileUUID:()=>{},deleteGameFile:()=>{},deviceMoved:()=>{},deviceShaken:()=>{},deviceTurned:()=>{},doubleClicked:()=>{},draw:()=>{},generateUUID:()=>{},getActiveScene:()=>{},getByReference:()=>{},getfromUUID:()=>{},keyPressed:()=>{},keyReleased:()=>{},keyTyped:()=>{},loadFromObject:()=>{},mouseClicked:()=>{},mouseDragged:()=>{},mouseMoved:()=>{},mousePressed:()=>{},mouseReleased:()=>{},mouseScreen:()=>{},mouseWheel:()=>{},resize:()=>{},setup:()=>{},touchEnded:()=>{},touchMoved:()=>{},touchStarted:()=>{},updateGui:()=>{},activeScene:()=>{},cameraPos:()=>{},cameraPos:()=>{},}
+            scene: [], currentScene: 0, files: {}, uuidList: {}, usedUUID: [], hasUUID: false, assignedUUID: "", world: {}, componentList: {}, removeListeners: [], physics: false, errorText: "", zoom: 1, camera: {}, gui: {}, mobile: false, guiObjects: {}, Initiate: () => { }, activeScene: () => { }, addObj: () => { }, addScriptByName: () => { }, assignUUID: () => { }, cameraPos: () => { }, changeUUID: () => { }, constructor: () => { }, customDraw: () => { }, customFileUUID: () => { }, deleteGameFile: () => { }, deviceMoved: () => { }, deviceShaken: () => { }, deviceTurned: () => { }, doubleClicked: () => { }, draw: () => { }, generateUUID: () => { }, getActiveScene: () => { }, getByReference: () => { }, getfromUUID: () => { }, keyPressed: () => { }, keyReleased: () => { }, keyTyped: () => { }, loadFromObject: () => { }, mouseClicked: () => { }, mouseDragged: () => { }, mouseMoved: () => { }, mousePressed: () => { }, mouseReleased: () => { }, mouseScreen: () => { }, mouseWheel: () => { }, resize: () => { }, setup: () => { }, touchEnded: () => { }, touchMoved: () => { }, touchStarted: () => { }, updateGui: () => { }, activeScene: () => { }, cameraPos: () => { }, cameraPos: () => { },
+        }
         let parser = javascript()
-        parser.allowNesting = true;
-        window.test = parser
         document.addEventListener("keydown", function (event) {
             if ((event.ctrlKey || event.metaKey) && event.key === "s") {
                 event.preventDefault();
                 sendTextToMainWindow();
             }
         });
-        function editorFromTextArea(textarea, extensions) {
+        function editorFromTextArea(textarea, ogValue = '') {
             let view = new EditorView({
-                doc: textarea.value, extensions: [
+                doc: ogValue, extensions: [
                     basicSetup,
                     parser,
                     oneDark
@@ -75,19 +54,26 @@
             })
             textarea.parentNode.insertBefore(view.dom, textarea)
             textarea.style.display = "none"
-            if (textarea.form) textarea.form.addEventListener("submit", () => {
-                textarea.value = view.state.doc.toString()
-            })
             return view
         }
 
-        var editor = editorFromTextArea(document.getElementById("popupEditor"));
-        function receivePopupText() {
-            var text = window.opener.scriptData();
+        var editor;
+        function receivePopupText(override) {
+            var text = ''
+            if (override) {
+                text = override
+            } else {
+                if (typeof window.opener.scriptData === "function") {
+                    text = window?.opener?.scriptData();
+                }
+            }
+            text = text.replace(/\?\?=/gm, `++=`);
             var beautifiedText = js_beautify(text, {
                 indent_size: 2,
             }); // Beautify the text
-            editor.setValue(beautifiedText);
+            beautifiedText = beautifiedText.replace(/\+\+ =/gm, ` ??=`);
+            editor?.dom.remove()
+            editor = editorFromTextArea(document.getElementById("popupEditor"), beautifiedText);
         }
 
         function sendTextToMainWindow() {
@@ -95,10 +81,17 @@
             prettierPlugins.babel.parsers.parser =
                 prettierPlugins.babel.parsers.babel.parse;
             prettierPlugins.babel.parsers.tabWidth = 0
-            var text = editor.getValue();
+            var text = editor.state.toJSON().doc;
             //Replace single lines into /**/ comments
             let regex = /(\/\/)(.*)/gm;
             text = text.replace(regex, '/*$2*/')
+            regex = /\?\?=/gm;
+            // a little hack to make sure ??= works
+            // ?. and ?? work but ??= doesn't
+            // so we assign ++= as it doesn't get deleted
+            // afterwards we replace ++= with ??= 
+            // as ++= isn't a value we can use whatsoever
+            text = text.replace(/\?\?=/gm, `++=`);
             var beautifiedText = js_beautify(text, {
                 indent_size: 0, // Set indent size to 0
                 space_in_empty_paren: true, // Preserve space in empty parentheses
@@ -115,13 +108,14 @@
                     prettierPlugins.babel.parsers
                 );
                 // Remove new lines
-                removeNewLines = (beautifiedText.replace(/\r?\n|\r/g, ""));
+                var removeNewLines = (beautifiedText.replace(/\r?\n|\r/g, ""));
                 try {
-                    let temp = { shown: {} };
-                    (new Function(beautifiedText)).call(temp);
                     try {
+                        // reconvert ++= -> ??=
+                        removeNewLines = removeNewLines.replace(/\+\+ =/gm, ` ??=`);
+
                         window.opener.receivePopupText(removeNewLines);
-                        receivePopupText()
+                        receivePopupText(removeNewLines);
                     } catch (error) {
                         alert("Couldn't send to window");
                         alert(error);

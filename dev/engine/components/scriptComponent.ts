@@ -281,7 +281,7 @@ class gameScript extends Component {
 					return _get().toString()
 				}
 				window.receivePopupText = (text) => {
-					console.warn(text);
+					//TODO: make small info box saying: Updated: (nameoffile)
 					_file.data = text;
 					set(_file);
 					_get = () => text;
@@ -411,7 +411,7 @@ class gameSprite extends Component {
 					return _get();
 				}
 				window.jsonImage = (text: string) => {
-					console.warn(text);
+					//TODO: info box: Updated:(name of file)
 					forceBrowserUpdate = true;
 					//_file.loadFile(addGameFile(val.imageb64,'.img'));
 					file.data = text;

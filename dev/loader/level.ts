@@ -175,8 +175,8 @@ function ScenesfromObject(levelsObject: ImportInterface) {
             let object = scene.Data[ind];
             let typeOfObj = object.shift();
             let obj = addObj(typeOfObj, object, sceneInd)
-            let _componentList;
-            if (scene.componentData[0][ind]) {
+            let _componentList = [];
+            if (scene?.componentData?.length === 1 && scene?.componentData[0][ind]) {
                 let componentList = scene.componentData[0][ind];
                 for (let component of componentList) {
                     var level = engine.scene[sceneInd];
