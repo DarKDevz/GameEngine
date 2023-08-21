@@ -241,19 +241,19 @@ a directly-named path.
 */
 function scopeCompletionSource(scope) {
     let cache = new Map;
+    let lastlength = Object.keys(scope()).length
     return (context) => {
         let path = completionPath(context);
         if (!path)
             return null;
-        let target = scope;
+        let target = scope();
         for (let step of path.path) {
             target = target[step];
             if (!target)
                 return null;
         }
-        let options = cache.get(target);
-        if (!options)
-            cache.set(target, options = enumeratePropertyCompletions(target, !path.path.length));
+        //Removed caching because it doesn't allow dynamic objects to work
+        let options = enumeratePropertyCompletions(target, !path.path.length)
         return {
             from: context.pos - path.name.length,
             options,
@@ -346,7 +346,7 @@ function javascript(config = {}, customObj) {
             autocomplete: localCompletionSource
         }),
         javascriptLanguage.data.of({
-            autocomplete: scopeCompletionSource(globalThis)
+            autocomplete: scopeCompletionSource(()=>globalThis.context)
         }),
         javascriptLanguage.data.of({
             autocomplete: ifNotIn(dontComplete, completeThisOutside)

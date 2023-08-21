@@ -771,7 +771,7 @@ function addEditableScript(name, set, get, parentName = "sideMenu", additionalDi
     inp.mousePressed(() => {
         var popupWindow = window.open("popup.html", "Popup Window", "width=400,height=300");
         window.scriptData = function () {
-            return _get().toString();
+            return [_get().toString(), window];
         };
         window.receivePopupText = (text) => {
             console.log(text);

@@ -278,7 +278,7 @@ class gameScript extends Component {
 			} else {
 				var popupWindow = window.open("popup.html", "Popup Window", "width=400,height=300");
 				window.scriptData = function () {
-					return _get().toString()
+					return [_get().toString(),window]
 				}
 				window.receivePopupText = (text) => {
 					//TODO: make small info box saying: Updated: (nameoffile)

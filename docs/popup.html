@@ -35,6 +35,7 @@
         globalThis.engine = {
             scene: [], currentScene: 0, files: {}, uuidList: {}, usedUUID: [], hasUUID: false, assignedUUID: "", world: {}, componentList: {}, removeListeners: [], physics: false, errorText: "", zoom: 1, camera: {}, gui: {}, mobile: false, guiObjects: {}, Initiate: () => { }, activeScene: () => { }, addObj: () => { }, addScriptByName: () => { }, assignUUID: () => { }, cameraPos: () => { }, changeUUID: () => { }, constructor: () => { }, customDraw: () => { }, customFileUUID: () => { }, deleteGameFile: () => { }, deviceMoved: () => { }, deviceShaken: () => { }, deviceTurned: () => { }, doubleClicked: () => { }, draw: () => { }, generateUUID: () => { }, getActiveScene: () => { }, getByReference: () => { }, getfromUUID: () => { }, keyPressed: () => { }, keyReleased: () => { }, keyTyped: () => { }, loadFromObject: () => { }, mouseClicked: () => { }, mouseDragged: () => { }, mouseMoved: () => { }, mousePressed: () => { }, mouseReleased: () => { }, mouseScreen: () => { }, mouseWheel: () => { }, resize: () => { }, setup: () => { }, touchEnded: () => { }, touchMoved: () => { }, touchStarted: () => { }, updateGui: () => { }, activeScene: () => { }, cameraPos: () => { }, cameraPos: () => { },
         }
+        globalThis.context = {};
         let parser = javascript()
         document.addEventListener("keydown", function (event) {
             if ((event.ctrlKey || event.metaKey) && event.key === "s") {
@@ -56,7 +57,6 @@
             textarea.style.display = "none"
             return view
         }
-
         var editor;
         function receivePopupText(override) {
             var text = ''
@@ -64,7 +64,8 @@
                 text = override
             } else {
                 if (typeof window.opener.scriptData === "function") {
-                    text = window?.opener?.scriptData();
+                    text = window?.opener?.scriptData()[0];
+                    globalThis.context = window?.opener?.scriptData()[1]
                 }
             }
             text = text.replace(/\?\?=/gm, `++=`);

@@ -8,8 +8,9 @@ var levels = new Proxy(temp, {
     get(target, key, receiver) {
         console.error("level variable is deprecated, use engine.scene instead");
         return engine.scene[key];
-    }
-})
+    },
+    enumerable:false
+});
 let cList = new Proxy(temp, {
     set(target, key, value) {
         engine.componentList[key] = value;
@@ -19,8 +20,9 @@ let cList = new Proxy(temp, {
     get(target, key, receiver) {
         console.error("componentList is deprecated, use engine.componentList instead");
         return engine.componentList[key];
-    }
-})
+    },
+    enumerable:false
+});
 Object.defineProperty(window, "componentList", {
     set(value) {
         cList = Object.assign(cList, value);
@@ -30,8 +32,9 @@ Object.defineProperty(window, "componentList", {
     get() {
         console.error("componentList variable is deprecated, use engine.componentList instead");
         return cList;
-    }
-})
+    },
+    enumerable:false
+});
 var boxes = new Proxy(temp, {
     set(target, key, value) {
         this.getActiveScene().boxes[key] = value;
@@ -42,7 +45,7 @@ var boxes = new Proxy(temp, {
         console.error("Boxes variable is deprecated, use engine.scene instead");
         return this.getActiveScene().boxes[key];
     }
-})
+});
 Object.defineProperty(window, "activeLevel", {
     set(value) {
         engine.currentScene = value;
@@ -52,8 +55,9 @@ Object.defineProperty(window, "activeLevel", {
     get() {
         console.error("activeLevel variable is deprecated, use engine.activeScene instead");
         return engine.currentScene;
-    }
-})
+    },
+    enumerable:false
+});
 Object.defineProperty(window, "deleteGameFile", {
     set(value) {
         //engine.activeScene = value;
@@ -63,8 +67,9 @@ Object.defineProperty(window, "deleteGameFile", {
     get() {
         console.error("deleteGameFile function is deprecated, use engine.deleteGameFile instead");
         return engine.deleteGameFile.bind(engine);
-    }
-})
+    },
+    enumerable:false
+});
 Object.defineProperty(window, "getByReference", {
     set(value) {
         //engine.activeScene = value;
@@ -74,8 +79,9 @@ Object.defineProperty(window, "getByReference", {
     get() {
         console.error("getByReference function is deprecated, use engine.getByReference instead");
         return engine.getByReference.bind(engine);
-    }
-})
+    },
+    enumerable:false
+});
 function removeNonNormal(obj) {
     const replacer = (key, value) => {
         if (key === "p5")
@@ -95,11 +101,9 @@ function removeNonNormal(obj) {
         return value;
         // Serialize the property as usual
     };
-
     const jsonString = JSON.stringify(obj, replacer);
     return JSON.parse(jsonString);
 }
-
 function replaceValues(obj, replaced) {
     if (typeof obj !== "object") {
         return obj;
@@ -107,10 +111,10 @@ function replaceValues(obj, replaced) {
     for (let key in obj) {
         if (replaced.hasOwnProperty(key)) {
             replaced[key] = obj[key];
-        } else if (typeof obj[key] === 'object' && typeof replaced[key] === 'object') {
+        }
+        else if (typeof obj[key] === 'object' && typeof replaced[key] === 'object') {
             replaced[key] = replaceValues(obj[key], replaced[key]);
         }
     }
-
     return replaced;
 }
