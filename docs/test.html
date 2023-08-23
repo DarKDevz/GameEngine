@@ -8,23 +8,23 @@
     <script>
         var pRenderer;
         function setup() {
-        createCanvas(windowWidth, windowHeight)
-        pRenderer = new ParticleRenderer()
+            createCanvas(windowWidth, windowHeight)
+            pRenderer = new ParticleRenderer()
 
         }
         function windowResized() {
-            resizeCanvas(windowWidth,windowHeight);
-            pRenderer.settings.pos = createVector(width/2,height/2)
+            resizeCanvas(windowWidth, windowHeight);
+            pRenderer.settings.pos = createVector(width / 2, height / 2)
         }
         function draw() {
-            clear()
+            background(0)
             pRenderer.display()
             pRenderer.update()
         }
-        class Particle{
+        class Particle {
             constructor(settings) {
                 this.lifeTime = settings.lifeTime;
-                this.dir = createVector(random(...settings.rDirX),random(...settings.rDirY))
+                this.dir = createVector(random(...settings.rDirX), random(...settings.rDirY))
                 this.pos = settings.pos.copy();
                 this.gX = settings.gDir[0];
                 this.gY = settings.gDir[1];
@@ -34,43 +34,49 @@
                 this.dir.setMag(settings.velocity);
             }
             update() {
-                if(frameCount-this.creation>this.lifeTime) {
+                if (frameCount - this.creation > this.lifeTime) {
                     this.toBeRemoved = true;
-                }else {
-                    this.dir.x += this.gX*this.velocity;
-                    this.dir.y += this.gY*this.velocity;
+                } else {
+                    this.dir.x += this.gX * this.velocity;
+                    this.dir.y += this.gY * this.velocity;
                     this.pos.x += this.dir.x;
                     this.pos.y += this.dir.y;
                 }
             }
             display() {
-                fill(255,0,0);
-                circle(this.pos.x,this.pos.y,50);
+                fill(255, 0, 0);
+                circle(this.pos.x, this.pos.y, 50);
             }
         }
         class ParticleRenderer {
             constructor() {
                 this.settings = {
-                    lifeTime:255,
-                    rDirX:[-1,1],
-                    rDirY:[-1,1],
-                    gDir:[-.5,0],
-                    velocity:5,
-                    pos:createVector(width/2,height/2)
+                    lifeTime: 255,
+                    rDirX: [-1, 1],
+                    rDirY: [-1, 1],
+                    gDir: [-.5, 0],
+                    velocity: 5,
+                    pos: createVector(width / 2, height / 2),
+                    timer: 1,
+                    howManyPer: 1,
                 }
                 this.particles = []
             }
             update() {
-                this.particles.push(new Particle(this.settings))
-                for(let i = this.particles.length; i--; i>=0) {
-                    let particle = this.particles[i];
-                    if(particle.toBeRemoved) {
-                        this.particles.splice(i,1);
+                if (frameCount % this.settings.timer === 0) {
+                    for(let i = 0; i<this.settings.howManyPer; i++) {
+                    this.particles.push(new Particle(this.settings))
                     }
                 }
+                for (let i = this.particles.length; i--; i >= 0) {
+                        let particle = this.particles[i];
+                        if (particle.toBeRemoved) {
+                            this.particles.splice(i, 1);
+                        }
+                    }
             }
             display() {
-                for(let i = this.particles.length; i--; i>=0) {
+                for (let i = this.particles.length; i--; i >= 0) {
                     let particle = this.particles[i];
                     particle.update()
                     particle.display()
@@ -80,7 +86,7 @@
     </script>
 </head>
 
-<body>
+<body style="margin: 0;">
 </body>
 
 </html>

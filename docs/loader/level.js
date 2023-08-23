@@ -172,6 +172,27 @@ function ScenesfromObject(levelsObject) {
             return;
         }
     }
+    if (levelsObject.GUI.default) {
+        engine.assignUUID("Joystick");
+        let stick = new Joystick(windowHeight / 3 / 1.5, windowHeight - windowHeight / 3 / 1.5, windowHeight / 3, windowHeight / 6, {});
+        stick.mobileOnly = true;
+        stick.resize = (ww, wh) => {
+            stick.position.x = wh / 3 / 1.5;
+            stick.position.y = wh - wh / 3 / 1.5;
+            stick.stickPosition.x = stick.position.x;
+            stick.stickPosition.y = stick.position.y;
+            stick.size = wh / 3;
+            stick.stickSize = wh / 6;
+        };
+        engine.assignUUID("Button");
+        let jumpBtn = new Button(windowWidth - windowHeight / 3 / 1.5, windowHeight - windowHeight / 3 / 1.5, windowHeight / 3, () => { }, () => { });
+        jumpBtn.resize = (ww, wh) => {
+            jumpBtn.position.x = ww - wh / 3 / 1.5;
+            jumpBtn.position.y = wh - wh / 3 / 1.5;
+            jumpBtn.size = wh / 3;
+        };
+        jumpBtn.mobileOnly = true;
+    }
     for (let sceneInd in levelsObject.scenes) {
         let scene = levelsObject.scenes[sceneInd];
         let t_boxes = [];
@@ -618,7 +639,9 @@ function MapJson() {
         }
     }
     mapData.GUI = {};
-    mapData.GUI.default = true;
+    //TODO: make window to disable default GUI
+    //instead of this hack to remove it
+    mapData.GUI.default = engine.uuidList.hasOwnProperty("Joystick");
     return JSON.stringify(mapData);
 }
 function addLevel(arr, pos, maxPos = 500) {

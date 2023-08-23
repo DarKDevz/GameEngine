@@ -19,6 +19,22 @@ interface Window {
 interface Array<T> {
     equals(arg0: Array<T>): boolean;
 }
+interface Joystick extends GUIElement{
+    stickSize: any;
+    position: Vec;
+    stickPosition: any;
+    isDragging: boolean;
+    dir: { [x: string]: any }
+}
+interface Button extends GUIElement{
+    size: number;
+    cb:[Function,Function]
+    position: Vec;
+    pressed: boolean
+}
+interface GUIElement extends GameObject{
+    size: number
+}
 interface ImportInterface {
     version: number
     file: {[x:UUID]:FileConstructor}[]
@@ -155,7 +171,22 @@ interface xywhObject extends xyObject {
     height: number
 }
 interface GameEvents {
-    entryPoints: string[];
+    deviceMoved   (...args:any):void,
+    deviceTurned  (...args:any):void,
+    deviceShaken  (...args:any):void,
+    doubleClicked (...args:any):void,
+    mousePressed  (...args:any):void,
+    mouseReleased (...args:any):void,
+    mouseMoved    (...args:any):void,
+    mouseDragged  (...args:any):void,
+    mouseClicked  (...args:any):void,
+    mouseWheel    (...args:any):void,
+    touchStarted  (...args:any):void,
+    touchMoved    (...args:any):void,
+    touchEnded    (...args:any):void,
+    keyPressed    (...args:any):void,
+    keyReleased   (...args:any):void,
+    keyTyped      (...args:any):void,
 }
 interface Level {
     toJSON(): any;
@@ -218,6 +249,7 @@ interface Engine extends GameEvents{
     gui: ReturnType<typeof createGraphics>
     mobile: boolean
     guiObjects: { [x: UUID]: GUIElement }
+    eventListener: {[x:UUID]:{[x:string]:Function}}
 }
 interface GUIElement extends GameObject{
     id: UUID

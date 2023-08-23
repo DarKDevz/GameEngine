@@ -1,4 +1,5 @@
 var loadInterval;
+var MapData = {data:""}
 function changeMapData(data:string) {
     window.loaded = true;
     MapData.data = data;

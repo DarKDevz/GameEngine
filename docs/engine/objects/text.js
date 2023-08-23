@@ -35,7 +35,6 @@ class TextObject extends GameObject {
     }
 }
 class GUIElement extends GameObject {
-    size;
     constructor(x, y) {
         super(x, y);
         this.position = createVector(x, y);
@@ -90,13 +89,10 @@ class GUIElement extends GameObject {
     update(...args) { }
 }
 class Button extends GUIElement {
-    position;
-    cb;
-    pressed;
     constructor(x, y, radius, pressed, notPressed) {
         super(x, y);
         this.position = createVector(x, y);
-        this.cb = [pressed, notPressed];
+        this.cb ??= [pressed, notPressed];
         this.size = radius;
         this.pressed = false;
     }
@@ -131,11 +127,6 @@ class Button extends GUIElement {
     }
 }
 class Joystick extends GUIElement {
-    stickSize;
-    position;
-    stickPosition;
-    isDragging;
-    dir;
     constructor(x, y, size, stickSize, direction) {
         super(x, y);
         this.size = size;
@@ -143,7 +134,7 @@ class Joystick extends GUIElement {
         this.position = createVector(x, y);
         this.stickPosition = this.position.copy();
         this.isDragging = false;
-        this.dir = direction;
+        this.dir ??= direction;
     }
     update() {
         if (this.isDragging) {

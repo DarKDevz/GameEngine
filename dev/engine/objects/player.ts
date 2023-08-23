@@ -26,27 +26,16 @@ class Player {
             "down": false
         }
         this.shouldJump = false;
-        stick = new Joystick(windowHeight / 3 / 1.5, windowHeight - windowHeight / 3 / 1.5, windowHeight / 3, windowHeight / 6, this.dir);
-        stick.mobileOnly = true;
-        stick.resize = (ww, wh) => {
-            stick.position.x = wh / 3 / 1.5;
-            stick.position.y = wh - wh / 3 / 1.5
-            stick.stickPosition.x = stick.position.x;
-            stick.stickPosition.y = stick.position.y;
-            stick.size = wh / 3
-            stick.stickSize = wh / 6
-        }
-        jumpBtn = new Button(windowWidth - windowHeight / 3 / 1.5, windowHeight - windowHeight / 3 / 1.5, windowHeight / 3, () => {
-            this.shouldJump = true;
-        }, () => {
-            this.shouldJump = false;
-        })
-        jumpBtn.resize = (ww, wh) => {
-            jumpBtn.position.x = ww - wh / 3 / 1.5
-            jumpBtn.position.y = wh - wh / 3 / 1.5
-            jumpBtn.size = wh / 3
-        }
-        jumpBtn.mobileOnly = true;
+        engine.onload("Joystick", (obj) => {
+            obj.dir = this.dir;
+        });
+        engine.onload("Button", (obj) => {
+            obj.cb = [() => {
+                this.shouldJump = true;
+            }, () => {
+                this.shouldJump = false;
+            }]
+        });
         if(engine.mobile)engine.camera.zoom = .7;
         let bodyDef = new b2BodyDef;
         var fixDef = new b2FixtureDef;
@@ -74,7 +63,7 @@ class Player {
         //Custom gravity scale i made
         this.body.gravityScale = new b2Vec2(0, 0);
         //We override this so we can use our own physics things
-        engine.physics = true;
+        engine.physics = !window?.editor;
         engine.cameraPos = this.cameraPos;
         //Enable Running physics
         //world.gravity.y = 5;
@@ -207,7 +196,7 @@ class Player {
         if (pos_center.y > t_center.y) {
             this.vel.y = 0;
             let distance = (this.size.copy().div(2).y + bsize.copy().div(2).y) + (t_center.y - pos_center.y);
-            this.pos.y += distance + 1;
+            this.pos.y += distance;
         }
     }
     xCollision(id: UUID) {
@@ -220,12 +209,12 @@ class Player {
         if (pos_center.x < t_center.x) {
             this.vel.x = 0;
             let distance = (this.size.copy().div(2).x + bsize.copy().div(2).x) - (t_center.x - pos_center.x);
-            this.pos.x -= distance + 2;
+            this.pos.x -= distance;
         }
         if (pos_center.x > t_center.x) {
             this.vel.x = 0;
             let distance = (this.size.copy().div(2).x + bsize.copy().div(2).x) + (t_center.x - pos_center.x);
-            this.pos.x += distance + 2;
+            this.pos.x += distance;
         }
     }
     onCollide(id: UUID) {

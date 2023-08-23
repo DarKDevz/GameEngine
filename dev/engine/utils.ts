@@ -1,6 +1,8 @@
 class GameEvents {
     constructor() {
-        this.entryPoints = [
+    }
+    globalDefine(hardDefined=false) {
+        let entryPoints = [
             'deviceMoved',
             'deviceTurned',
             'deviceShaken',
@@ -18,9 +20,7 @@ class GameEvents {
             'keyReleased',
             'keyTyped',
         ];
-    }
-    globalDefine(hardDefined=false) {
-        for (let i of this.entryPoints) {
+        for (let i of entryPoints) {
             window[i] ??= this[i].bind(this);
             if(hardDefined) {
                 window[i] = this[i].bind(this);

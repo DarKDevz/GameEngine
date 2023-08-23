@@ -11,7 +11,19 @@ class Engine extends GameEvents {
         this.zoom = 1;
         this.currentScene;
         this.files = {};
-        this.uuidList = {};
+        let temp = {};
+        let context = this;
+        this.uuidList = new Proxy(temp, {
+            set(target, key:string, value) {
+                target[key] = value;
+                context.eventListener[key]?.onload(value);
+                return true;
+            },
+            get(target, key, receiver) {
+                return target[key];
+            }
+        });
+        ;
         this.usedUUID = [];
         this.hasUUID = false;
         this.assignedUUID = "";
@@ -26,6 +38,7 @@ class Engine extends GameEvents {
         this.world = new b2World(new b2Vec2(0, 100)    //gravity
             , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
         this.componentList = Engine.componentList
+        this.eventListener = {}
         // this.body = new p2.Body({ mass: 1 });
         // this.world.addBody(this.body);
     }
@@ -147,6 +160,12 @@ class Engine extends GameEvents {
         this.gui.text("FPS: " + round(frameRate() / 10) * 10, 50, 50);
         image(this.gui, 0, 0, width, height);
     }
+    onload(uuid: UUID, func: (arg0:GameObject)=>void) {
+        this.eventListener[uuid] = Object.assign({ onload: func }, this.eventListener[uuid])
+        if(this.uuidList[uuid]) {
+            func(this.uuidList[uuid])
+        }
+    }
     addObj(box: GameObject, doId = false) {
         box.init()
         console.log(box.init);
@@ -258,11 +277,11 @@ class Engine extends GameEvents {
     updateGui(display: boolean = true, forceDraw: boolean = false, update: boolean = true) {
         for (let uuid in this.guiObjects) {
             let GUIElement = this.guiObjects[uuid];
-            if(GUIElement.mobileOnly) {
-                if(engine.mobile) {
+            if (GUIElement.mobileOnly) {
+                if (engine.mobile) {
                     if (update) GUIElement.update();
                     if (display) GUIElement.display();
-                }else if(forceDraw) {
+                } else if (forceDraw) {
                     if (update) GUIElement.update();
                     if (display) GUIElement.display();
                 }
@@ -273,10 +292,10 @@ class Engine extends GameEvents {
             }
         }
     }
-    customDraw(doDraw:boolean) {
-        if(doDraw) {
+    customDraw(doDraw: boolean) {
+        if (doDraw) {
             this.activeScene?.customDraw(true);
-            this.updateGui(true,true,false);
+            this.updateGui(true, true, false);
         }
     }
 }
