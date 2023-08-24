@@ -62,7 +62,7 @@ class Player {
         //Custom gravity scale i made
         this.body.gravityScale = new b2Vec2(0, 0);
         //We override this so we can use our own physics things
-        engine.physics = true;
+        engine.physics = !window?.editor;
         engine.cameraPos = this.cameraPos;
         //Enable Running physics
         //world.gravity.y = 5;

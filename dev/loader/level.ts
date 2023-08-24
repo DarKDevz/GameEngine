@@ -54,23 +54,18 @@ function removeObject(objId: UUID | GameObject | number) {
         if (!obj) return;
         deleteUser(obj)
         obj.delete()
-        let sceneId = engine.getActiveScene().boxes.indexOf(obj)
         //delete engine.uuidList[objId];
-        reloadcurrent();
     } else if (typeof objId === "object") {
         deleteUser(objId);
         if (!objId) return;
-        let sceneId = engine.getActiveScene().boxes.indexOf(objId)
         objId.delete()
         //delete engine.uuidList[objId.uuid];
-        reloadcurrent()
     }
     else {
         let obj = engine.getActiveScene().boxes[objId]
         if (!obj) return;
         deleteUser(obj)
         engine.uuidList[obj.uuid].delete();
-        reloadcurrent();
     }
 }
 
@@ -331,10 +326,12 @@ class Level extends GameEvents {
         translate(-cameraPos.x, -cameraPos.y)
     }
     lateUpdate(shouldRun = true) {
-        if (!shouldRun) return 1;
+        if (shouldRun) {
         for (let t_box of this.boxes) {
             t_box.lateUpdate();
         }
+    }
+    reloadcurrent();
     }
     earlyUpdate(shouldRun = true) {
         if (!shouldRun) return 1;

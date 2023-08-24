@@ -52,18 +52,14 @@ function removeObject(objId) {
             return;
         deleteUser(obj);
         obj.delete();
-        let sceneId = engine.getActiveScene().boxes.indexOf(obj);
         //delete engine.uuidList[objId];
-        reloadcurrent();
     }
     else if (typeof objId === "object") {
         deleteUser(objId);
         if (!objId)
             return;
-        let sceneId = engine.getActiveScene().boxes.indexOf(objId);
         objId.delete();
         //delete engine.uuidList[objId.uuid];
-        reloadcurrent();
     }
     else {
         let obj = engine.getActiveScene().boxes[objId];
@@ -71,7 +67,6 @@ function removeObject(objId) {
             return;
         deleteUser(obj);
         engine.uuidList[obj.uuid].delete();
-        reloadcurrent();
     }
 }
 function addObj(ind, arr, sceneId) {
@@ -338,11 +333,12 @@ class Level extends GameEvents {
         translate(-cameraPos.x, -cameraPos.y);
     }
     lateUpdate(shouldRun = true) {
-        if (!shouldRun)
-            return 1;
-        for (let t_box of this.boxes) {
-            t_box.lateUpdate();
+        if (shouldRun) {
+            for (let t_box of this.boxes) {
+                t_box.lateUpdate();
+            }
         }
+        reloadcurrent();
     }
     earlyUpdate(shouldRun = true) {
         if (!shouldRun)
