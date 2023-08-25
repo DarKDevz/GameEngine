@@ -21,8 +21,8 @@ class GameObject extends GameEvents {
         engine.uuidList[this.uuid] = this;
     }
     updateComponents() {
-        for(let component of this.components) {
-            component.update()
+        for (let component of this.components) {
+            component.update();
         }
     }
     resize(ww, wh) {

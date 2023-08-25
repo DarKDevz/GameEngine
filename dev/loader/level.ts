@@ -327,6 +327,7 @@ class Level extends GameEvents {
             text(engine.errorText, 50 - width / 2, 50 - height / 2)
         }
         translate(-cameraPos.x, -cameraPos.y)
+        reloadcurrent();
     }
     lateUpdate(shouldRun = true) {
         if (shouldRun) {
@@ -342,6 +343,8 @@ class Level extends GameEvents {
         for (let t_box of this.boxes) {
             t_box.earlyUpdate();
         }
+        reloadcurrent();
+
     }
     set posX(x) {
         this.pos.x = x;

@@ -8,7 +8,8 @@ class Component {
         this.fileType = "";
         this.shouldUpdateMenu = false;
     }
-    update() {}
+    update() {
+    }
     initialize() {
     }
     MenuEdit(parent) {

@@ -8,7 +8,6 @@ class Engine extends GameEvents {
         this.globalDefine(true);
         this.physics = engine?.physics ? true : false;
         this.scene = [];
-        this.zoom = 1;
         this.currentScene;
         this.files = {};
         let temp = {};
@@ -113,10 +112,10 @@ class Engine extends GameEvents {
         this.activeScene?.mouseClicked(e, Boolean(window?.editor));
     }
     mouseWheel(e) {
-        if(Boolean(window?.editor)) {
-            engine.camera.zoom -=(e.deltaY)*.035*engine.camera.zoom;
-            engine.camera.zoom = constrain(engine.camera.zoom, 0, 5)
-            e.preventDefault()
+        if (Boolean(window?.editor)) {
+            engine.camera.zoom -= (e.deltaY) * .035 * engine.camera.zoom;
+            engine.camera.zoom = constrain(engine.camera.zoom, 0, 5);
+            e.preventDefault();
         }
         this.activeScene?.mouseWheel(e, Boolean(window?.editor));
     }
