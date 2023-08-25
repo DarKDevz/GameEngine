@@ -8,6 +8,9 @@ class Component {
         this.fileType = ""
         this.shouldUpdateMenu = false;
     }
+    update() {
+        
+    }
     initialize() {
 
     }

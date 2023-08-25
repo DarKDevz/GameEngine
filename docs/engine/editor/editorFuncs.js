@@ -577,6 +577,7 @@ class Editor {
         else {
             return;
         }
+        //TODO: audio
         let file = addGameFile(data, dragFile.type === "text/javascript" ? ".js" : ".img");
         content.changeName(file, newName);
         return file;

@@ -324,6 +324,9 @@ class Level extends GameEvents {
             //engine.world.DrawDebugData();
             engine.world.ClearForces();
         }
+        for (let t_box of this.boxes) {
+            t_box.updateComponents()
+        }
         translate(cameraPos.x, cameraPos.y);
         if (engine.errorText) {
             fill(0);

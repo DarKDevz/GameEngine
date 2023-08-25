@@ -7,24 +7,40 @@
     <script src="libs/p5.js"></script>
     <script>
         var pRenderer;
+        var pg; // Graphics buffer
+        var lastFrame;
         function setup() {
-            createCanvas(windowWidth, windowHeight)
-            pRenderer = new ParticleRenderer()
-
+            createCanvas(windowWidth, windowHeight);
+            pg = createGraphics(width, height); // Create a graphics buffer
+            pRenderer = new ParticleRenderer();
         }
+
         function windowResized() {
             resizeCanvas(windowWidth, windowHeight);
-            pRenderer.settings.pos = createVector(width / 2, height / 2)
+            pg.resizeCanvas(width, height); // Resize the graphics buffer
+            pRenderer.settings.pos = createVector(width / 2, height / 2);
         }
+
         function draw() {
-            background(0)
-            pRenderer.display()
-            pRenderer.update()
+            background(125)
+            pg.clear()
+            pg.rect(width/2,height/2,50,50)
+            if(lastFrame) {
+                pg.image(lastFrame,0,0)
+                //pg.filter(INVERT);
+                pg.tint(255,200)
+                //console.log(lastFrame);
+            }
+            pRenderer.display(); // Pass the graphics buffer to the display function
+            pRenderer.update();
+            lastFrame = pg.get()
+            image(pg, 0, 0); // Draw the graphics buffer onto the main canvas
         }
+
         class Particle {
             constructor(settings) {
                 this.lifeTime = settings.lifeTime;
-                this.dir = createVector(random(...settings.rDirX), random(...settings.rDirY))
+                this.dir = createVector(random(...settings.rDirX), random(...settings.rDirY));
                 this.pos = settings.pos.copy();
                 this.gX = settings.gDir[0];
                 this.gY = settings.gDir[1];
@@ -32,7 +48,19 @@
                 this.toBeRemoved = false;
                 this.creation = frameCount;
                 this.dir.setMag(settings.velocity);
+                this.dir.x += this.gX * this.velocity;
+                this.dir.y += this.gY * this.velocity;
+                this.shape = settings.shape; // New shape property
+
+                if (this.shape === "line") {
+                    this.size = settings.size; // Set size as length for lines
+                } else if (this.shape === "circle") {
+                    this.size = settings.size; // Set size for circles
+                }
+
+                this.color = settings.color; // Set color property
             }
+
             update() {
                 if (frameCount - this.creation > this.lifeTime) {
                     this.toBeRemoved = true;
@@ -43,9 +71,21 @@
                     this.pos.y += this.dir.y;
                 }
             }
+
             display() {
-                fill(255, 0, 0);
-                circle(this.pos.x, this.pos.y, 50);
+                pg.noStroke();
+                pg.fill(this.color);
+
+                if (this.shape === "line") {
+                    // Draw a line with specified length
+                    pg.stroke(this.color);
+                    let endX = this.pos.x + this.size * cos(this.dir.heading());
+                    let endY = this.pos.y + this.size * sin(this.dir.heading());
+                    pg.line(this.pos.x, this.pos.y, endX, endY);
+                } else if (this.shape === "circle") {
+                    // Draw a circle with specified size
+                    pg.circle(this.pos.x, this.pos.y, this.size);
+                }
             }
         }
         class ParticleRenderer {
@@ -54,35 +94,40 @@
                     lifeTime: 255,
                     rDirX: [-1, 1],
                     rDirY: [-1, 1],
-                    gDir: [-.5, 0],
+                    gDir: [0, 0],
                     velocity: 5,
                     pos: createVector(width / 2, height / 2),
                     timer: 1,
                     howManyPer: 1,
-                }
-                this.particles = []
+                    size: 50, // Default size
+                    color: "#FF0000", // Default color (red)
+                    shape: 'line'
+                };
+                this.particles = [];
             }
+
             update() {
                 if (frameCount % this.settings.timer === 0) {
-                    for(let i = 0; i<this.settings.howManyPer; i++) {
-                    this.particles.push(new Particle(this.settings))
+                    for (let i = 0; i < this.settings.howManyPer; i++) {
+                        this.particles.push(new Particle(this.settings));
                     }
                 }
-                for (let i = this.particles.length; i--; i >= 0) {
-                        let particle = this.particles[i];
-                        if (particle.toBeRemoved) {
-                            this.particles.splice(i, 1);
-                        }
-                    }
-            }
-            display() {
-                for (let i = this.particles.length; i--; i >= 0) {
+                for (let i = this.particles.length - 1; i >= 0; i--) {
                     let particle = this.particles[i];
-                    particle.update()
-                    particle.display()
+                    if (particle.toBeRemoved) {
+                        this.particles.splice(i, 1);
+                    }
+                }
+            }
+
+            display() {
+                for (let particle of this.particles) {
+                    particle.update();
+                    particle.display(pg);
                 }
             }
         }
+
     </script>
 </head>
 

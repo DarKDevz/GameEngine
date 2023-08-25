@@ -20,6 +20,11 @@ class GameObject extends GameEvents {
         this.imageInitialized = false;
         engine.uuidList[this.uuid] = this;
     }
+    updateComponents() {
+        for(let component of this.components) {
+            component.update()
+        }
+    }
     resize(ww, wh) {
     }
     keyPress(event) {

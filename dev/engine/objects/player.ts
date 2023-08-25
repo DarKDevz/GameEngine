@@ -134,7 +134,7 @@ class Player {
                 this.pos.y += SizeY - this.size.y;
             } else if (this.size.y != 70) {
                 let SizeY = this.size.y;
-                this.size.y = lerp(this.size.y, 70, .5);;
+                this.size.y = lerp(this.size.y, 70, .5);
                 this.pos.y += SizeY - this.size.y;
             }
         }

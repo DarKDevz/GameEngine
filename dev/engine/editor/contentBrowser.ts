@@ -101,8 +101,9 @@ function PanelsInit() {
                     document.getElementById("bottomDiv").style.height = '10px';
                 }
                 else {
-                    document.getElementById("topDiv").style.height = "calc(" + topDivNewLocation / innerHeight * 100 + "% )";;
+                    document.getElementById("topDiv").style.height = "calc(" + topDivNewLocation / innerHeight * 100 + "% )";
                     document.getElementById("bottomDiv").style.height = "calc(" + bottomDivNewLocation / innerHeight * 100 + "% )";
+                    document.getElementById("divider").style.height = "calc(" + (100 - ((topDivNewLocation / innerHeight * 100) + (bottomDivNewLocation / innerHeight * 100))) + "% )"
                 }
                 windowResized()
             }

@@ -244,7 +244,6 @@ interface Engine extends GameEvents{
     removeListeners: Function[]
     physics: boolean;
     errorText: string;
-    zoom: number;
     camera: Camera;
     gui: ReturnType<typeof createGraphics>
     mobile: boolean
@@ -261,6 +260,36 @@ interface Camera {
     zoom: number;
     currentPos: { x: number; y: number; };
     isLocked: boolean;
+}
+interface Particle {
+    lifeTime: number
+    graphics: ReturnType<typeof createGraphics>
+    dir: Vec
+    pos: Vec
+    gX: number
+    gY: number
+    velocity: number
+    toBeRemoved: boolean
+    creation: ReturnType<typeof frameCount>
+    shape: 'line'|'circle'
+    size: number
+    color: string
+}
+interface ParticleRenderer{
+    settings:{timer:number,howManyPer:number,lifeTime: number,
+        rDirX: number[],
+        rDirY: number[],
+        gDir:  number[],
+        velocity: number,
+        pos: xyObject,
+        size: number, // Default size
+        color: string, // Default color (red)
+        shape: 'line'|'circle'}
+    particles:Particle[]
+    ownObject: GameObject
+    graphics: ReturnType<typeof createGraphics>
+    lastFrame: ReturnType<typeof createImage>
+
 }
 function downloadFile(content: any, arg1: string) {
     throw new Error("Function not implemented.");
