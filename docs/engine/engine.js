@@ -35,7 +35,7 @@ class Engine extends GameEvents {
             mouseButton = 'left';
         }
         this.world = new b2World(new b2Vec2(0, 100) //gravity
-        , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
+            , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
         this.componentList = Engine.componentList;
         this.eventListener = {};
         // this.body = new p2.Body({ mass: 1 });
@@ -113,8 +113,12 @@ class Engine extends GameEvents {
     }
     mouseWheel(e) {
         if (Boolean(window?.editor)) {
-            engine.camera.zoom -= (e.deltaY) * .035 * engine.camera.zoom;
-            engine.camera.zoom = constrain(engine.camera.zoom, 0, 5);
+            if (abs(e.deltaY) > abs(e.deltaX)) {
+                engine.camera.zoom -= constrain(e.deltaY,-8,8) * .035 * engine.camera.zoom;
+                engine.camera.zoom = constrain(engine.camera.zoom, 0.01, 5);
+            } else {
+                editor.cameraPos.x += (e.deltaX) / engine.camera.zoom;
+            }
             e.preventDefault();
         }
         this.activeScene?.mouseWheel(e, Boolean(window?.editor));
