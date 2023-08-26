@@ -13,7 +13,7 @@ class Engine extends GameEvents {
         let temp = {};
         let context = this;
         this.uuidList = new Proxy(temp, {
-            set(target, key:string, value) {
+            set(target, key: string, value) {
                 target[key] = value;
                 context.eventListener[key]?.onload(value);
                 return true;
@@ -111,9 +111,13 @@ class Engine extends GameEvents {
         this.activeScene?.mouseClicked(e, Boolean(window?.editor));
     }
     mouseWheel(e: WheelEvent) {
-        if(Boolean(window?.editor)) {
-            engine.camera.zoom -=(e.deltaY)*.035*engine.camera.zoom;
-            engine.camera.zoom = constrain(engine.camera.zoom, 0, 5)
+        if (Boolean(window?.editor)) {
+            if (abs(e.deltaY) > abs(e.deltaX)) {
+                engine.camera.zoom -= constrain(e.deltaY,-8,8) * .035 * engine.camera.zoom;
+                engine.camera.zoom = constrain(engine.camera.zoom, 0.01, 5);
+            } else {
+                editor.cameraPos.x += (e.deltaX) / engine.camera.zoom;
+            }
             e.preventDefault()
         }
         this.activeScene?.mouseWheel(e, Boolean(window?.editor));
@@ -164,9 +168,9 @@ class Engine extends GameEvents {
         this.gui.text("FPS: " + round(frameRate() / 10) * 10, 50, 50);
         image(this.gui, 0, 0, width, height);
     }
-    onload(uuid: UUID, func: (arg0:GameObject)=>void) {
+    onload(uuid: UUID, func: (arg0: GameObject) => void) {
         this.eventListener[uuid] = Object.assign({ onload: func }, this.eventListener[uuid])
-        if(this.uuidList[uuid]) {
+        if (this.uuidList[uuid]) {
             func(this.uuidList[uuid])
         }
     }
