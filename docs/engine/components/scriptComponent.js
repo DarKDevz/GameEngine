@@ -563,19 +563,19 @@ class gameParticle extends Component {
     constructor({ obj, settings }) {
         super("gameParticle", obj);
         this.id = engine.generateUUID();
-        this.pRenderer = new ParticleRenderer(this.ownObject, settings);
+        this.manager = new ParticleRenderer(this.ownObject, settings);
     }
     toJson() {
         return {
             name: this.componentName,
             params: {
-                settings: this.pRenderer.settings
+                settings: this.manager.settings
             }
         };
     }
     update() {
-        this.pRenderer.update();
-        this.pRenderer.display();
+        this.manager.update();
+        this.manager.display();
     }
     MenuEdit(parent) {
         Component.componentOpen[this.id] ??= { value: false };
@@ -588,10 +588,10 @@ class gameParticle extends Component {
         inputField.parent(divHolder);
         accordionMenu(headerText, inputField, "Particle Editor", shouldOpen);
         infoDivs.push(divHolder);
-        this.addNewEditObj(this.pRenderer.settings, inputField, Component.componentOpen[this.id]);
+        this.addNewEditObj(this.manager.settings, inputField, Component.componentOpen[this.id]);
     }
     updateValues() {
-        //do something ig
+        this.manager.reloadLoops();
     }
     addNewEditObj(obj, parent = 'sideMenu', opened) {
         let Holder;
@@ -638,9 +638,13 @@ class Particle {
         this.shape = settings.shape; // New shape property
         if (this.shape === "line") {
             this.size = settings.size; // Set size as length for lines
+            this.display = this.lineDisplay;
+            this.sinDir = sin(this.dir.heading());
+            this.cosDir = cos(this.dir.heading());
         }
         else if (this.shape === "circle") {
             this.size = settings.size; // Set size for circles
+            this.display = this.circleDisplay;
         }
         this.color = settings.color; // Set color property
     }
@@ -651,30 +655,32 @@ class Particle {
         else {
             this.dir.x += this.gX * this.velocity;
             this.dir.y += this.gY * this.velocity;
+            this.sinDir = sin(this.dir.heading());
+            this.cosDir = cos(this.dir.heading());
             this.pos.x += this.dir.x;
             this.pos.y += this.dir.y;
         }
     }
-    display() {
+    lineDisplay() {
         this.graphics.noStroke();
         this.graphics.fill(this.color);
-        if (this.shape === "line") {
-            // Draw a line with specified length
-            this.graphics.stroke(this.color);
-            let endX = this.pos.x + this.size * cos(this.dir.heading());
-            let endY = this.pos.y + this.size * sin(this.dir.heading());
-            this.graphics.line(this.pos.x, this.pos.y, endX, endY);
-        }
-        else if (this.shape === "circle") {
-            // Draw a circle with specified size
-            this.graphics.circle(this.pos.x, this.pos.y, this.size);
-        }
+        // Draw a line with specified length
+        this.graphics.stroke(this.color);
+        let endX = this.pos.x + this.size * this.cosDir;
+        let endY = this.pos.y + this.size * this.sinDir;
+        this.graphics.line(this.pos.x, this.pos.y, endX, endY);
     }
+    circleDisplay() {
+        this.graphics.noStroke();
+        this.graphics.fill(this.color);
+        // Draw a circle with specified size
+        this.graphics.circle(this.pos.x, this.pos.y, this.size);
+    }
+    display() { }
 }
 class ParticleRenderer {
     constructor(obj, settings) {
-        this.settings = settings;
-        this.settings ??= {
+        this.settings = Object.assign({
             lifeTime: 255,
             rDirX: [-1, 1],
             rDirY: [-1, 1],
@@ -685,21 +691,58 @@ class ParticleRenderer {
             howManyPer: 1,
             size: 50,
             color: "#FF0000",
-            shape: 'line'
-        };
+            shape: 'line',
+            loop: true,
+            autoPlay: true
+        }, settings);
         this.particles = [];
         this.graphics = createGraphics(obj.w, obj.h);
         this.ownObject = obj;
-        this.lastFrame;
+        this.lastFrame = this.graphics.get();
+        this.allIntervals = [];
+        if (this.settings.autoPlay)
+            this.addAll();
+    }
+    addAll() {
+        this.allIntervals = [
+            setInterval(() => {
+                for (let i = 0; i < this.settings.howManyPer; i++) {
+                    this.particles.push(new Particle(this.settings, this.graphics));
+                }
+                if (!this.settings.loop) {
+                    clearInterval(this.allIntervals[0]);
+                    this.onStop();
+                }
+            }, this.settings.timer),
+            setInterval(this.asyncDisplay.bind(this), 1000 / 60),
+            setInterval(this.asyncUpdate.bind(this), 1000 / 60)
+        ];
+    }
+    onStop() { }
+    onStep() { }
+    play() {
+        this.reloadLoops();
+    }
+    stop() {
+        for (let index of this.allIntervals) {
+            clearInterval(index);
+        }
+    }
+    pause() {
+        this.stop();
+    }
+    reloadLoops() {
+        this.stop();
+        this.addAll();
+    }
+    asyncUpdate() {
+        for (let particle of this.particles) {
+            particle.update();
+        }
     }
     update() {
         if (this.ownObject.h !== this.graphics.height || this.ownObject.w !== this.graphics.width) {
             this.graphics.resizeCanvas(this.ownObject.h, this.ownObject.w);
-        }
-        if (frameCount % this.settings.timer === 0) {
-            for (let i = 0; i < this.settings.howManyPer; i++) {
-                this.particles.push(new Particle(this.settings, this.graphics));
-            }
         }
         for (let i = this.particles.length - 1; i >= 0; i--) {
             let particle = this.particles[i];
@@ -708,19 +751,14 @@ class ParticleRenderer {
             }
         }
     }
-    display() {
+    asyncDisplay() {
         this.graphics.clear();
-        if (this.lastFrame) {
-            this.graphics.image(this.lastFrame, 0, 0);
-            //pg.filter(INVERT);
-            this.graphics.tint(255, 200);
-            //console.log(lastFrame);
-        }
         for (let particle of this.particles) {
-            particle.update();
             particle.display();
         }
-        this.lastFrame = this.graphics.get();
+        this.onStep();
+    }
+    display() {
         image(this.graphics, this.ownObject.x, this.ownObject.y); // Draw the graphics buffer onto the main canvas
     }
 }

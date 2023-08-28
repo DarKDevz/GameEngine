@@ -278,7 +278,7 @@ class gameScript extends Component {
 			} else {
 				var popupWindow = window.open("popup.html", "Popup Window", "width=400,height=300");
 				window.scriptData = function () {
-					return [_get().toString(),window]
+					return [_get().toString(), window]
 				}
 				window.receivePopupText = (text) => {
 					//TODO: make small info box saying: Updated: (nameoffile)
@@ -543,175 +543,207 @@ class gameSprite extends Component {
 	}
 }
 class gameParticle extends Component {
-    constructor({ obj, settings }) {
-        super("gameParticle", obj);
-        this.id = engine.generateUUID()
-        this.pRenderer = new ParticleRenderer(this.ownObject,settings)
-    }
-    toJson() {
-        return {
-            name: this.componentName,
-            params: {
-                settings:this.pRenderer.settings
-            }
-        };
-    }
-    update() {
-        this.pRenderer.update()
-        this.pRenderer.display()
-
-    }
-    MenuEdit(parent) {
-        Component.componentOpen[this.id] ??= { value: false }
-        let shouldOpen = Component.componentOpen[this.id];
-        let divHolder = createDiv()
-        divHolder.parent(parent);
-        let headerText = createDiv()
-        headerText.parent(divHolder)
-        let inputField = createDiv()
-        inputField.parent(divHolder);
-        accordionMenu(headerText, inputField, "Particle Editor", shouldOpen);
-        infoDivs.push(divHolder);
-        this.addNewEditObj(this.pRenderer.settings, inputField, Component.componentOpen[this.id])
-    }
-    updateValues() {
-        //do something ig
-    }
-    addNewEditObj(obj, parent:any = 'sideMenu', opened) {
-        let Holder;
-        //console.log(obj)
-        for (let i in obj) {
-            //console.log(i, obj[i], typeof obj[i]);
-            if (typeof obj[i] === "object") {
-                let divHolder = createDiv().parent(parent);
-                let headerText = createDiv();
-                Holder = accordionMenu(headerText, createDiv(), i, opened);
-                headerText.parent(divHolder);
-                Holder.parent(divHolder);
-                infoDivs.push(headerText);
-                opened[i] ??= { value: false };
-                this.addNewEditObj(obj[i], Holder, opened[i]);
-            }
-            else {
-                addMenuInput(i, (_) => {
-                    obj[i] = parseStringNum(_);
-                    this.updateValues();
-                    return obj[i];
-                }, () => {
-                    return obj[i];
-                }, parent);
-                //console.log("final Object", obj[i]);
-            }
-        }
-    }
+	constructor({ obj, settings }) {
+		super("gameParticle", obj);
+		this.id = engine.generateUUID()
+		this.manager = new ParticleRenderer(this.ownObject, settings)
+	}
+	toJson() {
+		return {
+			name: this.componentName,
+			params: {
+				settings: this.manager.settings
+			}
+		};
+	}
+	update() {
+		this.manager.update()
+		this.manager.display()
+	}
+	MenuEdit(parent) {
+		Component.componentOpen[this.id] ??= { value: false }
+		let shouldOpen = Component.componentOpen[this.id];
+		let divHolder = createDiv()
+		divHolder.parent(parent);
+		let headerText = createDiv()
+		headerText.parent(divHolder)
+		let inputField = createDiv()
+		inputField.parent(divHolder);
+		accordionMenu(headerText, inputField, "Particle Editor", shouldOpen);
+		infoDivs.push(divHolder);
+		this.addNewEditObj(this.manager.settings, inputField, Component.componentOpen[this.id])
+	}
+	updateValues() {
+		this.manager.reloadLoops()
+	}
+	addNewEditObj(obj, parent: any = 'sideMenu', opened) {
+		let Holder;
+		//console.log(obj)
+		for (let i in obj) {
+			//console.log(i, obj[i], typeof obj[i]);
+			if (typeof obj[i] === "object") {
+				let divHolder = createDiv().parent(parent);
+				let headerText = createDiv();
+				Holder = accordionMenu(headerText, createDiv(), i, opened);
+				headerText.parent(divHolder);
+				Holder.parent(divHolder);
+				infoDivs.push(headerText);
+				opened[i] ??= { value: false };
+				this.addNewEditObj(obj[i], Holder, opened[i]);
+			}
+			else {
+				addMenuInput(i, (_) => {
+					obj[i] = parseStringNum(_);
+					this.updateValues();
+					return obj[i];
+				}, () => {
+					return obj[i];
+				}, parent);
+				//console.log("final Object", obj[i]);
+			}
+		}
+	}
 }
 class Particle {
-    constructor(settings, graphics) {
-        this.lifeTime = settings.lifeTime;
-        this.graphics = graphics;
-        this.dir = createVector(random(...settings.rDirX), random(...settings.rDirY));
-        this.pos = createVector(settings.pos.x,settings.pos.y);
-        this.gX = settings.gDir[0];
-        this.gY = settings.gDir[1];
-        this.velocity = settings.velocity;
-        this.toBeRemoved = false;
-        this.creation = frameCount;
-        this.dir.setMag(settings.velocity);
-        this.dir.x += this.gX * this.velocity;
-        this.dir.y += this.gY * this.velocity;
-        this.shape = settings.shape; // New shape property
-
-        if (this.shape === "line") {
-            this.size = settings.size; // Set size as length for lines
-        } else if (this.shape === "circle") {
-            this.size = settings.size; // Set size for circles
-        }
-
-        this.color = settings.color; // Set color property
-    }
-
-    update() {
-        if (frameCount - this.creation > this.lifeTime) {
-            this.toBeRemoved = true;
-        } else {
-            this.dir.x += this.gX * this.velocity;
-            this.dir.y += this.gY * this.velocity;
-            this.pos.x += this.dir.x;
-            this.pos.y += this.dir.y;
-        }
-    }
-
-    display() {
-        this.graphics.noStroke();
-        this.graphics.fill(this.color);
-
-        if (this.shape === "line") {
-            // Draw a line with specified length
-            this.graphics.stroke(this.color);
-            let endX = this.pos.x + this.size * cos(this.dir.heading());
-            let endY = this.pos.y + this.size * sin(this.dir.heading());
-            this.graphics.line(this.pos.x, this.pos.y, endX, endY);
-        } else if (this.shape === "circle") {
-            // Draw a circle with specified size
-            this.graphics.circle(this.pos.x, this.pos.y, this.size);
-        }
-    }
+	constructor(settings, graphics) {
+		this.lifeTime = settings.lifeTime;
+		this.graphics = graphics;
+		this.dir = createVector(random(...settings.rDirX), random(...settings.rDirY));
+		this.pos = createVector(settings.pos.x, settings.pos.y);
+		this.gX = settings.gDir[0];
+		this.gY = settings.gDir[1];
+		this.velocity = settings.velocity;
+		this.toBeRemoved = false;
+		this.creation = frameCount;
+		this.dir.setMag(settings.velocity);
+		this.dir.x += this.gX * this.velocity;
+		this.dir.y += this.gY * this.velocity;
+		this.shape = settings.shape; // New shape property
+		if (this.shape === "line") {
+			this.size = settings.size; // Set size as length for lines
+			this.display = this.lineDisplay;
+			this.sinDir = sin(this.dir.heading())
+			this.cosDir = cos(this.dir.heading())
+		}
+		else if (this.shape === "circle") {
+			this.size = settings.size; // Set size for circles
+			this.display = this.circleDisplay;
+		}
+		this.color = settings.color; // Set color property
+	}
+	update() {
+		if (frameCount - this.creation > this.lifeTime) {
+			this.toBeRemoved = true;
+		}
+		else {
+			this.dir.x += this.gX * this.velocity;
+			this.dir.y += this.gY * this.velocity;
+			this.sinDir = sin(this.dir.heading())
+			this.cosDir = cos(this.dir.heading())
+			this.pos.x += this.dir.x;
+			this.pos.y += this.dir.y;
+		}
+	}
+	lineDisplay() {
+		this.graphics.noStroke();
+		this.graphics.fill(this.color);
+		// Draw a line with specified length
+		this.graphics.stroke(this.color);
+		let endX = this.pos.x + this.size * this.cosDir;
+		let endY = this.pos.y + this.size * this.sinDir;
+		this.graphics.line(this.pos.x, this.pos.y, endX, endY);
+	}
+	circleDisplay() {
+		this.graphics.noStroke();
+		this.graphics.fill(this.color);
+		// Draw a circle with specified size
+		this.graphics.circle(this.pos.x, this.pos.y, this.size);
+	}
+	display() { }
 }
 class ParticleRenderer {
-    constructor(obj, settings) {
-        this.settings = settings
-        this.settings ??= {
-            lifeTime: 255,
-            rDirX: [-1, 1],
-            rDirY: [-1, 1],
-            gDir: [0, 0],
-            velocity: 5,
-            pos: {x:obj.w/2,y:obj.h/2},
-            timer: 1,
-            howManyPer: 1,
-            size: 50, // Default size
-            color: "#FF0000", // Default color (red)
-            shape: 'line'
-        };
-        this.particles = [];
-        this.graphics = createGraphics(obj.w, obj.h)
-        this.ownObject = obj;
-        this.lastFrame;
-    }
-
-    update() {
-        if (this.ownObject.h !== this.graphics.height || this.ownObject.w !== this.graphics.width) {
-            this.graphics.resizeCanvas(this.ownObject.h, this.ownObject.w)
-        }
-        if (frameCount % this.settings.timer === 0) {
-            for (let i = 0; i < this.settings.howManyPer; i++) {
-                this.particles.push(new Particle(this.settings, this.graphics));
-            }
-        }
-        for (let i = this.particles.length - 1; i >= 0; i--) {
-            let particle = this.particles[i];
-            if (particle.toBeRemoved) {
-                this.particles.splice(i, 1);
-            }
-        }
-    }
-
-    display() {
-        this.graphics.clear()
-        if (this.lastFrame) {
-            this.graphics.image(this.lastFrame, 0, 0)
-            //pg.filter(INVERT);
-            this.graphics.tint(255, 200)
-            //console.log(lastFrame);
-        }
-        for (let particle of this.particles) {
-            particle.update();
-            particle.display();
-        }
-        this.lastFrame = this.graphics.get()
-        image(this.graphics, this.ownObject.x, this.ownObject.y); // Draw the graphics buffer onto the main canvas
-
-    }
+	constructor(obj, settings) {
+		this.settings = Object.assign({
+			lifeTime: 255,
+			rDirX: [-1, 1],
+			rDirY: [-1, 1],
+			gDir: [0, 0],
+			velocity: 5,
+			pos: { x: obj.w / 2, y: obj.h / 2 },
+			timer: 1,
+			howManyPer: 1,
+			size: 50,
+			color: "#FF0000",
+			shape: 'line',
+			loop: true,
+			autoPlay:true
+		}, settings);
+		this.particles = [];
+		this.graphics = createGraphics(obj.w, obj.h);
+		this.ownObject = obj;
+		this.lastFrame = this.graphics.get();
+		this.allIntervals = [];
+		if(this.settings.autoPlay)this.addAll()
+	}
+	addAll() {
+		this.allIntervals = [
+			setInterval(() => {
+				for (let i = 0; i < this.settings.howManyPer; i++) {
+					this.particles.push(new Particle(this.settings, this.graphics));
+				}
+				if (!this.settings.loop) {
+					clearInterval(this.allIntervals[0])
+					this.onStop()
+				}
+			}, this.settings.timer),
+			setInterval(this.asyncDisplay.bind(this),
+				1000 / 60),
+			setInterval(this.asyncUpdate.bind(this), 1000 / 60
+			)]
+	}
+	onStop() { }
+	onStep() { }
+	play() {
+		this.reloadLoops()
+	}
+	stop() {
+		for (let index of this.allIntervals) {
+			clearInterval(index);
+		}
+	}
+	pause() {
+		this.stop()
+	}
+	reloadLoops() {
+		this.stop()
+		this.addAll()
+	}
+	asyncUpdate() {
+		for (let particle of this.particles) {
+			particle.update();
+		}
+	}
+	update() {
+		if (this.ownObject.h !== this.graphics.height || this.ownObject.w !== this.graphics.width) {
+			this.graphics.resizeCanvas(this.ownObject.h, this.ownObject.w);
+		}
+		for (let i = this.particles.length - 1; i >= 0; i--) {
+			let particle = this.particles[i];
+			if (particle.toBeRemoved) {
+				this.particles.splice(i, 1);
+			}
+		}
+	}
+	asyncDisplay() {
+		this.graphics.clear();
+		for (let particle of this.particles) {
+			particle.display();
+		}
+		this.onStep()
+	}
+	display() {
+		image(this.graphics, this.ownObject.x, this.ownObject.y); // Draw the graphics buffer onto the main canvas
+	}
 }
 class gameFile extends Component {
 	static addGameFile = function (data: string, type?: string, references?: object): gameFile {
@@ -741,7 +773,7 @@ class gameFile extends Component {
 		this.whoUses = {};
 	}
 	get name(): string {
-		return this.references?.name?this.references.name:this.UUID
+		return this.references?.name ? this.references.name : this.UUID
 	}
 	editReference(name: string, value: string) {
 		this.references[name] = value;

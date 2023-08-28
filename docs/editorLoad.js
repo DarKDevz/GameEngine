@@ -7,6 +7,11 @@ function changeMapData(data) {
 }
 function doReload() {
     console.error("works");
+    //Clean up all intervals
+    let id = setTimeout(()=>{},0)
+    while(id--) {
+        clearTimeout(id);
+    }
     preload();
 }
 function checkLoad() {

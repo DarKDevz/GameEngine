@@ -52,9 +52,9 @@ declare module './index' {
 
     type RENDERER = P2D | WEBGL;
 
-    type SIZE_H = AUTO;
+    type SIZE_H = AUTO | string;
 
-    type SIZE_W = AUTO;
+    type SIZE_W = AUTO | string;
 
     type STROKE_CAP = ROUND | SQUARE | PROJECT;
 

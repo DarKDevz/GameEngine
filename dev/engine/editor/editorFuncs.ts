@@ -856,7 +856,7 @@ function addEditableSprite(name, set, get,
         };
     });
 
-    inp.size(177, "auto");
+    inp.size(177, 'fit-content');
     let infoId = infoDivs.push(divHolder);
     infoDivs[infoId - 1].parent(parentName);
     inputField.parent(divHolder);

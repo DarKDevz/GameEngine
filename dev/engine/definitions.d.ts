@@ -19,25 +19,25 @@ interface Window {
 interface Array<T> {
     equals(arg0: Array<T>): boolean;
 }
-interface Joystick extends GUIElement{
+interface Joystick extends GUIElement {
     stickSize: any;
     position: Vec;
     stickPosition: any;
     isDragging: boolean;
     dir: { [x: string]: any }
 }
-interface Button extends GUIElement{
+interface Button extends GUIElement {
     size: number;
-    cb:[Function,Function]
+    cb: [Function, Function]
     position: Vec;
     pressed: boolean
 }
-interface GUIElement extends GameObject{
+interface GUIElement extends GameObject {
     size: number
 }
 interface ImportInterface {
     version: number
-    file: {[x:UUID]:FileConstructor}[]
+    file: { [x: UUID]: FileConstructor }[]
     GUI: { default: boolean }
     scenes: {
         [x: number]: SceneConstructor
@@ -49,14 +49,14 @@ interface SceneConstructor {
     sceneData: number[],
     componentData?: [listOfComponents]
 }
-interface listOfComponents{
+interface listOfComponents {
     [x: string]: componentConstructor[]
-    [Symbol.iterator]():{
-        next():{value:componentConstructor}
+    [Symbol.iterator](): {
+        next(): { value: componentConstructor }
     }
 }
 interface componentConstructor {
-        name: string, params: { fileUUID: UUID, vals: any }
+    name: string, params: { fileUUID: UUID, vals: any }
 }
 type SpecialFunc = {
     (...anything: any): any
@@ -119,7 +119,7 @@ interface Editor {
     forceMenuUpdate: boolean;
     tryOffset: { [x: UUID]: xyObject }
 }
-interface GameObject extends GameEvents{
+interface GameObject extends GameEvents {
     x: number;
     y: number;
     z: number;
@@ -171,22 +171,22 @@ interface xywhObject extends xyObject {
     height: number
 }
 interface GameEvents {
-    deviceMoved   (...args:any):void,
-    deviceTurned  (...args:any):void,
-    deviceShaken  (...args:any):void,
-    doubleClicked (...args:any):void,
-    mousePressed  (...args:any):void,
-    mouseReleased (...args:any):void,
-    mouseMoved    (...args:any):void,
-    mouseDragged  (...args:any):void,
-    mouseClicked  (...args:any):void,
-    mouseWheel    (...args:any):void,
-    touchStarted  (...args:any):void,
-    touchMoved    (...args:any):void,
-    touchEnded    (...args:any):void,
-    keyPressed    (...args:any):void,
-    keyReleased   (...args:any):void,
-    keyTyped      (...args:any):void,
+    deviceMoved(...args: any): void,
+    deviceTurned(...args: any): void,
+    deviceShaken(...args: any): void,
+    doubleClicked(...args: any): void,
+    mousePressed(...args: any): void,
+    mouseReleased(...args: any): void,
+    mouseMoved(...args: any): void,
+    mouseDragged(...args: any): void,
+    mouseClicked(...args: any): void,
+    mouseWheel(...args: any): void,
+    touchStarted(...args: any): void,
+    touchMoved(...args: any): void,
+    touchEnded(...args: any): void,
+    keyPressed(...args: any): void,
+    keyReleased(...args: any): void,
+    keyTyped(...args: any): void,
 }
 interface Level {
     toJSON(): any;
@@ -231,7 +231,7 @@ interface gameSprite {
     ownObject: GameObject
 }
 type World = Box2D.Dynamics.b2World;
-interface Engine extends GameEvents{
+interface Engine extends GameEvents {
     scene: Level[]
     currentScene: number
     files: { [x: string]: gameFile }
@@ -248,9 +248,9 @@ interface Engine extends GameEvents{
     gui: ReturnType<typeof createGraphics>
     mobile: boolean
     guiObjects: { [x: UUID]: GUIElement }
-    eventListener: {[x:UUID]:{[x:string]:Function}}
+    eventListener: { [x: UUID]: { [x: string]: Function } }
 }
-interface GUIElement extends GameObject{
+interface GUIElement extends GameObject {
     id: UUID
     mobileOnly: boolean;
     position: Vec
@@ -271,21 +271,34 @@ interface Particle {
     velocity: number
     toBeRemoved: boolean
     creation: ReturnType<typeof frameCount>
-    shape: 'line'|'circle'
+    shape: 'line' | 'circle'
     size: number
     color: string
+    sinDir: number;
+    cosDir: number
 }
-interface ParticleRenderer{
-    settings:{timer:number,howManyPer:number,lifeTime: number,
-        rDirX: number[],
-        rDirY: number[],
-        gDir:  number[],
-        velocity: number,
-        pos: xyObject,
-        size: number, // Default size
-        color: string, // Default color (red)
-        shape: 'line'|'circle'}
-    particles:Particle[]
+interface gameParticle extends Component {
+    id: UUID
+    manager: ParticleRenderer
+}
+interface ParticleRenderer {
+    settings: {
+        autoPlay: boolean;
+        timer: number;
+        howManyPer: number;
+        lifeTime: number;
+        rDirX: number[];
+        rDirY: number[];
+        gDir: number[];
+        velocity: number;
+        pos: xyObject;
+        size: number; // Default size
+        color: string; // Default color (red)
+        shape: 'line' | 'circle'
+        loop: boolean;
+    }
+    particles: Particle[]
+    allIntervals: number[]
     ownObject: GameObject
     graphics: ReturnType<typeof createGraphics>
     lastFrame: ReturnType<typeof createImage>

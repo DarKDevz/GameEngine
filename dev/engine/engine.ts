@@ -111,7 +111,7 @@ class Engine extends GameEvents {
         this.activeScene?.mouseClicked(e, Boolean(window?.editor));
     }
     mouseWheel(e: WheelEvent) {
-        if (Boolean(window?.editor)) {
+        if (Boolean(window?.editor) && !overUI) {
             if (abs(e.deltaY) > abs(e.deltaX)) {
                 engine.camera.zoom -= constrain(e.deltaY,-8,8) * .035 * engine.camera.zoom;
                 engine.camera.zoom = constrain(engine.camera.zoom, 0.01, 5);
