@@ -195,8 +195,13 @@ async function createZip() {
         zip.file(scriptInfo.path, scriptContent);
     }));
     // Generate the zip
-    zip.generateAsync({ type: 'blob' })
-        .then(function (content) {
+    let content = await zip.generateAsync({ type: 'blob' })
+    if (window?.showSaveFilePicker) {
+        let file = await showSaveFilePicker({suggestedName:"project.zip",types:[{description:"Zip File",accept: {"text/blob":[".zip"]}}] });
+        file = await file.createWritable()
+        file.write(content);
+        file.close()
+    } else {
         downloadFile(content, 'export.zip');
-    });
+    }
 }

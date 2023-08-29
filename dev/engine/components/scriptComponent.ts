@@ -686,6 +686,9 @@ class ParticleRenderer {
 		if(this.settings.autoPlay)this.addAll()
 	}
 	addAll() {
+		if(this.allIntervals.length !== 0) {
+			this.stop()
+		}
 		this.allIntervals = [
 			setInterval(() => {
 				for (let i = 0; i < this.settings.howManyPer; i++) {
@@ -710,6 +713,7 @@ class ParticleRenderer {
 		for (let index of this.allIntervals) {
 			clearInterval(index);
 		}
+		this.allIntervals = [];
 	}
 	pause() {
 		this.stop()

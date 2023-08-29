@@ -809,7 +809,7 @@ function addEditableSprite(name, set, get, parentName = "sideMenu", additionalDi
             _get = () => { val; };
         };
     });
-    inp.size(177, "fit-content");
+    inp.size(177, 'fit-content');
     let infoId = infoDivs.push(divHolder);
     infoDivs[infoId - 1].parent(parentName);
     inputField.parent(divHolder);

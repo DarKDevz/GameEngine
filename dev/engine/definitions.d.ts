@@ -8,7 +8,7 @@ declare var b2PolygonShape: Box2D.Collision.Shapes.b2PolygonShape
 declare var canvas: any
 declare var MapData: { data: any }
 declare var JSZip: any
-
+declare function showSaveFilePicker(options:any): Promise<any>
 type Vec = ReturnType<typeof createVector>
 type Div = ReturnType<typeof createDiv>
 type b2Shape = Box2D.Collision.Shapes.b2Shape
