@@ -147,7 +147,7 @@ class Engine extends GameEvents {
         window.windowResized ??= () => this.resize();
     }
     setup() {
-        canvas.oncontextmenu = function (e) {
+        document.oncontextmenu = function (e) {
             e.preventDefault();
         };
     }
@@ -168,7 +168,12 @@ class Engine extends GameEvents {
         pop();
         this.gui.fill(0);
         this.gui.text("FPS: " + round(frameRate() / 10) * 10, 50, 50);
-        image(this.gui, 0, 0, width, height);
+        if (webglVersion !== "p2d") {
+            image(this.gui, -width / 2, -height / 2, width, height);
+        }
+        else {
+            image(this.gui, 0, 0, width, height);
+        }
     }
     onload(uuid, func) {
         this.eventListener[uuid] = Object.assign({ onload: func }, this.eventListener[uuid]);

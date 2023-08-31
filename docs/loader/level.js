@@ -278,7 +278,8 @@ class Level extends GameEvents {
         engine.gui.stroke(0);
     }
     display(OnlyDraw = false) {
-        translate(width / 2, height / 2);
+        if (webglVersion === "p2d")
+            translate(width / 2, height / 2);
         let camera = engine.camera;
         let cameraPos = camera.updateCameraPos();
         scale(camera.zoom);
@@ -329,9 +330,9 @@ class Level extends GameEvents {
         }
         translate(cameraPos.x, cameraPos.y);
         if (engine.errorText) {
-            fill(0);
-            textSize(16);
-            text(engine.errorText, 50 - width / 2, 50 - height / 2);
+            engine.gui.fill(0);
+            engine.gui.textSize(16);
+            engine.gui.text(engine.errorText, 50, 150);
         }
         translate(-cameraPos.x, -cameraPos.y);
         reloadcurrent();

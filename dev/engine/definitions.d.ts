@@ -9,6 +9,7 @@ declare var canvas: any
 declare var MapData: { data: any }
 declare var JSZip: any
 declare function showSaveFilePicker(options:any): Promise<any>
+declare var webglVersion: 'p2d'|'webgl2'
 type Vec = ReturnType<typeof createVector>
 type Div = ReturnType<typeof createDiv>
 type b2Shape = Box2D.Collision.Shapes.b2Shape

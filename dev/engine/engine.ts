@@ -113,7 +113,7 @@ class Engine extends GameEvents {
     mouseWheel(e: WheelEvent) {
         if (Boolean(window?.editor) && !overUI) {
             if (abs(e.deltaY) > abs(e.deltaX)) {
-                engine.camera.zoom -= constrain(e.deltaY,-8,8) * .035 * engine.camera.zoom;
+                engine.camera.zoom -= constrain(e.deltaY, -8, 8) * .035 * engine.camera.zoom;
                 engine.camera.zoom = constrain(engine.camera.zoom, 0.01, 5);
             } else {
                 editor.cameraPos.x += (e.deltaX) / engine.camera.zoom;
@@ -145,7 +145,7 @@ class Engine extends GameEvents {
         window.windowResized ??= () => this.resize();
     }
     setup() {
-        canvas.oncontextmenu = function (e) {
+        document.oncontextmenu = function (e) {
             e.preventDefault();
         }
     }
@@ -166,7 +166,11 @@ class Engine extends GameEvents {
         pop()
         this.gui.fill(0);
         this.gui.text("FPS: " + round(frameRate() / 10) * 10, 50, 50);
-        image(this.gui, 0, 0, width, height);
+        if (webglVersion !== "p2d") {
+            image(this.gui, -width / 2, -height / 2, width, height);
+        } else {
+            image(this.gui, 0, 0, width, height);
+        }
     }
     onload(uuid: UUID, func: (arg0: GameObject) => void) {
         this.eventListener[uuid] = Object.assign({ onload: func }, this.eventListener[uuid])

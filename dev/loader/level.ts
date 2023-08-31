@@ -163,7 +163,7 @@ function ScenesfromObject(levelsObject: ImportInterface) {
             return;
         }
     }
-    if(levelsObject.GUI.default) {
+    if (levelsObject.GUI.default) {
         engine.assignUUID("Joystick");
         let stick = new Joystick(windowHeight / 3 / 1.5, windowHeight - windowHeight / 3 / 1.5, windowHeight / 3, windowHeight / 6, {});
         stick.mobileOnly = true;
@@ -176,7 +176,7 @@ function ScenesfromObject(levelsObject: ImportInterface) {
             stick.stickSize = wh / 6
         }
         engine.assignUUID("Button");
-        let jumpBtn = new Button(windowWidth - windowHeight / 3 / 1.5, windowHeight - windowHeight / 3 / 1.5, windowHeight / 3,()=>{},()=>{})
+        let jumpBtn = new Button(windowWidth - windowHeight / 3 / 1.5, windowHeight - windowHeight / 3 / 1.5, windowHeight / 3, () => { }, () => { })
         jumpBtn.resize = (ww, wh) => {
             jumpBtn.position.x = ww - wh / 3 / 1.5
             jumpBtn.position.y = wh - wh / 3 / 1.5
@@ -272,7 +272,7 @@ class Level extends GameEvents {
         engine.gui.stroke(0);
     }
     display(OnlyDraw = false) {
-        translate(width / 2, height / 2);
+        if (webglVersion === "p2d") translate(width / 2, height / 2);
         let camera: Camera = engine.camera
         let cameraPos = camera.updateCameraPos()
         scale(camera.zoom);
@@ -322,20 +322,20 @@ class Level extends GameEvents {
         }
         translate(cameraPos.x, cameraPos.y)
         if (engine.errorText) {
-            fill(0)
-            textSize(16);
-            text(engine.errorText, 50 - width / 2, 50 - height / 2)
+            engine.gui.fill(0)
+            engine.gui.textSize(16);
+            engine.gui.text(engine.errorText, 50, 150)
         }
         translate(-cameraPos.x, -cameraPos.y)
         reloadcurrent();
     }
     lateUpdate(shouldRun = true) {
         if (shouldRun) {
-        for (let t_box of this.boxes) {
-            t_box.lateUpdate();
+            for (let t_box of this.boxes) {
+                t_box.lateUpdate();
+            }
         }
-    }
-    reloadcurrent();
+        reloadcurrent();
     }
     earlyUpdate(shouldRun = true) {
         if (!shouldRun) return 1;

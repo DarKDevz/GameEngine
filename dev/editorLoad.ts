@@ -34,13 +34,12 @@ function preload() {
 }
 function setup() {
     //Initialize Game things
-    createCanvas(windowWidth, windowHeight);
+    createCanvas(windowWidth, windowHeight, WEBGL);
+    noSmooth();
     //Remove right click default behaviour
-    canvas.oncontextmenu = function (e) {
+    document.oncontextmenu = function (e) {
         e.preventDefault();
     }
-    noSmooth();
-
 }
 function draw() {
     //Make Sure it's loaded correctly

@@ -10,7 +10,7 @@ globalThis.setup = function () {
     createCanvas(windowWidth, windowHeight);
     noSmooth();
     //Remove right click default behaviour
-    canvas.oncontextmenu = function (e) {
+    document.oncontextmenu = function (e) {
         e.preventDefault();
     };
     engine.setup();
