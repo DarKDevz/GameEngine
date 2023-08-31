@@ -169,7 +169,7 @@ function ScenesfromObject(levelsObject) {
     }
     if (levelsObject.GUI.default) {
         engine.assignUUID("Joystick");
-        let stick = new Joystick(windowHeight / 3 / 1.5, windowHeight - windowHeight / 3 / 1.5, windowHeight / 3, windowHeight / 6, {});
+        let stick = new Joystick(height / 3 / 1.5, height - height / 3 / 1.5, height / 3, height / 6, {});
         stick.mobileOnly = true;
         stick.resize = (ww, wh) => {
             stick.position.x = wh / 3 / 1.5;
@@ -180,7 +180,7 @@ function ScenesfromObject(levelsObject) {
             stick.stickSize = wh / 6;
         };
         engine.assignUUID("Button");
-        let jumpBtn = new Button(windowWidth - windowHeight / 3 / 1.5, windowHeight - windowHeight / 3 / 1.5, windowHeight / 3, () => { }, () => { });
+        let jumpBtn = new Button(width - height / 3 / 1.5, height - height / 3 / 1.5, height / 3, () => { }, () => { });
         jumpBtn.resize = (ww, wh) => {
             jumpBtn.position.x = ww - wh / 3 / 1.5;
             jumpBtn.position.y = wh - wh / 3 / 1.5;
