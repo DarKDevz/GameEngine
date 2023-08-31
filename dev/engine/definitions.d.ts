@@ -37,6 +37,7 @@ interface GUIElement extends GameObject {
     size: number
 }
 interface ImportInterface {
+    _font: { default: boolean , value: string};
     version: number
     file: { [x: UUID]: FileConstructor }[]
     GUI: { default: boolean }

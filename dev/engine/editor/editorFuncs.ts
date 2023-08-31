@@ -491,7 +491,8 @@ class Editor {
                     Data:[[0, 100, 100, 500, 50]],
                     sceneData:[0, 400, -10, 500],
                 }
-            }
+            },
+            _font:{default:true,value:''}
             }
             engine = new Engine();
             ScenesfromObject(emptyExample)
@@ -844,7 +845,7 @@ function addEditableSprite(name, set, get,
     accordionMenu(headerText, inputField, "Sprite Component", opener);
     inp.mousePressed(() => {
 
-        let popup = window.open('imagePopup.html', '_blank', 'width=400,height=400');
+        let popup = window.open('fileInput.html', '_blank', 'width=400,height=400');
         popup._ImageData = () => {
             return _get();
         }

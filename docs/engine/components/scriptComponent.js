@@ -422,7 +422,7 @@ class gameSprite extends Component {
                 content.changeName(file);
             }
             else {
-                let popup = window.open('imagePopup.html', '_blank', 'width=400,height=400');
+                let popup = window.open('fileInput.html', '_blank', 'width=400,height=400');
                 popup._ImageData = () => {
                     return _get();
                 };

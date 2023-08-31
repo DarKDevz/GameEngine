@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="libs/p5.min.js"></script>
+    <script>
+        var context, font;
+        function setup() {
+            createCanvas(50, 50)
+            context = canvas.getContext('2d');
+            noSmooth()
+            if (this._ImageData) {
+                // Set the source of the image to the base64 data
+                clear()
+                let img = loadImage(this._ImageData(), () => {
+                    resizeCanvas(img.width, img.height)
+                    image(img, 0, 0, img.width, img.height);
+                });
+            }
+            noLoop()
+        }
+        function handleFile(input) {
+            let file = input.files[0];
+            let reader = new FileReader();
+            reader.onload = function (event) {
+                let result = event.target.result;
+                if (file.type.startsWith('image/')) {
+                    clear()
+                    let img = loadImage(result, () => {
+                        resizeCanvas(img.width, img.height)
+                        image(img, 0, 0, img.width, img.height);
+                    });
+                    window.opener.jsonImage(result);
+                } else if (file.type.startsWith("font/ttf")) {
+                    (window.opener?.jsonFont ? window.opener.jsonFont : () => { })();
+                    clear()
+                    resizeCanvas(windowWidth, 150)
+                    font = loadFont(result, () => {
+                        textFont(font ? font : 'sans-serif')
+                        text("This is the font,qwertyuiopasdfghjklzxcvbnm,.-òàù+è\/&%$£!", 50, 50)
+                    })
+                } else if (file.type.startsWith('audio/') || file.type === 'text/plain') {
+                    // Throw an error for audio or text file
+                    throw new Error('Unsupported file type');
+                } else {
+                    console.log(result);
+                    throw new Error('Invalid file type');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+        console.log(handleFile);
+    </script>
+</head>
+
+<body>
+    <input type="file" onchange="handleFile(this)">
+</body>
+
+</html>
