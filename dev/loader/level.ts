@@ -282,15 +282,14 @@ class Level extends GameEvents {
         stroke(0, 255, 0);
         line(this.pos.x, this.pos.y, this.pos.x, this.pos.y + 25);
         stroke(0);
-        engine.gui.translate(0, -engine.cameraPos.y + height / 2);
-        engine.gui.stroke(255, 0, 0);
-        engine.gui.line(0, this.maxPos, width, this.maxPos);
-        engine.gui.resetMatrix()
-        engine.gui.stroke(0);
+        let mult = 1 / engine.camera.zoom
+        stroke(255, 0, 0);
+        strokeWeight(mult);
+        line((engine.cameraPos.x - (width / 2 * mult)),this.maxPos,width * mult, this.maxPos);
     }
     display(OnlyDraw = false) {
         if (webglVersion === "p2d") translate(width / 2, height / 2);
-        let camera: Camera = engine.camera
+        let camera = engine.camera
         let cameraPos = camera.updateCameraPos()
         scale(camera.zoom);
         translate(-cameraPos.x, -cameraPos.y)
