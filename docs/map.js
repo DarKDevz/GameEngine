@@ -16,8 +16,7 @@ window.preload = async function () {
 window.setup = function () {
     //Initialize Game things
     window.topDiv = document.getElementById("topDiv");
-    let cnv = createCanvas(window.topDiv.clientWidth, window.topDiv.clientHeight);
-    cnv.parent(document.getElementById("topDiv"));
+    createCanvas(window.topDiv.clientWidth, window.topDiv.clientHeight, WEBGL);
     noSmooth();
     //Initialize Editor things
     editor = new Editor();
@@ -26,6 +25,7 @@ window.setup = function () {
     engine.cameraPos = editor.cameraPos;
     engine.camera.isLocked = true;
     windowResized();
+    document.getElementById("topDiv").appendChild(canvas);
 };
 window.draw = function () {
     //engine.load();
@@ -44,5 +44,10 @@ window.draw = function () {
     //Editor things
     editor.onUpdate();
     pop();
-    image(engine.gui, 0, 0, width, height);
+            if (webglVersion !== "p2d") {
+            image(engine.gui, -width / 2, -height / 2, width, height);
+        }
+        else {
+            image(engine.gui, 0, 0, width, height);
+        }
 };

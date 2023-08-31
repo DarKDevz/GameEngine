@@ -293,7 +293,6 @@ class Level extends GameEvents {
         stroke(0);
         let mult = 1 / engine.camera.zoom
         stroke(255, 0, 0);
-        strokeWeight(mult*2);
         line((engine.cameraPos.x - (width / 2 * mult)),this.maxPos,width * mult, this.maxPos);
     }
     display(OnlyDraw = false) {

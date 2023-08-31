@@ -185,13 +185,13 @@ class Joystick extends GUIElement {
         engine.gui.fill(0);
     }
     getValues() {
-        return super.getValues().concat(this.stickSize);
+        return super.getValues().concat(this.stickSize,this.dir);
     }
     getActualValuesName() {
-        return super.getActualValuesName().concat("stickSize");
+        return super.getActualValuesName().concat("stickSize","dir");
     }
     getValuesName() {
-        return super.getValuesName().concat("Size of stick");
+        return super.getValuesName().concat("Size of stick","Direction");
     }
     touchStarted() {
         for (let touch of touches) {

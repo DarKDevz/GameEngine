@@ -47,7 +47,7 @@ class Bullet extends GameObject {
         let collides = collideCircle(rect, this);
         return collides;
     }
-    display() {
+    draw() {
         this.oldX = this.x;
         this.oldY = this.y;
         fill(0, 255, 0);
