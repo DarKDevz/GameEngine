@@ -542,10 +542,18 @@ class gameSprite extends Component {
 	}
 }
 class gameParticle extends Component {
+	static stopAll: () => void;
+	static allIntervals: number[];
 	constructor({ obj, settings }) {
 		super("gameParticle", obj);
 		this.id = engine.generateUUID()
-		this.manager = new ParticleRenderer(this.ownObject, settings)
+		this.settings = settings;
+		if(""+engine.activeScene === obj.sceneInd) {
+			this.initialize()
+		}
+	}
+	initialize() {
+		this.manager ??= new ParticleRenderer(this.ownObject, this.settings)
 	}
 	toJson() {
 		return {
@@ -556,8 +564,8 @@ class gameParticle extends Component {
 		};
 	}
 	update() {
-		this.manager.update()
-		this.manager.display()
+		this.manager?.update()
+		this.manager?.display()
 	}
 	MenuEdit(parent) {
 		Component.componentOpen[this.id] ??= { value: false }
@@ -570,7 +578,7 @@ class gameParticle extends Component {
 		inputField.parent(divHolder);
 		accordionMenu(headerText, inputField, "Particle Editor", shouldOpen);
 		infoDivs.push(divHolder);
-		this.addNewEditObj(this.manager.settings, inputField, Component.componentOpen[this.id])
+		this.addNewEditObj(this.manager?.settings?this.manager.settings:this.settings, inputField, Component.componentOpen[this.id])
 	}
 	updateValues() {
 		this.manager.reloadLoops()
@@ -603,6 +611,13 @@ class gameParticle extends Component {
 		}
 	}
 }
+gameParticle.stopAll = function() {
+	for(let i of gameParticle.allIntervals) {
+	clearInterval(i);
+	}
+	gameParticle.allIntervals = [];
+}
+gameParticle.allIntervals = []
 class Particle {
 	constructor(settings, graphics) {
 		this.lifeTime = settings.lifeTime;
@@ -702,6 +717,7 @@ class ParticleRenderer {
 				1000 / 60),
 			setInterval(this.asyncUpdate.bind(this), 1000 / 60
 			)]
+		gameParticle.allIntervals.push(...this.allIntervals);
 	}
 	onStop() { }
 	onStep() { }
@@ -711,6 +727,10 @@ class ParticleRenderer {
 	stop() {
 		for (let index of this.allIntervals) {
 			clearInterval(index);
+			let _ = gameParticle.allIntervals.indexOf(index)
+			if(_!==-1) {
+				gameParticle.allIntervals.splice(_,1)
+			}
 		}
 		this.allIntervals = [];
 	}

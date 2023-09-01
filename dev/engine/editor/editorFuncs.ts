@@ -701,38 +701,44 @@ class Editor {
             for (let editable of edit) {
                 if (editable?.isComponent) {
                     engine.getfromUUID(uuid)?.components[editable.componentId].MenuEdit?.('sideMenu')
-                } else if (editable?.addComponent) {
+                }                else if (editable?.addComponent) {
                     let divHolder = createDiv();
                     let ComponentSelect = createSelect();
                     for (const [key, value] of Object.entries(engine.componentList)) {
                         if (key !== "gameFile")
                             ComponentSelect.option(key);
                     }
-                    ComponentSelect.style('cursor: pointer;')
+                    ComponentSelect.style('cursor: pointer;');
                     ComponentSelect.parent(divHolder);
                     let addButton = createButton("Add");
-                    addButton.elt.title = "Add component"
+                    addButton.elt.title = "Add component";
                     divHolder.elt.ondrop = (event) => {
                         //console.log(event);
-                        if (event.dataTransfer.getData("UUID") === "") return;
+                        if (event.dataTransfer.getData("UUID") === "")
+                            return;
                         console.warn(event.dataTransfer.getData("UUID"));
                         if (event.dataTransfer.files.length > 0) {
                             this.makeFile(event).then((file) => {
                                 let className = Engine.fileTypeList[file.type];
-                                engine.getfromUUID(uuid).components.push(new engine.componentList[className]({
+                                let component = new engine.componentList[className]({
                                     obj: engine.getfromUUID(uuid),
                                     fileUUID: file.UUID
-                                }));
-                            })
-                        } else {
+                                });
+                                component.initialize();
+                                engine.getfromUUID(uuid).components.push(component);
+                            });
+                        }
+                        else {
                             let uuid = event.dataTransfer.getData("UUID");
                             let file = engine.files[uuid];
                             let className = Engine.fileTypeList[file.type];
                             console.log(className);
-                            engine.getfromUUID(uuid).components.push(new engine.componentList[className]({
+                            let component = new engine.componentList[className]({
                                 obj: engine.getfromUUID(uuid),
                                 fileUUID: uuid
-                            }));
+                            })
+                            component.initialize();
+                            engine.getfromUUID(uuid).components.push(component);
                             console.warn(file);
                         }
                     };
@@ -741,12 +747,14 @@ class Editor {
                         //console.warn(event.dataTransfer.getData("UUID"));
                     };
                     addButton.mousePressed(() => {
-                        engine.getfromUUID(uuid).components.push(new engine.componentList[ComponentSelect.value()]({
+                        let component = new engine.componentList[ComponentSelect.value()]({
                             obj: engine.getfromUUID(uuid)
-                        }));
+                        });
+                        component.initialize()
+                        engine.getfromUUID(uuid).components.push(component);
                     });
                     addButton.parent(divHolder);
-                    addButton.style('cursor: pointer;')
+                    addButton.style('cursor: pointer;');
                     divHolder.parent('sideMenu');
                     infoDivs.push(divHolder);
                 }else {

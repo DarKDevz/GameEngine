@@ -404,6 +404,7 @@ class Level extends GameEvents {
         player.colliding = false;
         player.collidedId = null;
         player.vel = createVector(0, 0);
+        gameParticle.stopAll();
         if (engine.currentScene !== undefined) {
             for (let box of engine.getActiveScene().boxes) {
                 box.removeBody();
@@ -420,6 +421,9 @@ class Level extends GameEvents {
         //console.error(this.boxes);
         for (let t_box of this.boxes) {
             t_box.init();
+            for (let component of t_box.components) {
+                component.initialize();
+            }
         }
     }
     reloadBoxes() {

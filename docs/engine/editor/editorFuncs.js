@@ -676,10 +676,12 @@ class Editor {
                         if (event.dataTransfer.files.length > 0) {
                             this.makeFile(event).then((file) => {
                                 let className = Engine.fileTypeList[file.type];
-                                engine.getfromUUID(uuid).components.push(new engine.componentList[className]({
+                                let component = new engine.componentList[className]({
                                     obj: engine.getfromUUID(uuid),
                                     fileUUID: file.UUID
-                                }));
+                                });
+                                component.initialize();
+                                engine.getfromUUID(uuid).components.push(component);
                             });
                         }
                         else {
@@ -687,10 +689,12 @@ class Editor {
                             let file = engine.files[uuid];
                             let className = Engine.fileTypeList[file.type];
                             console.log(className);
-                            engine.getfromUUID(uuid).components.push(new engine.componentList[className]({
+                            let component = new engine.componentList[className]({
                                 obj: engine.getfromUUID(uuid),
                                 fileUUID: uuid
-                            }));
+                            });
+                            component.initialize();
+                            engine.getfromUUID(uuid).components.push(component);
                             console.warn(file);
                         }
                     };
@@ -699,9 +703,11 @@ class Editor {
                         //console.warn(event.dataTransfer.getData("UUID"));
                     };
                     addButton.mousePressed(() => {
-                        engine.getfromUUID(uuid).components.push(new engine.componentList[ComponentSelect.value()]({
+                        let component = new engine.componentList[ComponentSelect.value()]({
                             obj: engine.getfromUUID(uuid)
-                        }));
+                        });
+                        component.initialize();
+                        engine.getfromUUID(uuid).components.push(component);
                     });
                     addButton.parent(divHolder);
                     addButton.style('cursor: pointer;');

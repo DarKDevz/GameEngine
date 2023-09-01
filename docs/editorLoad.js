@@ -1,4 +1,3 @@
-var loadInterval;
 var MapData = { data: "" };
 function changeMapData(data) {
     window.loaded = true;
@@ -8,19 +7,15 @@ function changeMapData(data) {
 function doReload() {
     console.error("works");
     //Clean up all intervals
-    let id = setTimeout(() => { }, 0);
-    while (id--) {
-        clearTimeout(id);
-    }
     preload();
 }
 function checkLoad() {
     if (window.loaded) {
-        clearInterval(loadInterval);
         engine = new Engine();
         window.windowResized = () => { engine.resize(); };
         player = new Player();
         JsonMap(MapData);
+        return;
     }
     else if (window.editorData) {
         changeMapData(window.editorData);
@@ -28,11 +23,11 @@ function checkLoad() {
     else if (localStorage.getItem("map")) {
         changeMapData(localStorage.getItem("map"));
     }
+    setTimeout(checkLoad, 200);
 }
 function preload() {
     window.loaded = false;
-    clearInterval(loadInterval);
-    loadInterval = setInterval(checkLoad, 200);
+    setTimeout(checkLoad, 200);
 }
 function setup() {
     //Initialize Game things
