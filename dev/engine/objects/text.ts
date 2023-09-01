@@ -226,15 +226,6 @@ class Joystick extends GUIElement {
     }
     getEditableArray(): EditableObject[] {
         return super.getEditableArray().concat({
-            name:"Base Size",
-            get:() => {
-                return this.size
-            },
-            set:(value)=>{
-                this.size = value
-            },
-            value:this.size
-        },{
             name:"Size of stick",
             get:() => {
                 return this.stickSize
