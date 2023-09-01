@@ -47,6 +47,9 @@ class GUIElement extends GameObject {
         let dist = coords.dist(this.position)
         return dist < this.size;
     }
+    getParameters(): any[] {
+        return [this.position.x,this.position.y];
+    }
     getValuesName(): string[] {
         return ["Mobile Button", "GUI Size"]
     }

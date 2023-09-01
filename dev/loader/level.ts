@@ -56,13 +56,15 @@ function removeObject(objId: UUID | GameObject | number) {
         obj.delete()
         //delete engine.uuidList[objId];
     } else if (typeof objId === "object") {
-        deleteUser(objId);
-        if (!objId) return;
-        objId.delete()
+        let obj: GameObject = objId;
+        deleteUser(obj);
+        if (!obj) return;
+        obj.delete()
         //delete engine.uuidList[objId.uuid];
     }
     else {
-        let obj = engine.getActiveScene().boxes[objId]
+        let index: any = objId;
+        let obj = engine.getActiveScene().boxes[index]
         if (!obj) return;
         deleteUser(obj)
         engine.uuidList[obj.uuid].delete();

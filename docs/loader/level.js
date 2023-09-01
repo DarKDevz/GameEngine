@@ -453,7 +453,7 @@ class Level extends GameEvents {
             return box.typeId !== undefined;
         });
         window?.editor?.updateLevels?.();
-        const boxVals = this.boxes.map((t_box) => [t_box.typeId, ...t_box.getValues()]);
+        const boxVals = this.boxes.map((t_box) => [t_box.typeId, ...t_box.getParameters()]);
         return boxVals;
     }
     addSceneBtn(leftDiv, openerState) {

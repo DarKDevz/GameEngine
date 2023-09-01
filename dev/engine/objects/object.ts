@@ -64,6 +64,9 @@ class GameObject extends GameEvents{
         this.x = x;
         this.y = y;
     }
+    getParameters(): any[] {
+        return [this.x,this.y];
+    }
     getValues(): any[] {
         return [this.x, this.y];
     }

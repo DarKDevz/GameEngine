@@ -4,7 +4,6 @@ class Interactive extends GameObject {
         super(x, y, "interactive");
         this.r = radius;
         this.z = 1;
-        this.callback = callback;
         this.components = [];
         this.collisionType = 'Circle'
         /*let gScript = new gameScript({ obj: this, fn: callback });
@@ -18,6 +17,9 @@ class Interactive extends GameObject {
 
     getCollisionVectors() {
         return [{ x: this.x, y: this.y }, this.r * 2]
+    }
+    getParameters(): any[] {
+        return super.getParameters().concat( 0, this.r)
     }
     getValuesName() {
         return [...super.getValuesName(), "noMenu", "radius"];

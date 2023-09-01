@@ -158,6 +158,9 @@ class Box extends GameObject {
         }
     }
     onCollide(obj: Object): void { }
+    getParameters(): any[] {
+        return super.getParameters().concat(this.width, this.height)
+    }
 }
 
 

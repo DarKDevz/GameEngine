@@ -48,6 +48,9 @@ class movingPlatform extends Box {
 		fill(this.clr);
 		rect(this.x, this.y, this.width, this.height);
 	}
+	getParameters(): any[] {
+		return super.getValues().concat(this.x1, this.x2);
+	}
 	getValues() {
 		return [...super.getValues(), this.x1, this.x2];
 	}
