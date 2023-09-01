@@ -12,21 +12,33 @@ class TextObject extends GameObject {
         this.loaded = true;
         this.width = textWidth(this.t);
     }
+    getParameters(): any[] {
+        return [...super.getParameters(),this.t]
+    }
+    getEditableArray(): EditableObject[] {
+        return [...super.getEditableArray(),{
+            name:"radius",
+            set:(val) => {
+                this.text = val
+            },
+            get:()=> {
+                return this.text;
+            },
+            value:this.text
+        }]
+    }
     getClassName() {
         return "Text"
     }
-    getValues() {
-        return [...super.getValues(), this.t];
-    }
-    getValuesName() {
-        return [...super.getValuesName(), "text"]
-    }
-    getActualValuesName() {
-        return [...super.getActualValuesName(), "text"]
+    parameterNames() {
+        return [...super.parameterNames(), "text"]
     }
     set text(v: string) {
         this.t = v;
         if (this.loaded) this.width = textWidth(this.t);
+    }
+    get text() {
+        return this.t
     }
     display() {
         fill(this.clr)
@@ -47,17 +59,42 @@ class GUIElement extends GameObject {
         let dist = coords.dist(this.position)
         return dist < this.size;
     }
+    getEditableArray(): EditableObject[] {
+        return [{
+            name:"x",
+            set:(val)=> {
+                this.position.x = val
+            },
+            get:()=>{
+                return this.position.x
+            },
+            value: this.position.x
+        },{
+            name:"y",
+            set:(val)=> {
+                this.position.y = val
+            },
+            get:()=>{
+                return this.position.y
+            },
+            value:this.position.y
+        },{
+            name:"isMobile",
+            set:(val)=>{this.mobileOnly = val},
+            get:()=>{return this.mobileOnly},
+            value:this.mobileOnly
+        },{
+            name:"Size",
+            set:(val)=>{this.size = val},
+            get:()=>{return this.size},
+            value:this.size
+        }]
+    }
     getParameters(): any[] {
         return [this.position.x,this.position.y];
     }
-    getValuesName(): string[] {
-        return ["Mobile Button", "GUI Size"]
-    }
-    getValues(): any[] {
-        return [this.mobileOnly,this.size]
-    }
-    getActualValuesName(): string[] {
-        return ["mobileOnly","size"]
+    parameterNames(): string[] {
+        return ["x", "y"]
     }
     resize(ww, wh) {
 
@@ -187,14 +224,32 @@ class Joystick extends GUIElement {
         engine.gui.ellipse(this.stickPosition.x, this.stickPosition.y, this.stickSize);
         engine.gui.fill(0)
     }
-    getValues(): any[] {
-        return super.getValues().concat(this.stickSize)
+    getEditableArray(): EditableObject[] {
+        return super.getEditableArray().concat({
+            name:"Base Size",
+            get:() => {
+                return this.size
+            },
+            set:(value)=>{
+                this.size = value
+            },
+            value:this.size
+        },{
+            name:"Size of stick",
+            get:() => {
+                return this.stickSize
+            },
+            set:(value)=>{
+                this.stickSize = value
+            },
+            value:this.stickSize
+        })   
     }
-    getActualValuesName(): string[] {
-        return super.getActualValuesName().concat("stickSize")
+    getParameters(): any[] {
+        return super.getParameters().concat(this.size,this.stickSize,this.dir);
     }
-    getValuesName(): string[] {
-        return super.getValuesName().concat("Size of stick")
+    parameterNames(): string[] {
+        return super.parameterNames().concat("base Size","Size of stick","Direction")
     }
     touchStarted() {
         for (let touch of touches) {

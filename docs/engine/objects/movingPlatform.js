@@ -51,14 +51,32 @@ class movingPlatform extends Box {
         fill(this.clr);
         rect(this.x, this.y, this.width, this.height);
     }
-    getValues() {
-        return [...super.getValues(), this.x1, this.x2];
+    getParameters() {
+        return super.getParameters().concat(this.x1, this.x2);
     }
-    getValuesName() {
-        return [...super.getValuesName(), "placeX1", "placeX2"];
+    getEditableArray() {
+        return [...super.getEditableArray(), {
+                name: "Point A",
+                set: (val) => {
+                    this.x1 = val;
+                },
+                get: () => {
+                    return this.x1;
+                },
+                value: this.x1
+            }, {
+                name: "Point B",
+                set: (val) => {
+                    this.x2 = val;
+                },
+                get: () => {
+                    return this.x2;
+                },
+                value: this.x2
+            }];
     }
-    getActualValuesName() {
-        return [...super.getActualValuesName(), "x1", "x2"];
+    parameterNames() {
+        return [...super.parameterNames(), "placeX1", "placeX2"];
     }
     earlyUpdate() {
         if (player.grounded && player.groundedId === this.uuid) {

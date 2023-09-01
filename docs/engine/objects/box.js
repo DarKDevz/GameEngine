@@ -81,14 +81,8 @@ class Box extends GameObject {
     getCollisionVectors() {
         return [this, { x: this.width, y: this.height }];
     }
-    getValuesName() {
-        return super.getValuesName().concat(["width", "height"]);
-    }
-    getValues() {
-        return super.getValues().concat(this.width, this.height);
-    }
-    getActualValuesName() {
-        return super.getActualValuesName().concat(["width", "height"]);
+    parameterNames() {
+        return super.parameterNames().concat(["width", "height"]);
     }
     draw() {
         fill(this.clr);
@@ -152,4 +146,28 @@ class Box extends GameObject {
         }
     }
     onCollide(obj) { }
+    getParameters() {
+        return super.getParameters().concat(this.width, this.height);
+    }
+    getEditableArray() {
+        return [...super.getEditableArray(), {
+                name: "width",
+                set: (val) => {
+                    this.width = val;
+                },
+                get: () => {
+                    return this.width;
+                },
+                value: this.width
+            }, {
+                name: "height",
+                set: (val) => {
+                    this.height = val;
+                },
+                get: () => {
+                    return this.height;
+                },
+                value: this.height
+            }];
+    }
 }

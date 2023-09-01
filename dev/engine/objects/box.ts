@@ -85,17 +85,10 @@ class Box extends GameObject {
     getCollisionVectors(): (this | { x: number; y: number; })[] {
         return [this, { x: this.width, y: this.height }]
     }
-    getValuesName(): string[] {
-        return super.getValuesName().concat(["width", "height"]);
+    parameterNames(): string[] {
+        return super.parameterNames().concat(["width", "height"]);
     }
 
-    getValues(): any[] {
-        return super.getValues().concat(this.width, this.height);
-    }
-
-    getActualValuesName(): string[] {
-        return super.getActualValuesName().concat(["width", "height"]);
-    }
     draw(): void {
         fill(this.clr);
         rect(this.x, this.y, this.width, this.height);
@@ -160,6 +153,27 @@ class Box extends GameObject {
     onCollide(obj: Object): void { }
     getParameters(): any[] {
         return super.getParameters().concat(this.width, this.height)
+    }
+    getEditableArray(): EditableObject[] {
+        return [...super.getEditableArray(),{
+            name:"width",
+            set:(val) => {
+                this.width = val;
+            },
+            get:() => {
+                return this.width
+            },
+            value:this.width
+        },{
+            name:"height",
+            set:(val) =>{
+                this.height = val;
+            },
+            get:() => {
+                return this.height
+            },
+            value:this.height
+        }]
     }
 }
 

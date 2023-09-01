@@ -190,4 +190,17 @@ Array.prototype.equals = function (array: Array<any>) {
 Object.defineProperty(Array.prototype, "equals", {
     enumerable: false,
 });
-
+function deepReadCheck(obj1,obj2) {
+    //Returns 1 if the same, 0 if value has changed, -1 if different lengths
+    let read = JSON.stringify
+    if(read(obj1)===read(obj2)) {
+      //all values are the same
+      return 1;
+    }else {
+      if(read(Object.getOwnPropertyNames(obj1))===read(Object.getOwnPropertyNames(obj2))) {
+        return 0;
+      }else {
+        return -1;
+      }
+    }
+  }

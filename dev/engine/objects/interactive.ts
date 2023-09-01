@@ -21,14 +21,20 @@ class Interactive extends GameObject {
     getParameters(): any[] {
         return super.getParameters().concat( 0, this.r)
     }
-    getValuesName() {
-        return [...super.getValuesName(), "noMenu", "radius"];
+    getEditableArray(): EditableObject[] {
+        return [...super.getEditableArray(),{
+            name:"radius",
+            set:(val) => {
+                this.r = val;
+            },
+            get:() => {
+                return this.r;
+            },
+            value:this.r
+        }]
     }
-    getValues() {
-        return [...super.getValues(), 0, this.r]
-    }
-    getActualValuesName() {
-        return [...super.getActualValuesName(), "components[0]", "r"]
+    parameterNames() {
+        return [...super.parameterNames(), "noMenu", "radius"];
     }
     getClassName() {
         return "Interactive"

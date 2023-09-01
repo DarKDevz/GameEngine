@@ -297,7 +297,6 @@ class gameScript extends Component {
                     //TODO: make small info box saying: Updated: (nameoffile)
                     _file.data = text;
                     set(_file);
-                    _get = () => text;
                 };
             }
         });

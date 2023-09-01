@@ -67,13 +67,31 @@ class GameObject extends GameEvents{
     getParameters(): any[] {
         return [this.x,this.y];
     }
+    getEditableArray():EditableObject[] {
+        return [{
+            name:"x",
+            set:(num:number)=>{
+                this.x = num;
+            },
+            get:()=>{
+                return this.x
+            },
+            value:this.x
+        },{
+            name:"y",
+            set:(num:number)=>{
+                this.y = num;
+            },
+            get:()=>{
+                return this.y
+            },
+            value:this.x
+        }]
+    }
     getValues(): any[] {
         return [this.x, this.y];
     }
-    getValuesName() {
-        return ["x", "y"];
-    }
-    getActualValuesName() {
+    parameterNames() {
         return ["x", "y"];
     }
     collision(obj: any, trigger = false) {

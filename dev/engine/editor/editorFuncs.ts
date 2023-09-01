@@ -22,8 +22,8 @@ var forceMenuUpdate = false,
     actionButtons = null,
     sideMenu = null,
     boxInfo = null,
-    info = [],
-    lastInfo = [],
+    info = {},
+    lastInfo = {},
     infoDivs = [],
     infoDivsHolder = [],
     infoIndexes = [],
@@ -286,7 +286,7 @@ class Editor {
                         this.newObject.x = this.startPos.x;
                         this.newObject.y = this.startPos.y;
                     }
-                    for (let param of objClass.prototype.getValuesName()) {
+                    for (let param of objClass.prototype.parameterNames()) {
                         let resp = this.newObject[param];
                         if (resp === undefined) {
                             let paramResp = param !== "noMenu" ? prompt(param) : ' ';
@@ -319,7 +319,7 @@ class Editor {
         this.copiedObjs = [];
         for (let objId of selectedObjects) {
             let copiedObj = {
-                vals: engine.getfromUUID(objId).getValues(),
+                vals: engine.getfromUUID(objId).getParameters(),
                 type: engine.getfromUUID(objId).typeId,
                 components: engine.getfromUUID(objId).jsonComponents()
             }
@@ -629,50 +629,59 @@ class Editor {
         content.changeName(file, newName);
         return file
     }
-
+    countChildren(obj,stack=0) {
+        let count = 0;
+        //it's iterating too many times, stop it
+        if(stack > 20) {
+            return 1;
+        }
+        for(let index in obj) {
+            let i = obj[index]
+            if(typeof i !== "object") {
+                count++;
+            }else {
+                stack++;
+                count+=this.countChildren(i,stack);
+            }
+        }
+        return count;
+    }
     OpenEditMenu() {
         //remove any non removed objs
-        lastInfo = info;
-        info = [];
+        lastInfo = JSON.parse(JSON.stringify(info));
+        info = {};
         let lastIndexes = infoIndexes;
         infoIndexes = [];
         for (let objectId of selectedObjects) {
             let tempBox = engine.getfromUUID(objectId);
-            infoIndexes.push(objectId);
             if (tempBox) {
-                for (let t_val_id in tempBox.getValues()) {
-                    info.push(objectId);
-                    info.push(tempBox.getValuesName()[t_val_id])
-                    info.push(tempBox.getValues()[t_val_id])
-                    info.push(tempBox.getActualValuesName()[t_val_id])
+                info[tempBox.uuid] = tempBox.getEditableArray();
+                for(let index in new Array(this.countChildren(tempBox.getEditableArray()))) {
+                    infoIndexes.push(objectId+""+index);
                 }
                 if (tempBox.components) {
                     for (let componentId in tempBox.components) {
-                        let components = tempBox.components[componentId];
-                        info.push(objectId);
-                        info.push("component")
-                        info.push(componentId)
-                        info.push(components.shouldUpdateMenu);
+                        info[tempBox.uuid].push({ isComponent: true, componentId });
+                        infoIndexes.push(""+objectId+""+componentId);
                     }
                 }
-                if(!tempBox?.noComponent) {
-                    info.push(objectId)
-                    info.push("AddComponent")
-                    info.push(0)
-                    info.push(0)
+                if (!(tempBox?.noComponents)) {
+                    info[tempBox.uuid].push({ addComponent: true });
                 }
             }
         }
-        if ((lastInfo.length !== info.length)) {
-            //console.log(lastInfo.length - info.length, lastIndexes.length - infoIndexes.length);
-        }
-        if (info.equals(lastInfo) && !forceMenuUpdate) {
+        let check = deepReadCheck(info, lastInfo);
+        //Means same
+        if (check > 0 && !forceMenuUpdate) {
             return;
         }
-        let newInfo = lastInfo.length !== info.length
-        let noNewObjects = lastIndexes.equals(infoIndexes)
-        if (!newInfo && noNewObjects && !forceMenuUpdate) {
-            //edit existing values
+        if(lastIndexes.length !== infoIndexes.length) {
+            //More values than before
+            //Force update
+            forceMenuUpdate = true;
+        }
+        //Means Different Values
+        if (check === 0 && !forceMenuUpdate) {
             for (let t_info of infoDivs) {
                 t_info.elt.dispatchEvent(this.valChanged);
                 //Hacky solution to fix updating dom every time
@@ -687,18 +696,12 @@ class Editor {
             infoDivs = [];
         }
         console.table(info);
-        for (let i = 0; i < info.length; i += 4) {
-            //console.log(info[i]);
-            if (info[i + 1] === "noMenu" || info[i + 1] === "component" || info[i + 1] === "AddComponent") {
-                //console.log("works");
-                if (info[i + 1] === "noMenu") { // if (boxes[info[i]].components[info[i + 2]]) {
-                    //     boxes[info[i]].components[info[i + 2]].MenuEdit('sideMenu');
-                    // }
-                } else if (info[i + 1] === "component") {
-                    if (engine.getfromUUID(info[i]).components[info[i + 2]]) {
-                        engine.getfromUUID(info[i]).components[info[i + 2]].MenuEdit('sideMenu');
-                    }
-                } else {
+        for (let uuid in info) {
+            let edit = info[uuid];
+            for (let editable of edit) {
+                if (editable?.isComponent) {
+                    engine.getfromUUID(uuid)?.components[editable.componentId].MenuEdit?.('sideMenu')
+                } else if (editable?.addComponent) {
                     let divHolder = createDiv();
                     let ComponentSelect = createSelect();
                     for (const [key, value] of Object.entries(engine.componentList)) {
@@ -709,15 +712,15 @@ class Editor {
                     ComponentSelect.parent(divHolder);
                     let addButton = createButton("Add");
                     addButton.elt.title = "Add component"
-                    divHolder.elt.ondrop = (event: { dataTransfer: DataTransfer }) => {
+                    divHolder.elt.ondrop = (event) => {
                         //console.log(event);
                         if (event.dataTransfer.getData("UUID") === "") return;
                         console.warn(event.dataTransfer.getData("UUID"));
                         if (event.dataTransfer.files.length > 0) {
-                            this.makeFile(event).then((file: gameFile) => {
+                            this.makeFile(event).then((file) => {
                                 let className = Engine.fileTypeList[file.type];
-                                engine.getfromUUID(info[i]).components.push(new engine.componentList[className]({
-                                    obj: engine.getfromUUID(info[i]),
+                                engine.getfromUUID(uuid).components.push(new engine.componentList[className]({
+                                    obj: engine.getfromUUID(uuid),
                                     fileUUID: file.UUID
                                 }));
                             })
@@ -726,8 +729,8 @@ class Editor {
                             let file = engine.files[uuid];
                             let className = Engine.fileTypeList[file.type];
                             console.log(className);
-                            engine.getfromUUID(info[i]).components.push(new engine.componentList[className]({
-                                obj: engine.getfromUUID(info[i]),
+                            engine.getfromUUID(uuid).components.push(new engine.componentList[className]({
+                                obj: engine.getfromUUID(uuid),
                                 fileUUID: uuid
                             }));
                             console.warn(file);
@@ -738,26 +741,141 @@ class Editor {
                         //console.warn(event.dataTransfer.getData("UUID"));
                     };
                     addButton.mousePressed(() => {
-                        engine.getfromUUID(info[i]).components.push(new engine.componentList[ComponentSelect.value()]({
-                            obj: engine.getfromUUID(info[i])
+                        engine.getfromUUID(uuid).components.push(new engine.componentList[ComponentSelect.value()]({
+                            obj: engine.getfromUUID(uuid)
                         }));
                     });
                     addButton.parent(divHolder);
                     addButton.style('cursor: pointer;')
                     divHolder.parent('sideMenu');
                     infoDivs.push(divHolder);
+                }else {
+                    this.useEditObj(editable,'sideMenu',{});
                 }
-            } else {
-                addMenuInput(info[i + 1], (val) => {
-                    let actValue = parseStringNum(val);
-                    engine.getfromUUID(info[i])[info[i + 3]] = actValue;
-                    engine.getfromUUID(info[i])?.updateShape?.()
-                    engine.getfromUUID(info[i])?.updatePosition?.()
-                    info[i + 2] = actValue;
-                }, () => info[i + 2])
             }
         }
+        /*         for (let i = 0; i < info.length; i += 4) {
+                    //console.log(info[i]);
+                    if (info[i + 1] === "noMenu" || info[i + 1] === "component" || info[i + 1] === "AddComponent") {
+                        //console.log("works");
+                        if (info[i + 1] === "noMenu") { // if (boxes[info[i]].components[info[i + 2]]) {
+                            //     boxes[info[i]].components[info[i + 2]].MenuEdit('sideMenu');
+                            // }
+                        } else if (info[i + 1] === "component") {
+                            if (engine.getfromUUID(info[i]).components[info[i + 2]]) {
+                                engine.getfromUUID(info[i]).components[info[i + 2]].MenuEdit('sideMenu');
+                            }
+                        } else {
+                            let divHolder = createDiv();
+                            let ComponentSelect = createSelect();
+                            for (const [key, value] of Object.entries(engine.componentList)) {
+                                if (key !== "gameFile")
+                                    ComponentSelect.option(key);
+                            }
+                            ComponentSelect.style('cursor: pointer;')
+                            ComponentSelect.parent(divHolder);
+                            let addButton = createButton("Add");
+                            addButton.elt.title = "Add component"
+                            divHolder.elt.ondrop = (event: { dataTransfer: DataTransfer }) => {
+                                //console.log(event);
+                                if (event.dataTransfer.getData("UUID") === "") return;
+                                console.warn(event.dataTransfer.getData("UUID"));
+                                if (event.dataTransfer.files.length > 0) {
+                                    this.makeFile(event).then((file: gameFile) => {
+                                        let className = Engine.fileTypeList[file.type];
+                                        engine.getfromUUID(info[i]).components.push(new engine.componentList[className]({
+                                            obj: engine.getfromUUID(info[i]),
+                                            fileUUID: file.UUID
+                                        }));
+                                    })
+                                } else {
+                                    let uuid = event.dataTransfer.getData("UUID");
+                                    let file = engine.files[uuid];
+                                    let className = Engine.fileTypeList[file.type];
+                                    console.log(className);
+                                    engine.getfromUUID(info[i]).components.push(new engine.componentList[className]({
+                                        obj: engine.getfromUUID(info[i]),
+                                        fileUUID: uuid
+                                    }));
+                                    console.warn(file);
+                                }
+                            };
+                            divHolder.elt.ondragover = (event) => {
+                                event.preventDefault();
+                                //console.warn(event.dataTransfer.getData("UUID"));
+                            };
+                            addButton.mousePressed(() => {
+                                engine.getfromUUID(info[i]).components.push(new engine.componentList[ComponentSelect.value()]({
+                                    obj: engine.getfromUUID(info[i])
+                                }));
+                            });
+                            addButton.parent(divHolder);
+                            addButton.style('cursor: pointer;')
+                            divHolder.parent('sideMenu');
+                            infoDivs.push(divHolder);
+                        }
+                    } else {
+                        addMenuInput(info[i + 1], (val) => {
+                            let actValue = parseStringNum(val);
+                            engine.getfromUUID(info[i])[info[i + 3]] = actValue;
+                            engine.getfromUUID(info[i])?.updateShape?.()
+                            engine.getfromUUID(info[i])?.updatePosition?.()
+                            info[i + 2] = actValue;
+                        }, () => info[i + 2])
+                    }
+                } */
     }
+    useEditObj(obj:EditableObject, parent = 'sideMenu', opened) {
+        let Holder;
+        if (typeof obj.value === "object") {
+            let divHolder = createDiv().parent(parent);
+            let headerText = createDiv();
+            Holder = accordionMenu(headerText, createDiv(), i, opened);
+            headerText.parent(divHolder);
+            Holder.parent(divHolder);
+            infoDivs.push(headerText);
+            opened[i] ??= { value: false };
+            this.addNewEditObj(obj.value, Holder, opened[i],()=>{obj.set(obj.value)});
+        } else {
+            addMenuInput(obj.name, (_) => {
+                obj.set(parseStringNum(_));
+                return obj.get()
+            }
+                , () => {
+                    return obj.get()
+                }
+                , parent)
+            //console.log("final Object", obj[i]);
+        }
+    }
+    addNewEditObj(obj:any, parent = 'sideMenu', opened, onUpdate=()=>{}) {
+		let Holder;
+		//console.log(obj)
+		for (let i in obj) {
+			//console.log(i, obj[i], typeof obj[i]);
+			if (typeof obj[i] === "object") {
+				let divHolder = createDiv().parent(parent);
+				let headerText = createDiv();
+				Holder = accordionMenu(headerText, createDiv(), i, opened);
+				headerText.parent(divHolder);
+				Holder.parent(divHolder);
+				infoDivs.push(headerText);
+				opened[i] ??= { value: false };
+				this.addNewEditObj(obj[i], Holder, opened[i],onUpdate);
+			} else {
+				addMenuInput(obj[i], (_) => {
+					obj[i] = (parseStringNum(_));
+                    onUpdate()
+					return obj[i]
+				}
+					, () => {
+						return obj[i].get()
+					}
+					, parent)
+				//console.log("final Object", obj[i]);
+			}
+		}
+	}
 }
 //Accordion menu, menu edit, script edit, image edit
 //Don't touch could break everything

@@ -55,14 +55,16 @@ function removeObject(objId) {
         //delete engine.uuidList[objId];
     }
     else if (typeof objId === "object") {
-        deleteUser(objId);
-        if (!objId)
+        let obj = objId;
+        deleteUser(obj);
+        if (!obj)
             return;
-        objId.delete();
+        obj.delete();
         //delete engine.uuidList[objId.uuid];
     }
     else {
-        let obj = engine.getActiveScene().boxes[objId];
+        let index = objId;
+        let obj = engine.getActiveScene().boxes[index];
         if (!obj)
             return;
         deleteUser(obj);
@@ -291,9 +293,9 @@ class Level extends GameEvents {
         stroke(0, 255, 0);
         line(this.pos.x, this.pos.y, this.pos.x, this.pos.y + 25);
         stroke(0);
-        let mult = 1 / engine.camera.zoom
+        let mult = 1 / engine.camera.zoom;
         stroke(255, 0, 0);
-        line((engine.cameraPos.x - (width / 2 * mult)),this.maxPos,width * mult, this.maxPos);
+        line((engine.cameraPos.x - (width / 2 * mult)), this.maxPos, width * mult, this.maxPos);
     }
     display(OnlyDraw = false) {
         if (webglVersion === "p2d")

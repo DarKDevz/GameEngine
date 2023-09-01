@@ -97,7 +97,6 @@ function PanelsInit() {
                 else {
                     document.getElementById("topDiv").style.height = "calc(" + topDivNewLocation / innerHeight * 100 + "% + 4px )";
                     document.getElementById("bottomDiv").style.height = "calc(" + bottomDivNewLocation / innerHeight * 100 + "% + 4px )";
-                    document.getElementById("divider").style.height = "8px";
                 }
                 windowResized();
             }

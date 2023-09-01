@@ -44,10 +44,10 @@ window.draw = function () {
     //Editor things
     editor.onUpdate();
     pop();
-            if (webglVersion !== "p2d") {
-            image(engine.gui, -width / 2, -height / 2, width, height);
-        }
-        else {
-            image(engine.gui, 0, 0, width, height);
-        }
+    if (webglVersion !== "p2d") {
+        image(engine.gui, -width / 2, -height / 2, width, height);
+    }
+    else {
+        image(engine.gui, 0, 0, width, height);
+    }
 };

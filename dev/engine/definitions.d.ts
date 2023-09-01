@@ -121,6 +121,12 @@ interface Editor {
     forceMenuUpdate: boolean;
     tryOffset: { [x: UUID]: xyObject }
 }
+interface EditableObject {
+    name:string
+    set:(val:any)=>void
+    get:()=>any
+    value:any
+}
 interface GameObject extends GameEvents {
     x: number;
     y: number;
@@ -146,7 +152,7 @@ interface GameObject extends GameEvents {
     body: any
     init(): void
     getCollisionVectors(): any[]
-    getValues(): any[]
+    parameterNames(): string[]
     [x: string]: any;
 }
 interface Box extends GameObject {
