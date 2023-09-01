@@ -570,7 +570,12 @@ class gameParticle extends Component {
         }
     }
     initialize() {
-        this.manager ??= new ParticleRenderer(this.ownObject, this.settings);
+        if (this.manager) {
+            this.manager.play();
+        }
+        else {
+            this.manager ??= new ParticleRenderer(this.ownObject, this.settings);
+        }
     }
     toJson() {
         return {

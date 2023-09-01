@@ -680,7 +680,6 @@ class Editor {
                                     obj: engine.getfromUUID(uuid),
                                     fileUUID: file.UUID
                                 });
-                                component.initialize();
                                 engine.getfromUUID(uuid).components.push(component);
                             });
                         }
@@ -693,7 +692,6 @@ class Editor {
                                 obj: engine.getfromUUID(uuid),
                                 fileUUID: uuid
                             });
-                            component.initialize();
                             engine.getfromUUID(uuid).components.push(component);
                             console.warn(file);
                         }
@@ -706,7 +704,6 @@ class Editor {
                         let component = new engine.componentList[ComponentSelect.value()]({
                             obj: engine.getfromUUID(uuid)
                         });
-                        component.initialize();
                         engine.getfromUUID(uuid).components.push(component);
                     });
                     addButton.parent(divHolder);
