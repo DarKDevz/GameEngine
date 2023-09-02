@@ -85,6 +85,7 @@ function addObj(ind: string | number, arr: any, sceneId?: string) {
     return obj;
 }
 function ScenesfromObject(levelsObject: ImportInterface) {
+    engine.loading = true
     let t_levels = {};
     var newLevels = levelsObject;
     if (newLevels.file) {
@@ -236,6 +237,7 @@ function ScenesfromObject(levelsObject: ImportInterface) {
         addLevel(t_boxes, createVector(scene.sceneData[1], scene.sceneData[2]), scene.sceneData[3]);
     }
     engine.scene[0].loadLevel();
+    engine.loading = false;
 }
 function JsonMap(file: { data: any }) {
     if (!(engine instanceof Engine)) {
@@ -286,7 +288,7 @@ class Level extends GameEvents {
         stroke(0);
         let mult = 1 / engine.camera.zoom
         stroke(255, 0, 0);
-        line((engine.cameraPos.x - (width / 2 * mult)),this.maxPos,width * mult, this.maxPos);
+        line((engine.cameraPos.x - (width / 2 * mult)), this.maxPos, width * mult, this.maxPos);
     }
     display(OnlyDraw = false) {
         if (webglVersion === "p2d") translate(width / 2, height / 2);
@@ -308,15 +310,18 @@ class Level extends GameEvents {
         //Draw
         let zIndexed = {};
         let drawable = []
-        for (let t_box of this.boxes) {
-            if (t_box.z < 0) {
-                console.error("Z Index shouldn't be negative!")
-                console.trace()
-            }
-            let ObjectVectors = t_box.getCollisionVectors()
-            let collides = HandleCollision('Rect', t_box.getCollisionType() + 'Vector', ...collisionVectors, ...ObjectVectors)
-            if (collides) {
-                drawable.push(t_box)
+        if (webglVersion == "webgl2") {
+            //Remove culling if in webgl mode
+            //Will change later
+            drawable = this.boxes
+        } else {
+            for (let t_box of this.boxes) {
+                let ObjectVectors = t_box.getCollisionVectors()
+                let collides = HandleCollision('Rect', t_box.getCollisionType() + 'Vector', ...collisionVectors, ...ObjectVectors)
+                //Or if property alwaysDraw is set
+                if (collides || t_box.alwaysDraw) {
+                    drawable.push(t_box)
+                }
             }
         }
         let sorted = [...drawable].sort((a, b) => {
@@ -411,7 +416,7 @@ class Level extends GameEvents {
         //console.error(this.boxes);
         for (let t_box of this.boxes) {
             t_box.init();
-            for(let component of t_box.components) {
+            for (let component of t_box.components) {
                 component.initialize()
             }
         }

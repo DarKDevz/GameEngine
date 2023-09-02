@@ -548,7 +548,7 @@ class gameParticle extends Component {
 		super("gameParticle", obj);
 		this.id = engine.generateUUID()
 		this.settings = settings;
-		if(""+engine.activeScene === obj.sceneInd) {
+		if(!engine.loading && engine.activeScene.boxes.indexOf(obj)!==-1) {
 			this.initialize()
 		}
 	}
@@ -563,7 +563,7 @@ class gameParticle extends Component {
 		return {
 			name: this.componentName,
 			params: {
-				settings: this.manager.settings
+				settings: this.manager.settings || this.settings
 			}
 		};
 	}

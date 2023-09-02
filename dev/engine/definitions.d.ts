@@ -134,6 +134,8 @@ interface GameObject extends GameEvents {
     clr?: any;
     isShootable?: number;
     health?: number;
+    alwaysDraw: boolean;
+    is3D:boolean;
     width: number;
     height: number;
     isCollidable: boolean;

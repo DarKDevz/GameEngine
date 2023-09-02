@@ -3,6 +3,7 @@ class Engine extends GameEvents {
     static removeListeners: Function[];
     static componentList: { [x: string]: Component };
     static fileTypeList: { [x: string]: string };
+    loading: boolean;
     constructor() {
         super()
         this.globalDefine(true);

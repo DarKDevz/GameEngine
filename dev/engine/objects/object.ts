@@ -18,6 +18,8 @@ class GameObject extends GameEvents{
         this.shown = {};
         this.collisionType = 'Circle';
         this.imageInitialized = false;
+        this.alwaysDraw = false;
+        this.is3D = false;
         engine.uuidList[this.uuid] = this;
     }
     updateComponents() {
