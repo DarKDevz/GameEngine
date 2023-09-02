@@ -39,8 +39,16 @@ class Engine extends GameEvents {
         , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
         this.componentList = Engine.componentList;
         this.eventListener = {};
+        setTimeout(()=>{this.tryFirstLoad()},500)
         // this.body = new p2.Body({ mass: 1 });
         // this.world.addBody(this.body);
+    }
+    tryFirstLoad() {
+        if(window?.canvas?.width) {
+            this.resize(canvas.width,canvas.height)
+        }else {
+            setTimeout(()=>{this.tryFirstLoad()},500)
+        }
     }
     resize(ww = windowWidth, wh = windowHeight) {
         resizeCanvas(ww, wh);
