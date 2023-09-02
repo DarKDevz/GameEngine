@@ -37,9 +37,15 @@ function deleteUser(obj: GameObject) {
     }
 }
 function reloadcurrent() {
+    let test = {}
     for (let scene of engine.scene) {
+        test[scene.ind] = {}
         for (let boxesId = scene.boxes.length; boxesId >= 0; boxesId--) {
             if (typeof scene.boxes[boxesId] === "object") {
+                if(test[scene.ind][scene.boxes[boxesId].uuid]) {
+                   scene.boxes.splice(boxesId, 1);
+                }
+                test[scene.ind][scene.boxes[boxesId].uuid] ??= scene.boxes[boxesId]
                 if (engine.uuidList[scene.boxes[boxesId].uuid] === undefined) {
                     scene.boxes.splice(boxesId, 1);
                 }
@@ -278,6 +284,8 @@ class Level extends GameEvents {
     addObj(box: GameObject) {
         box.init();
         this.boxes = [...this.boxes, box];
+        engine.uuidList[box.uuid] ??= box
+        box.scene = ""+this.ind
     }
     customDraw(shouldRun = true) {
         if (!shouldRun) return 1;
