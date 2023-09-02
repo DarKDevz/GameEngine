@@ -298,42 +298,49 @@ class Level extends GameEvents {
         translate(-cameraPos.x, -cameraPos.y)
         //Call without drawing
         //Do Update First Only if you can
-        let mult = 1 / camera.zoom;
-        let collisionVectors = [
-            { x: (cameraPos.x - (width / 2 * mult)), y: (cameraPos.y - (height / 2 * mult)) },
-            { x: width * mult, y: height * mult }]
+        let collisionVectors = []
         if (!OnlyDraw) {
             for (let t_box of this.boxes) {
                 t_box.display(false, true);
             }
         }
-        //Draw
+        //Draw variables
         let zIndexed = {};
-        let drawable = []
+        let drawable = [];
+        let matrix = webglVersion == "p2d" ? drawingContext.getTransform().inverse() : null;
+        let pointFirst = new DOMPoint(0, 0);
+        let pointSecond = new DOMPoint(width, height);
+        /**
+         * @description WebGL hacks
+         * gets view matrix and inverts it
+         * gets top left corner and that's the xy origin
+         * gets bottom left subtracts top left to get xy width height
+         * pass it to 2D collision algorithm
+         * and it works!
+         */
         if (webglVersion == "webgl2") {
-            for (let t_box of this.boxes) {
-                let values = t_box.getCollisionVectors();
-                let type = t_box.getCollisionType()
-                switch(type) {
-                    case "Circle":
-                        if(engine.checkCircle(values[0],values[1]))drawable.push(t_box);
-                        break;
-                    case "Rect":
-                        if(engine.checkRect(values[0],values[1]))drawable.push(t_box)
-                        break
-                    default:
-                        drawable.push()
-                        break;
-                }
-            }
-        } else {
-            for (let t_box of this.boxes) {
-                let ObjectVectors = t_box.getCollisionVectors()
-                let collides = HandleCollision('Rect', t_box.getCollisionType() + 'Vector', ...collisionVectors, ...ObjectVectors)
-                //Or if property alwaysDraw is set
-                if (collides || t_box.alwaysDraw) {
-                    drawable.push(t_box)
-                }
+            matrix = (new DOMMatrix(p5.instance._renderer.uMVMatrix.mat4)).inverse();
+            pointFirst = new DOMPoint(-width / 2, -height / 2, -p5.instance._renderer._curCamera.eyeZ);
+            pointSecond = new DOMPoint(width / 2, height / 2, -p5.instance._renderer._curCamera.eyeZ);
+            /**
+             * origin point is 0,0,0
+             * we get the top left corner
+             * and the bottom right
+             * do calculations
+             * and the result is our frustum in xyz form
+             * we ignore the z for now and only use xy
+             */
+        }
+        collisionVectors[0] = matrix.transformPoint(pointFirst);
+        let p = matrix.transformPoint(pointSecond)
+        collisionVectors[1] = { x: p.x - collisionVectors[0].x, y: p.y - collisionVectors[0].y };
+
+        for (let t_box of this.boxes) {
+            let ObjectVectors = t_box.getCollisionVectors();
+            let collides = HandleCollision('Rect', t_box.getCollisionType() + 'Vector', ...collisionVectors, ...ObjectVectors);
+            //Or if property alwaysDraw is set
+            if (collides || t_box.alwaysDraw) {
+                drawable.push(t_box);
             }
         }
         let sorted = [...drawable].sort((a, b) => {

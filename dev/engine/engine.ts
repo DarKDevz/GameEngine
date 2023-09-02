@@ -67,43 +67,21 @@ class Engine extends GameEvents {
                 mouseIsPressed = false;
             }
         }
-        let mult = 1 / this.camera.zoom
-        return {
-            x: (mouseX * mult + this.cameraPos.x - (width / 2 * mult)),
-            y: (mouseY * mult + this.cameraPos.y - (height / 2 * mult))
-        };
+        //WebGL variant(Includes mouseZ)
+        let DPoint: DOMPoint;
+        let matrix: DOMMatrix;
+        if (webglVersion === "webgl2") {
+            //Removes all Z's that are from camera
+            matrix = new DOMMatrix(p5.instance._renderer.uMVMatrix.mat4);
+            DPoint = new DOMPoint(mouseX - width / 2, mouseY - height / 2,
+                -p5.instance._renderer._curCamera.eyeZ);
+        }
+        else {
+            matrix = drawingContext.getTransform();
+            DPoint = new DOMPoint(mouseX * pixelDensity(), mouseY * pixelDensity());
+        }
+        return matrix.inverse().transformPoint(DPoint);
     }
-    check(position:number[]) {
-        let pos = p5.instance._renderer.uMVMatrix.multiplyVec4(position[0],position[1],0,1);
-        //console.log(glPosition);
-        return (abs(pos[0]) <= width / 2 && abs(pos[1]) <= height / 2 && pos[2] < 0)
-    }
-    checkList(positions:number[][]) {
-        for(let pos of positions) {
-            if(this.check(pos)) {
-              return true;
-            }
-          }
-          return false;
-    }
-    checkRect(position:xyObject, size:xyObject) {
-        let list = [
-            [position.x,position.y]
-            ,[position.x+size.x,position.y]
-            ,[position.x+size.x,position.y+size.y]
-            ,[position.x,position.y+size.y]
-            ]
-            return this.checkList(list)
-    }
-    checkCircle(position:xyObject, size:number) {
-        let list = [
-        [position.x+size,position.y+size]
-        ,[position.x+size,position.y-size]
-        ,[position.x-size,position.y-size]
-        ,[position.x-size,position.y+size]
-        ]
-        return this.checkList(list)
-      }
     get activeScene() {
         return this.getActiveScene();
     }

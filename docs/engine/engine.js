@@ -68,42 +68,19 @@ class Engine extends GameEvents {
                 mouseIsPressed = false;
             }
         }
-        let mult = 1 / this.camera.zoom;
-        return {
-            x: (mouseX * mult + this.cameraPos.x - (width / 2 * mult)),
-            y: (mouseY * mult + this.cameraPos.y - (height / 2 * mult))
-        };
-    }
-    check(position) {
-        let pos = p5.instance._renderer.uMVMatrix.multiplyVec4(position[0], position[1], 0, 1);
-        //console.log(glPosition);
-        return (abs(pos[0]) <= width / 2 && abs(pos[1]) <= height / 2 && pos[2] < 0);
-    }
-    checkList(positions) {
-        for (let pos of positions) {
-            if (this.check(pos)) {
-                return true;
-            }
+        //WebGL variant(Includes mouseZ)
+        let DPoint;
+        let matrix;
+        if (webglVersion === "webgl2") {
+            //Removes all Z's that are from camera
+            matrix = new DOMMatrix(p5.instance._renderer.uMVMatrix.mat4);
+            DPoint = new DOMPoint(mouseX - width / 2, mouseY - height / 2, -p5.instance._renderer._curCamera.eyeZ);
         }
-        return false;
-    }
-    checkRect(position, size) {
-        let list = [
-            [position.x, position.y],
-            [position.x + size.x, position.y],
-            [position.x + size.x, position.y + size.y],
-            [position.x, position.y + size.y]
-        ];
-        return this.checkList(list);
-    }
-    checkCircle(position, size) {
-        let list = [
-            [position.x + size, position.y + size],
-            [position.x + size, position.y - size],
-            [position.x - size, position.y - size],
-            [position.x - size, position.y + size]
-        ];
-        return this.checkList(list);
+        else {
+            matrix = drawingContext.getTransform();
+            DPoint = new DOMPoint(mouseX * pixelDensity(), mouseY * pixelDensity());
+        }
+        return matrix.inverse().transformPoint(DPoint);
     }
     get activeScene() {
         return this.getActiveScene();
