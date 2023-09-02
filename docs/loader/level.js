@@ -322,16 +322,26 @@ class Level extends GameEvents {
         let zIndexed = {};
         let drawable = [];
         if (webglVersion == "webgl2") {
-            //Remove culling if in webgl mode
-            //Will change later
-            drawable = this.boxes;
+            for (let t_box of this.boxes) {
+                let values = t_box.getCollisionVectors();
+                let type = t_box.getCollisionType();
+                switch (type) {
+                    case "Circle":
+                        if (engine.checkCircle(values[0], values[1]))
+                            drawable.push(t_box);
+                        break;
+                    case "Rect":
+                        if (engine.checkRect(values[0], values[1]))
+                            drawable.push(t_box);
+                        break;
+                    default:
+                        drawable.push();
+                        break;
+                }
+            }
         }
         else {
             for (let t_box of this.boxes) {
-                if (t_box.z < 0) {
-                    console.error("Z Index shouldn't be negative!");
-                    console.trace();
-                }
                 let ObjectVectors = t_box.getCollisionVectors();
                 let collides = HandleCollision('Rect', t_box.getCollisionType() + 'Vector', ...collisionVectors, ...ObjectVectors);
                 //Or if property alwaysDraw is set

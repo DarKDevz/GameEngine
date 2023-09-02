@@ -12,10 +12,37 @@ function deepReadCheck(obj1,obj2) {
     }
   }
 }
-// Copyright 2014 The Chromium Authors
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
+/**
+ * Converting from xyz to screen space
+uniform mat4 uModelViewMatrix;
+uniform mat4 uProjectionMatrix;
+uniform vec3 aPosition
+gl_position = uModelViewMatrix*uProjectionMatrix*vec4(aPosition,1);
+ * 
+ */
 
+function checkCircle(position, size) {
+  let list = []
+  list.push([position.x+size,position.y+size])
+  list.push([position.x+size,position.y-size])
+  list.push([position.x-size,position.y-size])
+  list.push([position.x-size,position.y+size])
+  return checkList(list)
+}
+function checkList(positions) {
+  for(let pos of positions) {
+    if(check(pos)) {
+      return true;
+    }
+  }
+}
+function check(position) {
+  this.cam ??= createCamera();
+  window.test = this.cam;
+  let matrix = p5.instance._renderer.uMVMatrix;
+  let glPosition = matrix.multiplyVec4(position[0],position[1],0,1); /*engine.gui.translate(-width / 2, -height / 2);*/
+  return (abs(glPosition[0]) <= width / 2 && abs(glPosition[1]) <= height / 2 && glPosition[2] > 0)
+};
 /**
  * T-Rex runner.
  * @param {string} outerContainerId Outer containing element id.

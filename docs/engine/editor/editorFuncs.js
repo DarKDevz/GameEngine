@@ -684,13 +684,13 @@ class Editor {
                             });
                         }
                         else {
-                            let uuid = event.dataTransfer.getData("UUID");
-                            let file = engine.files[uuid];
+                            let fileUUID = event.dataTransfer.getData("UUID");
+                            let file = engine.files[fileUUID];
                             let className = Engine.fileTypeList[file.type];
                             console.log(className);
                             let component = new engine.componentList[className]({
                                 obj: engine.getfromUUID(uuid),
-                                fileUUID: uuid
+                                fileUUID: fileUUID
                             });
                             engine.getfromUUID(uuid).components.push(component);
                             console.warn(file);
