@@ -317,7 +317,7 @@ class Level extends GameEvents {
         let drawable = [];
         let matrix = webglVersion == "p2d" ? drawingContext.getTransform().inverse() : null;
         let pointFirst = new DOMPoint(0, 0);
-        let pointSecond = new DOMPoint(width, height);
+        let pointSecond = new DOMPoint(width*pixelDensity(), height*pixelDensity());
         /**
          * @description WebGL hacks
          * gets view matrix and inverts it
