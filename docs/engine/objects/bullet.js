@@ -10,9 +10,6 @@ class Bullet extends GameObject {
     getSpeed() {
         return 3;
     }
-    getCollisionType() {
-        return 'Circle'
-    }
     getCollisionVectors() {
         return [{ x: this.x, y: this.y }, this.r * 2];
     }

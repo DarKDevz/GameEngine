@@ -40,10 +40,10 @@ class Engine extends GameEvents {
         this.eventListener = {};
         this.collisionWorker;
         this.allCollisions = {};
-        if(window?.engine) {
-            engine.collisionWorker.terminate()
+        if (engine?.collisionWorker) {
+            engine.collisionWorker.terminate();
         }
-        this.collisionWorker = new Worker("engine/objects/collisionChecker.js");
+        this.collisionWorker ??= new Worker("engine/objects/collisionChecker.js");
         this.collisionWorker.addEventListener('message', (e) => {
             if (e.data.type === "cache") {
                 this.allCollisions = e.data.value;
