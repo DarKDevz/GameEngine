@@ -159,6 +159,7 @@ class Box extends GameObject {
             name:"width",
             set:(val) => {
                 this.width = val;
+                this.updateShape();
             },
             get:() => {
                 return this.width
@@ -168,6 +169,7 @@ class Box extends GameObject {
             name:"height",
             set:(val) =>{
                 this.height = val;
+                this.updateShape();
             },
             get:() => {
                 return this.height

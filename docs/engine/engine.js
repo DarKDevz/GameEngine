@@ -23,7 +23,6 @@ class Engine extends GameEvents {
                 return target[key];
             }
         });
-        ;
         this.usedUUID = [];
         this.hasUUID = false;
         this.assignedUUID = "";
@@ -39,15 +38,16 @@ class Engine extends GameEvents {
         , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
         this.componentList = Engine.componentList;
         this.eventListener = {};
-        setTimeout(()=>{this.tryFirstLoad()},500)
+        setTimeout(() => { this.tryFirstLoad(); }, 500);
         // this.body = new p2.Body({ mass: 1 });
         // this.world.addBody(this.body);
     }
     tryFirstLoad() {
-        if(window?.canvas?.width) {
-            this.resize(canvas.width,canvas.height)
-        }else {
-            setTimeout(()=>{this.tryFirstLoad()},500)
+        if (window?.canvas?.width) {
+            this.resize(canvas.width, canvas.height);
+        }
+        else {
+            setTimeout(() => { this.tryFirstLoad(); }, 500);
         }
     }
     resize(ww = windowWidth, wh = windowHeight) {

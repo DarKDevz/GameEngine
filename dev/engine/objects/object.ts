@@ -74,6 +74,7 @@ class GameObject extends GameEvents{
             name:"x",
             set:(num:number)=>{
                 this.x = num;
+                this?.updateShape?.();
             },
             get:()=>{
                 return this.x
@@ -83,6 +84,7 @@ class GameObject extends GameEvents{
             name:"y",
             set:(num:number)=>{
                 this.y = num;
+                this?.updateShape?.();
             },
             get:()=>{
                 return this.y

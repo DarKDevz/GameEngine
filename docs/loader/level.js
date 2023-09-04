@@ -34,15 +34,15 @@ function deleteUser(obj) {
     }
 }
 function reloadcurrent() {
-    let test = {}
+    let test = {};
     for (let scene of engine.scene) {
-        test[scene.ind] = {}
+        test[scene.ind] = {};
         for (let boxesId = scene.boxes.length; boxesId >= 0; boxesId--) {
             if (typeof scene.boxes[boxesId] === "object") {
-                if(test[scene.ind][scene.boxes[boxesId].uuid]) {
-                   scene.boxes.splice(boxesId, 1);
+                if (test[scene.ind][scene.boxes[boxesId].uuid]) {
+                    scene.boxes.splice(boxesId, 1);
                 }
-                test[scene.ind][scene.boxes[boxesId].uuid] ??= scene.boxes[boxesId]
+                test[scene.ind][scene.boxes[boxesId].uuid] ??= scene.boxes[boxesId];
                 if (engine.uuidList[scene.boxes[boxesId].uuid] === undefined) {
                     scene.boxes.splice(boxesId, 1);
                 }
@@ -292,8 +292,8 @@ class Level extends GameEvents {
     addObj(box) {
         box.init();
         this.boxes = [...this.boxes, box];
-        engine.uuidList[box.uuid] ??= box
-        box.scene = ""+this.ind
+        engine.uuidList[box.uuid] ??= box;
+        box.scene = "" + this.ind;
     }
     customDraw(shouldRun = true) {
         if (!shouldRun)
@@ -327,7 +327,7 @@ class Level extends GameEvents {
         let drawable = [];
         let matrix = webglVersion == "p2d" ? drawingContext.getTransform().inverse() : null;
         let pointFirst = new DOMPoint(0, 0);
-        let pointSecond = new DOMPoint(width*pixelDensity(), height*pixelDensity());
+        let pointSecond = new DOMPoint(width * pixelDensity(), height * pixelDensity());
         /**
          * @description WebGL hacks
          * gets view matrix and inverts it

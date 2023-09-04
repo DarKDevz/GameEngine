@@ -75,6 +75,7 @@ class GameObject extends GameEvents {
                 name: "x",
                 set: (num) => {
                     this.x = num;
+                    this?.updateShape?.();
                 },
                 get: () => {
                     return this.x;
@@ -84,6 +85,7 @@ class GameObject extends GameEvents {
                 name: "y",
                 set: (num) => {
                     this.y = num;
+                    this?.updateShape?.();
                 },
                 get: () => {
                     return this.y;
