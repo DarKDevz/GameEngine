@@ -83,7 +83,7 @@ class Player {
         return 'Rect';
     }
     getCollisionVectors() {
-        return [this.pos, this.size];
+        return [{ x: this.pos.x, y: this.pos.y }, { x: this.size.x, y: this.size.y }];
     }
     display(shouldRun = true) {
         if (!shouldRun)

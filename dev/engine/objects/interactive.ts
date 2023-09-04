@@ -46,7 +46,7 @@ class Interactive extends GameObject {
     onCollide() {
         //eval(this.components[0].fn)
     }
-    collision(obj: GameObject | Player) {
+    collision(obj:any) {
         var oX: any, oY: any, oW: any, oH: any;
         if (obj.pos !== undefined) {
             oX = obj.pos.x;

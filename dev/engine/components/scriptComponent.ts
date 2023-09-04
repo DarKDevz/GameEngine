@@ -751,8 +751,8 @@ class ParticleRenderer {
 		}
 	}
 	update() {
-		if (this.ownObject.h !== this.graphics.height || this.ownObject.w !== this.graphics.width) {
-			this.graphics.resizeCanvas(this.ownObject.h, this.ownObject.w);
+		if (this.ownObject.height !== this.graphics.height || this.ownObject.width !== this.graphics.width) {
+			this.graphics.resizeCanvas(this.ownObject.height, this.ownObject.width);
 		}
 		for (let i = this.particles.length - 1; i >= 0; i--) {
 			let particle = this.particles[i];

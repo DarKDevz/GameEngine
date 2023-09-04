@@ -83,7 +83,7 @@ class Box extends GameObject {
         }
     }
     getCollisionVectors(): (this | { x: number; y: number; })[] {
-        return [this, { x: this.width, y: this.height }]
+        return [{x:this.x,y:this.y}, { x: this.width, y: this.height }]
     }
     parameterNames(): string[] {
         return super.parameterNames().concat(["width", "height"]);
@@ -97,7 +97,7 @@ class Box extends GameObject {
         if (!noDraw) { this.draw() }
         if (!OnlyDraw) this.update();
     }
-    collision(obj: GameObject | Player): any {
+    collision(obj: any): any {
         let type = obj.getCollisionType() + 'Vector'
         let ObjectVectors = obj.getCollisionVectors()
         let collides = HandleCollision(this.getCollisionType(), type, ...this.getCollisionVectors(), ...ObjectVectors)
@@ -159,7 +159,6 @@ class Box extends GameObject {
             name:"width",
             set:(val) => {
                 this.width = val;
-                this.updateShape();
             },
             get:() => {
                 return this.width
@@ -169,7 +168,6 @@ class Box extends GameObject {
             name:"height",
             set:(val) =>{
                 this.height = val;
-                this.updateShape();
             },
             get:() => {
                 return this.height

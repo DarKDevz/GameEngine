@@ -40,7 +40,7 @@ class GameObject extends GameEvents{
      * @returns a Collision Vector
      */
     getCollisionVectors(): any[] {
-        return [this, 2]
+        return [{x:this.x,y:this.y}, 2]
     }
     jsonComponents() {
         let ret = [];

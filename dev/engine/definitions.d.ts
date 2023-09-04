@@ -100,7 +100,7 @@ interface Player {
     groundedId: UUID;
     shootingDelay: number;
     lastShotTime: number;
-    collisionType: string;
+    collisionType: 'Rect';
     savedX: number;
     skipNext: boolean;
     body: Box2D.Dynamics.b2Body;
@@ -128,36 +128,124 @@ interface EditableObject {
     get:()=>any
     value:any
 }
+/**
+ * Represents a game object.
+ * @interface
+ */
 interface GameObject extends GameEvents {
+    /** The x-coordinate of the object. */
     x: number;
+
+    /** The y-coordinate of the object. */
     y: number;
+
+    /** The z-coordinate of the object. In 2d used only for defining which objects are rendered first*/
     z: number;
+    /**Old x position used for physics */
+    oldX:number;
+    /**Old y position used for physics */
+    oldY:number;
+    /**if Components are enabled or not */
+    noComponents:boolean;
+    /** The color of the object (optional). */
     clr?: any;
-    isShootable?: number;
+
+    /** Determines if the object can be shot */
+    isShootable?: boolean;
+
+    /** The health of the object (optional). */
     health?: number;
+
+    /** Determines if the object should always be drawn. */
     alwaysDraw: boolean;
-    is3D:boolean;
+
+    /** Indicates if the object is in 3D space. */
+    is3D: boolean;
+
+    /** The width of the object. */
     width: number;
+
+    /** The height of the object. */
     height: number;
+
+    /** Indicates if the object is collidable. */
     isCollidable: boolean;
+
+    /** A tag to identify the object. */
     tag: string;
+
+    /** The scene in which the object is placed. */
     scene: string;
+
+    /** Object overrides (unsafe to modify). */
     overrides: any;
+
+    /** Saved functions for the object (unsafe to modify). */
     savedFuncs: any;
+
+    /** New overrides for the object (unsafe to modify). */
     newOverrides: any;
+
+    /** The unique identifier for the object. */
     uuid: string;
-    sprites: gameSprite[]; // Replace 'any' with the specific sprite type if available
+
+    /** List of gameSprite components. */
+    sprites: gameSprite[];
+
+    /**If singular sprite will return one sprite if multiple more than one*/
+    sprite: any
+
+    /**Debugging purposes */
+    script:string
+
+    /** Object used for variables that are shown in editor by gameScript */
     shown: any;
-    collisionType: string;
+
+    /** The collision type of the object. */
+    collisionType: 'Rect'|'Circle'|'Line'|'Point';
+
+    /** Indicates if the image for the object has been initialized. */
     imageInitialized: boolean;
-    typeId: number | undefined,
-    components: Component[]
-    body: any
-    init(): void
-    getCollisionVectors(): any[]
-    parameterNames(): string[]
-    [x: string]: any;
+
+    /** The type identifier for custom classes (set to undefined if not applicable). */
+    typeId: number | undefined;
+
+    /** List of components attached to the object. */
+    components: Component[];
+
+    /** The body of the object. */
+    body: any;
+
+    /**
+     * Initializes the object.
+     * @function
+     */
+    init(): void;
+
+    /**
+     * Retrieves collision vectors for the object.
+     * @function
+     * @returns {any[]} An array of collision vectors.
+     */
+    getCollisionVectors(): any[];
+
+    /**
+     * Retrieves parameter names for the object.
+     * @function
+     * @returns {string[]} An array of parameter names.
+     */
+    parameterNames(): string[];
+
+    /**
+     * Updates the shape of the object (optional).
+     * @function
+     */
+    updateShape?(): void;
+    __proto__: any
+
+    [x:string]:any
 }
+
 interface Box extends GameObject {
     oldX: number;
     oldY: number;
@@ -181,6 +269,14 @@ interface xywhObject extends xyObject {
     width: number,
     height: number
 }
+interface movingPlatform extends GameObject {
+    x1:number;
+    x2:number;
+    direction: 'r'|'l';
+}
+interface Interactive extends GameObject {
+    canBeInteracted:boolean;
+}
 interface GameEvents {
     deviceMoved(...args: any): void,
     deviceTurned(...args: any): void,
@@ -199,23 +295,105 @@ interface GameEvents {
     keyReleased(...args: any): void,
     keyTyped(...args: any): void,
 }
+/**
+ * Represents a level in the game.
+ * @interface
+ */
 interface Level {
+    /**
+     * Converts the level data to JSON format.
+     * @function
+     * @returns {any} The level data in JSON format.
+     */
     toJSON(): any;
+
+    /**
+     * Converts additional extras to JSON format.
+     * @function
+     * @returns {any} Additional extras in JSON format.
+     */
     extrasJson(): any;
+
+    /**
+     * Converts components data to an unknown format.
+     * @function
+     * @returns {unknown} Components data in an unknown format.
+     */
     componentsJson(): unknown;
-    ind: any
-    getLevelValues(): any[]
-    getLevelValueNames(): unknown
-    getActualLevelValues(): unknown
-    maxPos: any
-    pos: Vec
-    loadLevel(): void
-    keyPress(arg0: Event): undefined,
-    earlyUpdate(arg0: boolean): void,
-    display(arg0: boolean): void,
-    lateUpdate(arg0: boolean): void,
-    boxes: GameObject[]
+
+    /**
+     * The index of the level.
+     * @type {any}
+     */
+    ind: any;
+
+    /**
+     * Retrieves an array of level values.
+     * @function
+     * @returns {any[]} An array of level values.
+     */
+    getLevelValues(): any[];
+
+    /**
+     * Retrieves the names of level values.
+     * @function
+     * @returns {unknown} The names of level values in an unknown format.
+     */
+    getLevelValueNames(): unknown;
+
+    /**
+     * Retrieves the actual level values.
+     * @function
+     * @returns {unknown} The actual level values in an unknown format.
+     */
+    getActualLevelValues(): unknown;
+
+    /**
+     * The maximum position within the level.
+     * @type {any}
+     */
+    maxPos: any;
+
+    /**
+     * The starting position of the level represented as a vector.
+     * @type {Vec}
+     */
+    pos: Vec;
+
+    /**
+     * Loads the level.
+     * @function
+     */
+    loadLevel(): void;
+
+    /**
+     * Performs early update operations.
+     * @function
+     * @param {boolean} shouldRun - wheter its should run or not
+     */
+    earlyUpdate(shouldRun: boolean): void;
+
+    /**
+     * Displays the level. and runs update()
+     * @function
+     * @param {boolean} shouldRun - wheter its should run or not
+     */
+    display(shouldRun: boolean): void;
+
+    /**
+     * After drawing function
+     * @function
+     * @param {boolean} shouldRun - wheter its should run or not
+     */
+    lateUpdate(shouldRun: boolean): void;
+
+    /**
+     * An array of game objects (boxes) in the level.
+     * @type {GameObject[]}
+     */
+    boxes: GameObject[];
 }
+
 interface Component {
     shouldUpdateMenu: boolean;
     componentName: string;
@@ -242,25 +420,137 @@ interface gameSprite {
     ownObject: GameObject
 }
 type World = Box2D.Dynamics.b2World;
+/**
+ * Represents the game engine.
+ * @interface
+ * @extends {GameEvents}
+ */
 interface Engine extends GameEvents {
-    scene: Level[]
-    currentScene: number
-    files: { [x: string]: gameFile }
-    uuidList: { [x: UUID]: GameObject }
-    usedUUID: UUID[]
-    hasUUID: boolean
-    assignedUUID: string
-    world: World
-    componentList: { [x: string]: class }
-    removeListeners: Function[]
+    /**
+     * The scenes in the game.
+     * @type {Level[]}
+     */
+    scene: Level[];
+
+    /**
+     * The index of the currently active scene.
+     * @type {number}
+     */
+    currentScene: number;
+
+    /**
+     * Files used in the game.
+     * @type {{ [x: string]: gameFile }}
+     */
+    files: { [x: string]: gameFile };
+
+    /**
+     * Mapping of UUIDs to game objects.
+     * @type {{ [x: UUID]: GameObject }}
+     */
+    uuidList: { [x: UUID]: GameObject };
+
+    /**
+     * List of used UUIDs.
+     * @type {UUID[]}
+     */
+    usedUUID: UUID[];
+
+    /**
+     * Indicates whether UUIDs are available.
+     * @type {boolean}
+     */
+    hasUUID: boolean;
+
+    /**
+     * The assigned UUID for the engine.
+     * @type {string}
+     */
+    assignedUUID: string;
+
+    /**
+     * worker that takes care of collision
+     * to improve performance
+     * note:If your device doesn't have a WebWorker it wont work
+     * @type {Worker}
+     */
+    collisionWorker: Worker
+
+
+    /**
+     * List of all cached collisions
+     * To check if one is colliding with the other
+     * check both uuids
+     * cache[uuid1][uuid2]&&cache[uuid2][uuid1]
+     * or just use function checkCollided
+     * @type {[x:string]:{[x:string]:boolean}}
+     */
+    allCollisions: {
+        [x:UUID]:{
+            [x:UUID]:boolean
+        }
+    }
+    /**
+     * The world in the game.
+     * @type {World}
+     */
+    world: World;
+
+    /**
+     * List of available components.
+     * @type {{ [x: string]: class }}
+     */
+    componentList: { [x: string]: class };
+
+    /**
+     * List of remove listeners functions.
+     * @type {Function[]}
+     */
+    removeListeners: Function[];
+
+    /**
+     * Indicates whether physics are enabled.
+     * @type {boolean}
+     */
     physics: boolean;
+
+    /**
+     * Text for displaying errors.
+     * @type {string}
+     */
     errorText: string;
+
+    /**
+     * The camera used in the game.
+     * @type {Camera}
+     */
     camera: Camera;
-    gui: ReturnType<typeof createGraphics>
-    mobile: boolean
-    guiObjects: { [x: UUID]: GUIElement }
-    eventListener: { [x: UUID]: { [x: string]: Function } }
+
+    /**
+     * Graphics user interface (GUI).
+     * @type {ReturnType<typeof createGraphics>}
+     */
+    gui: ReturnType<typeof createGraphics>;
+
+    /**
+     * Indicates whether the game is running on a mobile device.
+     * @type {boolean}
+     */
+    mobile: boolean;
+
+    /**
+     * Mapping of UUIDs to GUI elements.
+     * @type {{ [x: UUID]: GUIElement }}
+     */
+    guiObjects: { [x: UUID]: GUIElement };
+
+    /**
+     * Mapping of UUIDs to event listener functions.
+     * @type {{ [x: UUID]: { [x: string]: Function } }}
+     */
+    eventListener: { [x: UUID]: { [x: string]: Function } };
 }
+
 interface GUIElement extends GameObject {
     id: UUID
     mobileOnly: boolean;
@@ -313,7 +603,6 @@ interface ParticleRenderer {
     ownObject: GameObject
     graphics: ReturnType<typeof createGraphics>
     lastFrame: ReturnType<typeof createImage>
-
 }
 function downloadFile(content: any, arg1: string) {
     throw new Error("Function not implemented.");

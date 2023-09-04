@@ -11,5 +11,8 @@
         "node_modules",
         "**/node_modules/*",
         "engine/collision/*.js",
+        "engine/types/libs/*",
+        "engine/libs/*",
+        "engine/utils/*"
     ]
 }

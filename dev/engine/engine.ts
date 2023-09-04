@@ -38,16 +38,37 @@ class Engine extends GameEvents {
             , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
         this.componentList = Engine.componentList
         this.eventListener = {}
+        this.collisionWorker;
+        this.allCollisions = {}
+        if(engine?.collisionWorker) {
+            engine.collisionWorker.terminate()
+        }
+        this.collisionWorker ??= new Worker("engine/object/collisionChecker.js")
+        this.collisionWorker.addEventListener('message',(e) => {
+            if(e.data.type === "cache") {
+                this.allCollisions = e.data.value
+            }
+        })
         setTimeout(()=>{this.tryFirstLoad()},500)
         // this.body = new p2.Body({ mass: 1 });
         // this.world.addBody(this.body);
     }
     tryFirstLoad() {
         if(window?.canvas?.width) {
-            this.resize(canvas.width,canvas.height)
+            this.resize(canvas.width,canvas.height);
         }else {
             setTimeout(()=>{this.tryFirstLoad()},500)
         }
+    }
+    checkCache(obj1:any, obj2:any): boolean|undefined {
+        let uuid1 = obj1?.uuid?obj1.uuid:obj1
+        let uuid2 = obj2?.uuid?obj2.uuid:obj2
+        if (this.allCollisions.hasOwnProperty(uuid1) && this.allCollisions.hasOwnProperty(uuid2)) {
+            if (this.allCollisions[uuid1].hasOwnProperty(uuid2) && this.allCollisions[uuid2].hasOwnProperty(uuid1)) {
+                return this.allCollisions[uuid1][uuid2] && this.allCollisions[uuid2][uuid1]
+            }
+        }
+        return undefined;
     }
     resize(ww = windowWidth, wh = windowHeight) {
         resizeCanvas(ww, wh);

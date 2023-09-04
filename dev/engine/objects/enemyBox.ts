@@ -6,8 +6,6 @@ class Enemy extends Box {
 	}
 	init() {
 		super.init()
-
-		if (this.phySprite) this.phySprite.color = color(255, 0, 0);
 	}
 	getClassName() {
 		return "Enemy"

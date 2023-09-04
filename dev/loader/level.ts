@@ -52,6 +52,15 @@ function reloadcurrent() {
             }
         }
     }
+    /**
+     * Gets all collision types and vectors and put them in the collision worker
+     */
+    let allCollision = {};
+    engine.activeScene.boxes.forEach((b)=>{ 
+    allCollision[b.uuid] = ([b.getCollisionType(),b.getCollisionVectors()])})
+    allCollision['Player'] = [player.getCollisionType(),player.getCollisionVectors()]
+    engine.collisionWorker.postMessage({type:"update",value:allCollision})
+    engine.collisionWorker.postMessage({type:"getcache"})
 }
 function removeObject(objId: UUID | GameObject | number) {
     if (typeof objId === "string" && objId.startsWith("0x")) {

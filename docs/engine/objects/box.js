@@ -79,7 +79,7 @@ class Box extends GameObject {
         }
     }
     getCollisionVectors() {
-        return [this, { x: this.width, y: this.height }];
+        return [{ x: this.x, y: this.y }, { x: this.width, y: this.height }];
     }
     parameterNames() {
         return super.parameterNames().concat(["width", "height"]);
@@ -154,7 +154,6 @@ class Box extends GameObject {
                 name: "width",
                 set: (val) => {
                     this.width = val;
-                    this.updateShape();
                 },
                 get: () => {
                     return this.width;
@@ -164,7 +163,6 @@ class Box extends GameObject {
                 name: "height",
                 set: (val) => {
                     this.height = val;
-                    this.updateShape();
                 },
                 get: () => {
                     return this.height;

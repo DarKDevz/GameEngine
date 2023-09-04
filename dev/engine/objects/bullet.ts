@@ -11,7 +11,7 @@ class Bullet extends GameObject {
         return 3
     }
     getCollisionVectors() {
-        return [this, this.r * 2]
+        return [{x:this.x,y:this.y}, this.r * 2]
     }
     getClassName() {
         return "Interactive"
@@ -22,7 +22,7 @@ class Bullet extends GameObject {
         }
         removeObject(this.uuid);
     }
-    collision(obj: GameObject) {
+    collision(obj: any) {
         var oX: any, oY: any, oW: any, oH: any;
         if (obj.pos !== undefined) {
             oX = obj.pos.x;
@@ -76,19 +76,14 @@ class Bullet extends GameObject {
         if (Date.now() >= expiryTime) {
             removeObject(this.uuid)
         }
-        let t_box_id: GameObject;
-        for (t_box_id of getCurrentBoxes()) {
-            if (t_box_id && t_box_id.isCollidable) {
-                let c = this.collision(t_box_id);
-                if (c) {
-                    this.collidedId = t_box_id;
-                    this.onCollide(t_box_id);
+        for (let uuid in engine.allCollisions[this.uuid]) {
+            if (engine.allCollisions[this.uuid][uuid]) {
+                let obj = engine.uuidList[uuid];
+                if (obj && engine.uuidList[uuid].isCollidable) {
+                    this.collidedId = obj;
+                    this.onCollide(obj);
                 }
             }
         }
     }
-}
-
-function lerp(x: number, arg1: number, speedx: number): number {
-    throw new Error("Function not implemented.");
 }
