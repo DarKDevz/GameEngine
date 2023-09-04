@@ -167,6 +167,7 @@ async function createZip() {
         { path: 'engine/objects/player.js' },
         { path: 'engine/objects/end.js' },
         { path: 'engine/objects/text.js' },
+        { path: 'engine/objects/collisionChecker.js' },
         { path: 'engine/objects/enemyBox.js' },
         { path: 'engine/objects/interactive.js' },
         { path: 'engine/objects/bullet.js' },

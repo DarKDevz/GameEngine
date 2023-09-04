@@ -77,13 +77,11 @@ class Bullet extends GameObject {
             removeObject(this.uuid)
         }
         for (let uuid in engine.allCollisions[this.uuid]) {
-            if (engine.allCollisions[this.uuid][uuid]) {
                 let obj = engine.uuidList[uuid];
                 if (obj && engine.uuidList[uuid].isCollidable) {
                     this.collidedId = obj;
                     this.onCollide(obj);
                 }
-            }
         }
     }
 }

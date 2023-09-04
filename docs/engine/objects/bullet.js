@@ -79,14 +79,11 @@ class Bullet extends GameObject {
         if (Date.now() >= expiryTime) {
             removeObject(this.uuid);
         }
-        let t_box_id;
         for (let uuid in engine.allCollisions[this.uuid]) {
-            if (engine.allCollisions[this.uuid][uuid]) {
-                let obj = engine.uuidList[uuid];
-                if (obj && engine.uuidList[uuid].isCollidable) {
-                    this.collidedId = obj;
-                    this.onCollide(obj);
-                }
+            let obj = engine.uuidList[uuid];
+            if (obj && engine.uuidList[uuid].isCollidable) {
+                this.collidedId = obj;
+                this.onCollide(obj);
             }
         }
     }

@@ -178,6 +178,7 @@ async function createZip() {
         { path: 'loader/level.js' },
         { path: 'loader/support.js' },
         { path: 'index.html' },
+        { path: 'engine/objects/collisionChecker.js' },
         { path: 'sketch.js', makeFile: createSketchFile },
         { path: 'export.json', makeFile: createMapFile }
     ];
