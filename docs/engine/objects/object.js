@@ -100,30 +100,8 @@ class GameObject extends GameEvents {
         return ["x", "y"];
     }
     collision(obj, trigger = false) {
-        var oX, oY, oW, oH;
-        if (obj.pos !== undefined) {
-            oX = obj.pos.x;
-            oY = obj.pos.y;
-        }
-        else {
-            oX = obj.x;
-            oY = obj.y;
-        }
-        if (obj.size !== undefined) {
-            oW = obj.size.x;
-            oH = obj.size.y;
-        }
-        else {
-            oW = obj.width;
-            oH = obj.height;
-        }
-        let rect2 = {
-            x: oX,
-            y: oY,
-            width: oW,
-            height: oH,
-        };
-        let collides = collide(this, rect2);
+        //Fix collision
+        let collides = false;
         if (collides && trigger)
             this.onCollide(obj);
         return collides;
@@ -148,6 +126,9 @@ class GameObject extends GameEvents {
         if (this.body) {
             engine.world.DestroyBody(this.body);
         }
+    }
+    addScriptByName(name, vals) {
+        engine.addScriptByName(name, vals, this);
     }
 }
 var Categories = {

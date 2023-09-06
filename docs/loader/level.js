@@ -56,7 +56,9 @@ function reloadcurrent() {
     engine.activeScene.boxes.forEach((b) => {
         allCollision[b.uuid] = ([b.getCollisionType(), b.getCollisionVectors()]);
     });
-    allCollision['Player'] = [player.getCollisionType(), player.getCollisionVectors()];
+    if (player?.getCollisionType) {
+        allCollision['Player'] = [player.getCollisionType(), player.getCollisionVectors()];
+    }
     engine.collisionWorker.postMessage({ type: "update", value: allCollision });
     engine.collisionWorker.postMessage({ type: "getcache" });
 }
@@ -338,6 +340,7 @@ class Level extends GameEvents {
         let matrix = webglVersion == "p2d" ? drawingContext.getTransform().inverse() : null;
         let pointFirst = new DOMPoint(0, 0);
         let pointSecond = new DOMPoint(width * pixelDensity(), height * pixelDensity());
+        let lookingAtZ = true
         /**
          * @description WebGL hacks
          * gets view matrix and inverts it
@@ -348,9 +351,11 @@ class Level extends GameEvents {
          */
         if (webglVersion == "webgl2") {
             matrix = (new DOMMatrix(p5.instance._renderer.uMVMatrix.mat4)).inverse();
-            pointFirst = new DOMPoint(-width / 2, -height / 2, -p5.instance._renderer._curCamera.eyeZ);
-            pointSecond = new DOMPoint(width / 2, height / 2, -p5.instance._renderer._curCamera.eyeZ);
-            /**
+            pointFirst = new DOMPoint(-width / 2, -height / 2, -500);
+            pointSecond = new DOMPoint(width / 2, height / 2, -500);
+            //If look at centerx y and 0 are all positive it means that it's looking at the z
+            lookingAtZ = p5.instance._renderer._curCamera.cameraMatrix.multiplyVec4(p5.instance._renderer._curCamera.centerX,p5.instance._renderer._curCamera.centerY,0,1)[2] < 0
+                        /**
              * origin point is 0,0,0
              * we get the top left corner
              * and the bottom right
@@ -363,8 +368,23 @@ class Level extends GameEvents {
         let p = matrix.transformPoint(pointSecond);
         collisionVectors[1] = { x: p.x - collisionVectors[0].x, y: p.y - collisionVectors[0].y };
         for (let t_box of this.boxes) {
-            let ObjectVectors = t_box.getCollisionVectors();
-            let collides = HandleCollision('Rect', t_box.getCollisionType() + 'Vector', ...collisionVectors, ...ObjectVectors);
+            var frustum = {
+                getCollisionType() {
+                    return 'Rect';
+                },
+                getCollisionVectors() {
+                    return collisionVectors;
+                }
+            };
+            line(collisionVectors[0].x,collisionVectors[0].y,collisionVectors[0].x+collisionVectors[1].x,collisionVectors[1].y+collisionVectors[0].y)
+            //Point is 2d
+            //If z is positive( means that it's past the 0 z view)
+            //Or if direction is opposite
+            let collides;
+            if(!t_box.is3D && !lookingAtZ) {
+                collides = false;
+            }
+            collides ??= HandleCollision(t_box, frustum);
             //Or if property alwaysDraw is set
             if (collides || t_box.alwaysDraw) {
                 drawable.push(t_box);

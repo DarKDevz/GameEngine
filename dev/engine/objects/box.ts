@@ -12,7 +12,7 @@ class Box extends GameObject {
         this.isCollidable = true;
         this.collisionType = 'Rect';
     }
-    getCollisionType(): string {
+    getCollisionType(): collisionTypes {
         return 'Rect';
     }
     set width(val: number) {
@@ -98,18 +98,13 @@ class Box extends GameObject {
         if (!OnlyDraw) this.update();
     }
     collision(obj: any): any {
-        let type = obj.getCollisionType() + 'Vector'
-        let ObjectVectors = obj.getCollisionVectors()
-        let collides = HandleCollision(this.getCollisionType(), type, ...this.getCollisionVectors(), ...ObjectVectors)
+        let collides = HandleCollision(this,obj);
 
         if (collides) {
             this.onCollide(obj);
         }
 
         return collides;
-    }
-    addScriptByName(name: string, vals: Object): void {
-        engine.addScriptByName(name, vals, this);
     }
     customDraw(): void {
         super.customDraw()

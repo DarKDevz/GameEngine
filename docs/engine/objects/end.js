@@ -15,6 +15,7 @@ class End extends Box {
         super.draw();
     }
     earlyUpdate() {
+        //Check if works
         if (this.collision(player)) {
             if (engine.scene[engine.currentScene + 1] !== undefined)
                 engine.scene[engine.currentScene + 1].loadLevel();

@@ -128,6 +128,12 @@ interface EditableObject {
     get:()=>any
     value:any
 }
+type collisionTypes = 'Rect'|'Circle'|'Line'|'Point'
+interface CollidableObject {
+    getCollisionType(): collisionTypes
+    getCollisionVectors(): any[]
+    [x:string]:any;
+}
 /**
  * Represents a game object.
  * @interface
@@ -202,7 +208,7 @@ interface GameObject extends GameEvents {
     shown: any;
 
     /** The collision type of the object. */
-    collisionType: 'Rect'|'Circle'|'Line'|'Point';
+    collisionType: collisionTypes;
 
     /** Indicates if the image for the object has been initialized. */
     imageInitialized: boolean;

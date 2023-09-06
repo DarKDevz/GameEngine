@@ -36,12 +36,12 @@ self.addEventListener('message', function (e) {
                         }
                         else {
                             //Deleted element so remove old collided objects
-                            if(cache[uuid]) {
-                            for(let uuid2 in cache[uuid]) {
-                                delete cache[uuid2][uuid]
+                            if (cache[uuid]) {
+                                for (let uuid2 in cache[uuid]) {
+                                    delete cache[uuid2][uuid];
+                                }
+                                delete cache[uuid];
                             }
-                            delete cache[uuid];
-                        }
                         }
                     }
                 }
@@ -83,9 +83,9 @@ function addCache(uuid1, uuid2, value) {
     cache[uuid1][uuid2] = value;
     cache[uuid2] ??= {};
     cache[uuid2][uuid1] = value;
-    if(!value) {
-        delete cache[uuid1][uuid2]
-        delete cache[uuid2][uuid1]
+    if (!value) {
+        delete cache[uuid1][uuid2];
+        delete cache[uuid2][uuid1];
     }
     if (value) {
         //console.log(uuid1,uuid2);

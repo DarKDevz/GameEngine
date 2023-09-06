@@ -218,9 +218,14 @@ class Editor {
         }
         selectedObjects = [];
         this.tryOffset = {};
+        let collisionRect = {
+            getCollisionType: () => { return 'Rect'; },
+            getCollisionVectors: () => { return [{ x: rect1.x, y: rect1.y }, { x: rect1.width, y: rect1.height }]; }
+        };
         for (let tempBox of engine.getActiveScene().boxes) {
             if (tempBox.collision) {
-                let c = tempBox.collision(rect1, false);
+                //Change to use collision types
+                let c = tempBox.collision(collisionRect, false) ? 1 : 0;
                 if (c) {
                     selectedObjects.push(tempBox.uuid);
                     //console.log(t_box.uuid);

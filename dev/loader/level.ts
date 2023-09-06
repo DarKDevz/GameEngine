@@ -58,8 +58,9 @@ function reloadcurrent() {
     let allCollision = {};
     engine.activeScene.boxes.forEach((b)=>{ 
     allCollision[b.uuid] = ([b.getCollisionType(),b.getCollisionVectors()])})
-    allCollision['Player'] = [player.getCollisionType(),player.getCollisionVectors()]
-    engine.collisionWorker.postMessage({type:"update",value:allCollision})
+    if(player?.getCollisionType) {
+        allCollision['Player'] = [player.getCollisionType(), player.getCollisionVectors()];
+    }    engine.collisionWorker.postMessage({type:"update",value:allCollision})
     engine.collisionWorker.postMessage({type:"getcache"})
 }
 function removeObject(objId: UUID | GameObject | number) {
@@ -353,8 +354,15 @@ class Level extends GameEvents {
         collisionVectors[1] = { x: p.x - collisionVectors[0].x, y: p.y - collisionVectors[0].y };
 
         for (let t_box of this.boxes) {
-            let ObjectVectors = t_box.getCollisionVectors();
-            let collides = HandleCollision('Rect', t_box.getCollisionType() + 'Vector', ...collisionVectors, ...ObjectVectors);
+            var frustum:CollidableObject = {
+                getCollisionType() {
+                    return 'Rect'
+                },
+                getCollisionVectors() {
+                    return collisionVectors
+                }
+            }
+            let collides = HandleCollision(t_box,frustum);
             //Or if property alwaysDraw is set
             if (collides || t_box.alwaysDraw) {
                 drawable.push(t_box);

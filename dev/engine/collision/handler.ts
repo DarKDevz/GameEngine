@@ -1,16 +1,24 @@
-var HandleCollision:SpecialFunc = function (temp1,temp2) {
-    if(temp1?.fixture?.m_shape && temp1?.body?.m_xf && temp2?.fixture?.m_shape && temp2?.body?.m_xf) {
-        return Box2D.Collision.Shapes.b2Shape.TestOverlap(temp1.fixture.m_shape,temp1.body.m_xf,temp2.fixture.m_shape,temp2.body.m_xf)
+function HandleCollision(obj1:CollidableObject,obj2:CollidableObject) {
+    if(obj1?.fixture?.m_shape && obj1?.body?.m_xf && obj2?.fixture?.m_shape && obj2?.body?.m_xf) {
+        return Box2D.Collision.Shapes.b2Shape.TestOverlap(obj1.fixture.m_shape,obj1.body.m_xf,obj2.fixture.m_shape,obj2.body.m_xf)
     }
-    let newArgs = Object.values(arguments);
-    let type1 = (newArgs.shift())
-    let type2 = (newArgs.shift())
-    let func = p5.prototype[('collide')+type1+type2]
-    if(typeof func === "function") {
-        //console.error('collision between: ',type1,' and ',type2)
-        return func(...newArgs);
-    }else {
-        console.trace()
-        throw new Error('collision between: '+type1+' and '+type2+'  doesnt exist')
+    let type1 = obj1.getCollisionType()
+    let type2 = obj2.getCollisionType()
+    return tCollision(type1,type2,obj1.getCollisionVectors(),obj1.getCollisionVectors(),true)
+}
+function tCollision(type1:collisionTypes, type2:collisionTypes, values1:any[], values2:any[], isVector:boolean) {
+    let test = p5.prototype["collide" + type1 + type2 + (isVector ? 'Vector' : '')];
+    if (typeof test === "function") {
+        return (test(...values1[1], ...values2[1]));
+    }
+    else {
+        let test = p5.prototype["collide" + type2 + type1 + (isVector ? 'Vector' : '')];
+        if (typeof test === "function") {
+            return (test(...values2[1], ...values1[1]));
+        }
+        else {
+            console.log(Array.from(arguments));
+            throw new Error('collision between: '+type1+' and '+type2+'  doesnt exist')
+        }
     }
 }

@@ -15,6 +15,7 @@ class Enemy extends Box {
         rect(this.x, this.y, this.width, this.height);
     }
     earlyUpdate() {
+        //Check if works
         if (this.collision(player)) {
             player.playerDeath();
         }

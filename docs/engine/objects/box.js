@@ -96,16 +96,11 @@ class Box extends GameObject {
             this.update();
     }
     collision(obj) {
-        let type = obj.getCollisionType() + 'Vector';
-        let ObjectVectors = obj.getCollisionVectors();
-        let collides = HandleCollision(this.getCollisionType(), type, ...this.getCollisionVectors(), ...ObjectVectors);
+        let collides = HandleCollision(this, obj);
         if (collides) {
             this.onCollide(obj);
         }
         return collides;
-    }
-    addScriptByName(name, vals) {
-        engine.addScriptByName(name, vals, this);
     }
     customDraw() {
         super.customDraw();

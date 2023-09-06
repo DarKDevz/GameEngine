@@ -46,35 +46,6 @@ class Interactive extends GameObject {
     onCollide() {
         //eval(this.components[0].fn)
     }
-    collision(obj) {
-        var oX, oY, oW, oH;
-        if (obj.pos !== undefined) {
-            oX = obj.pos.x;
-            oY = obj.pos.y;
-        }
-        else {
-            oX = obj.x;
-            oY = obj.y;
-        }
-        if (obj.size !== undefined) {
-            oW = obj.size.x;
-            oH = obj.size.y;
-        }
-        else {
-            oW = obj.width;
-            oH = obj.height;
-        }
-        let rect = {
-            x: oX,
-            y: oY,
-            width: oW,
-            height: oH,
-        };
-        let collides = collideCircle(rect, this);
-        if (collides && player === obj)
-            this.onCollide();
-        return collides;
-    }
     draw() {
         fill(255, 0, 255);
         circle(this.x, this.y, this.r * 2);
@@ -86,8 +57,5 @@ class Interactive extends GameObject {
         stroke(0, 255, 0);
         line(this.x, this.y, this.x, this.y - this.r);
         stroke(0);
-    }
-    lateUpdate() {
-        this.canBeInteracted = this.collision(player);
     }
 }

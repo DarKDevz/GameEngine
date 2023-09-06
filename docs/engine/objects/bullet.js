@@ -22,33 +22,6 @@ class Bullet extends GameObject {
         }
         removeObject(this.uuid);
     }
-    collision(obj) {
-        var oX, oY, oW, oH;
-        if (obj.pos !== undefined) {
-            oX = obj.pos.x;
-            oY = obj.pos.y;
-        }
-        else {
-            oX = obj.x;
-            oY = obj.y;
-        }
-        if (obj.size !== undefined) {
-            oW = obj.size.x;
-            oH = obj.size.y;
-        }
-        else {
-            oW = obj.width;
-            oH = obj.height;
-        }
-        let rect = {
-            x: oX,
-            y: oY,
-            width: oW,
-            height: oH,
-        };
-        let collides = collideCircle(rect, this);
-        return collides;
-    }
     draw() {
         this.oldX = this.x;
         this.oldY = this.y;

@@ -80,7 +80,7 @@ class Player {
     get height() {
         return this.size.y
     }
-    getCollisionType() {
+    getCollisionType():collisionTypes {
         return 'Rect'
     }
     getCollisionVectors() {

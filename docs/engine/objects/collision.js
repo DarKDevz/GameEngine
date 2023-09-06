@@ -1,8 +1,32 @@
 function collide(rect1, rect2) {
-    return HandleCollision('Rect', 'RectVector', rect1, { x: rect1.width, y: rect1.height }, rect2, { x: rect2.width, y: rect2.height });
+    let obj1 = {
+        getCollisionType: () => { return 'Rect'; },
+        getCollisionVectors() {
+            return [rect2, { x: rect2.width, y: rect2.height }];
+        },
+    };
+    let obj2 = {
+        getCollisionType: () => { return 'Rect'; },
+        getCollisionVectors() {
+            return [rect1, { x: rect1.width, y: rect1.height }];
+        },
+    };
+    return HandleCollision(obj1, obj2);
 }
 function collideCircle(rect, circle) {
-    return HandleCollision('Rect', 'CircleVector', rect, { x: rect.width, y: rect.height }, circle, circle.r * 2);
+    let obj1 = {
+        getCollisionType: () => { return 'Circle'; },
+        getCollisionVectors() {
+            return [circle, circle.r];
+        },
+    };
+    let obj2 = {
+        getCollisionType: () => { return 'Rect'; },
+        getCollisionVectors() {
+            return [rect, { x: rect.width, y: rect.height }];
+        },
+    };
+    return HandleCollision(obj1, obj2);
 }
 function checkRectangleCircleIntersection(x1, y1, width, height, cx, cy, r) {
     // Calculate the closest point on the rectangle to the center of the circle
