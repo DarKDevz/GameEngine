@@ -613,3 +613,7 @@ interface ParticleRenderer {
 function downloadFile(content: any, arg1: string) {
     throw new Error("Function not implemented.");
 }
+/**
+ * @description updates frustum planes to use for detecting wheter to draw an object or not
+ */
+function updateColliders():void

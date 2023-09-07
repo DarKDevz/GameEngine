@@ -345,10 +345,14 @@ class Level extends GameEvents {
                         return [p5.instace._renderer];
                     }
                 };
-                let collides;
+                let collides: boolean;
+                //To remove useless frustum collision check
+                if(t_box.alwaysDraw) {
+                    collides = true
+                }
                 collides ??= HandleCollision(t_box, frustum);
                 //Or if property alwaysDraw is set
-                if (collides || t_box.alwaysDraw) {
+                if (collides) {
                     drawable.push(t_box);
                 }
                 //No sorting in webgl
@@ -369,10 +373,13 @@ class Level extends GameEvents {
                         return collisionVectors;
                     }
                 };
-                let collides;
+                let collides: boolean;
+                if(t_box.alwaysDraw) {
+                    collides = true
+                }
                 collides ??= HandleCollision(t_box, frustum);
                 //Or if property alwaysDraw is set
-                if (collides || t_box.alwaysDraw) {
+                if (collides) {
                     drawable.push(t_box);
                 }
                 sorted = [...drawable].sort((a, b) => {
