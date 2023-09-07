@@ -128,7 +128,7 @@ interface EditableObject {
     get:()=>any
     value:any
 }
-type collisionTypes = 'Rect'|'Circle'|'Line'|'Point'
+type collisionTypes = 'Rect'|'Circle'|'Line'|'Point'|'Frustum'
 interface CollidableObject {
     getCollisionType(): collisionTypes
     getCollisionVectors(): any[]

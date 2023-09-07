@@ -9,12 +9,12 @@ function HandleCollision(obj1:CollidableObject,obj2:CollidableObject) {
 function tCollision(type1:collisionTypes, type2:collisionTypes, values1:any[], values2:any[], isVector:boolean) {
     let test = p5.prototype["collide" + type1 + type2 + (isVector ? 'Vector' : '')];
     if (typeof test === "function") {
-        return (test(...values1[1], ...values2[1]));
+        return (test(...values1, ...values2));
     }
     else {
         let test = p5.prototype["collide" + type2 + type1 + (isVector ? 'Vector' : '')];
         if (typeof test === "function") {
-            return (test(...values2[1], ...values1[1]));
+            return (test(...values2, ...values1));
         }
         else {
             console.log(Array.from(arguments));

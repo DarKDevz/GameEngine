@@ -340,59 +340,54 @@ class Level extends GameEvents {
         let matrix = webglVersion == "p2d" ? drawingContext.getTransform().inverse() : null;
         let pointFirst = new DOMPoint(0, 0);
         let pointSecond = new DOMPoint(width * pixelDensity(), height * pixelDensity());
-        let lookingAtZ = true
-        /**
-         * @description WebGL hacks
-         * gets view matrix and inverts it
-         * gets top left corner and that's the xy origin
-         * gets bottom left subtracts top left to get xy width height
-         * pass it to 2D collision algorithm
-         * and it works!
-         */
+        let sorted;
         if (webglVersion == "webgl2") {
-            matrix = (new DOMMatrix(p5.instance._renderer.uMVMatrix.mat4)).inverse();
-            pointFirst = new DOMPoint(-width / 2, -height / 2, -500);
-            pointSecond = new DOMPoint(width / 2, height / 2, -500);
-            //If look at centerx y and 0 are all positive it means that it's looking at the z
-            lookingAtZ = p5.instance._renderer._curCamera.cameraMatrix.multiplyVec4(p5.instance._renderer._curCamera.centerX,p5.instance._renderer._curCamera.centerY,0,1)[2] < 0
-                        /**
-             * origin point is 0,0,0
-             * we get the top left corner
-             * and the bottom right
-             * do calculations
-             * and the result is our frustum in xyz form
-             * we ignore the z for now and only use xy
-             */
-        }
-        collisionVectors[0] = matrix.transformPoint(pointFirst);
-        let p = matrix.transformPoint(pointSecond);
-        collisionVectors[1] = { x: p.x - collisionVectors[0].x, y: p.y - collisionVectors[0].y };
-        for (let t_box of this.boxes) {
-            var frustum = {
-                getCollisionType() {
-                    return 'Rect';
-                },
-                getCollisionVectors() {
-                    return collisionVectors;
+            updateColliders()
+            for (let t_box of this.boxes) {
+                var frustum = {
+                    getCollisionType() {
+                        return 'Frustum';
+                    },
+                    getCollisionVectors() {
+                        return [p5.instance._renderer];
+                    }
+                };
+                let collides;
+                collides ??= HandleCollision(t_box, frustum);
+                //Or if property alwaysDraw is set
+                if (collides || t_box.alwaysDraw) {
+                    drawable.push(t_box);
                 }
-            };
-            line(collisionVectors[0].x,collisionVectors[0].y,collisionVectors[0].x+collisionVectors[1].x,collisionVectors[1].y+collisionVectors[0].y)
-            //Point is 2d
-            //If z is positive( means that it's past the 0 z view)
-            //Or if direction is opposite
-            let collides;
-            if(!t_box.is3D && !lookingAtZ) {
-                collides = false;
+                //No sorting in webgl
+                //Does nothing
             }
-            collides ??= HandleCollision(t_box, frustum);
-            //Or if property alwaysDraw is set
-            if (collides || t_box.alwaysDraw) {
-                drawable.push(t_box);
+            sorted = drawable;
+        }
+        else {
+            collisionVectors = [matrix.transformPoint(pointFirst), matrix.transformPoint(pointSecond)];
+            let s = collisionVectors[0];
+            let b = collisionVectors[1];
+            collisionVectors[1] = { x: b.x - collisionVectors[0].x, y: b.y - collisionVectors[0].y };
+            for (let t_box of this.boxes) {
+                var frustum = {
+                    getCollisionType() {
+                        return 'Rect';
+                    },
+                    getCollisionVectors() {
+                        return collisionVectors;
+                    }
+                };
+                let collides;
+                collides ??= HandleCollision(t_box, frustum);
+                //Or if property alwaysDraw is set
+                if (collides || t_box.alwaysDraw) {
+                    drawable.push(t_box);
+                }
+                sorted = [...drawable].sort((a, b) => {
+                    return a.z - b.z;
+                });
             }
         }
-        let sorted = [...drawable].sort((a, b) => {
-            return a.z - b.z;
-        });
         fill(125);
         if (window?.editor) {
             DrawAll();

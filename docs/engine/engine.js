@@ -101,9 +101,12 @@ class Engine extends GameEvents {
         let DPoint;
         let matrix;
         if (webglVersion === "webgl2") {
-            //Removes all Z's that are from camera
+            let defaultEyeZ = height / 2 / Math.tan(p5.instance._renderer._curCamera.cameraFOV / 2);
+            //offZ1*=2
+            var ratio = (p5.instance._renderer._curCamera.eyeZ) / defaultEyeZ;
+            //Removes all Z's that are from camera and scale the object correctly
             matrix = new DOMMatrix(p5.instance._renderer.uMVMatrix.mat4);
-            DPoint = new DOMPoint(mouseX - width / 2, mouseY - height / 2, -p5.instance._renderer._curCamera.eyeZ);
+            DPoint = new DOMPoint((mouseX - width / 2)*ratio, (mouseY - height / 2)*ratio, -p5.instance._renderer._curCamera.eyeZ);
         }
         else {
             matrix = drawingContext.getTransform();
