@@ -18,7 +18,7 @@ function tCollision(type1, type2, values1, values2, isVector) {
         }
         else {
             console.log(Array.from(arguments));
-            throw new Error('collision between: '+type1+' and '+type2+'  doesnt exist')
+            throw new Error('collision between: ' + type1 + ' and ' + type2 + '  doesnt exist');
         }
     }
 }

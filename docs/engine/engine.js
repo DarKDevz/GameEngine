@@ -106,7 +106,7 @@ class Engine extends GameEvents {
             var ratio = (p5.instance._renderer._curCamera.eyeZ) / defaultEyeZ;
             //Removes all Z's that are from camera and scale the object correctly
             matrix = new DOMMatrix(p5.instance._renderer.uMVMatrix.mat4);
-            DPoint = new DOMPoint((mouseX - width / 2)*ratio, (mouseY - height / 2)*ratio, -p5.instance._renderer._curCamera.eyeZ);
+            DPoint = new DOMPoint((mouseX - width / 2) * ratio, (mouseY - height / 2) * ratio, -p5.instance._renderer._curCamera.eyeZ);
         }
         else {
             matrix = drawingContext.getTransform();
@@ -210,8 +210,9 @@ class Engine extends GameEvents {
         this.gui.fill(0);
         this.gui.text("FPS: " + round(frameRate() / 10) * 10, 50, 50);
         if (webglVersion !== "p2d") {
+            drawingContext.disable(drawingContext.DEPTH_TEST)
             image(this.gui, -width / 2, -height / 2, width, height);
-        }
+            drawingContext.enable(drawingContext.DEPTH_TEST)        }
         else {
             image(this.gui, 0, 0, width, height);
         }

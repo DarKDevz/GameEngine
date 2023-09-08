@@ -45,7 +45,9 @@ window.draw= function () {
     editor.onUpdate()
     pop()
     if (webglVersion !== "p2d") {
+        drawingContext.disable(drawingContext.DEPTH_TEST)
         image(engine.gui, -width / 2, -height / 2, width, height);
+        drawingContext.enable(drawingContext.DEPTH_TEST)
     }
     else {
         image(engine.gui, 0, 0, width, height);

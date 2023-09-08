@@ -1,3 +1,4 @@
+declare var Box2D: Box2D;
 declare var b2World: Box2D.Dynamics.b2World;
 declare var player: Player
 declare var b2Vec2: Box2D.Common.Math.b2Vec2;
@@ -610,10 +611,10 @@ interface ParticleRenderer {
     graphics: ReturnType<typeof createGraphics>
     lastFrame: ReturnType<typeof createImage>
 }
-function downloadFile(content: any, arg1: string) {
-    throw new Error("Function not implemented.");
-}
+function downloadFile(content: any, arg1: string):void
 /**
  * @description updates frustum planes to use for detecting wheter to draw an object or not
  */
 function updateColliders():void
+function replaceValues<SpecialFunc>():void
+function replaceValues<SpecialFunc>():void

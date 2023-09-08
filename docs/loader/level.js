@@ -342,7 +342,12 @@ class Level extends GameEvents {
         let pointSecond = new DOMPoint(width * pixelDensity(), height * pixelDensity());
         let sorted;
         if (webglVersion == "webgl2") {
-            updateColliders()
+            //Update plane collider
+            /**
+             * @todo Make it only update if needed aka camera matrix updated
+             * @todo Add left right bottom top planes Right now it has only near far (Gets the job done)
+             */
+            updateColliders();
             for (let t_box of this.boxes) {
                 var frustum = {
                     getCollisionType() {
@@ -353,15 +358,19 @@ class Level extends GameEvents {
                     }
                 };
                 let collides;
+                //To remove useless frustum collision check
+                if (t_box.alwaysDraw) {
+                    collides = true;
+                }
                 collides ??= HandleCollision(t_box, frustum);
                 //Or if property alwaysDraw is set
-                if (collides || t_box.alwaysDraw) {
+                if (collides) {
                     drawable.push(t_box);
                 }
                 //No sorting in webgl
                 //Does nothing
+                sorted = drawable;
             }
-            sorted = drawable;
         }
         else {
             collisionVectors = [matrix.transformPoint(pointFirst), matrix.transformPoint(pointSecond)];
@@ -378,9 +387,12 @@ class Level extends GameEvents {
                     }
                 };
                 let collides;
+                if (t_box.alwaysDraw) {
+                    collides = true;
+                }
                 collides ??= HandleCollision(t_box, frustum);
                 //Or if property alwaysDraw is set
-                if (collides || t_box.alwaysDraw) {
+                if (collides) {
                     drawable.push(t_box);
                 }
                 sorted = [...drawable].sort((a, b) => {
