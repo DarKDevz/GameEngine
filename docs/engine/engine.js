@@ -210,9 +210,10 @@ class Engine extends GameEvents {
         this.gui.fill(0);
         this.gui.text("FPS: " + round(frameRate() / 10) * 10, 50, 50);
         if (webglVersion !== "p2d") {
-            drawingContext.disable(drawingContext.DEPTH_TEST)
+            drawingContext.disable(drawingContext.DEPTH_TEST);
             image(this.gui, -width / 2, -height / 2, width, height);
-            drawingContext.enable(drawingContext.DEPTH_TEST)        }
+            drawingContext.enable(drawingContext.DEPTH_TEST);
+        }
         else {
             image(this.gui, 0, 0, width, height);
         }

@@ -342,7 +342,7 @@ class Level extends GameEvents {
                         return 'Frustum';
                     },
                     getCollisionVectors() {
-                        return [p5.instace._renderer];
+                        return [p5.instance._renderer];
                     }
                 };
                 let collides: boolean;
@@ -451,6 +451,7 @@ class Level extends GameEvents {
         return ["level Index", "starting Position x", "starting Position y", "Max Y Pos"]
     }
     loadLevel() {
+        if(player.cameraPos) {
         player.pos = this.pos.copy();
         player.cameraPos.x = this.pos.x;
         player.cameraPos.y = this.pos.y;
@@ -459,6 +460,7 @@ class Level extends GameEvents {
         player.colliding = false;
         player.collidedId = null;
         player.vel = createVector(0, 0);
+        }
         gameParticle.stopAll()
         if (engine.currentScene !== undefined) {
             for (let box of engine.getActiveScene().boxes) {

@@ -463,14 +463,16 @@ class Level extends GameEvents {
         return ["level Index", "starting Position x", "starting Position y", "Max Y Pos"];
     }
     loadLevel() {
-        player.pos = this.pos.copy();
-        player.cameraPos.x = this.pos.x;
-        player.cameraPos.y = this.pos.y;
-        player.grounded = false;
-        player.groundedId = null;
-        player.colliding = false;
-        player.collidedId = null;
-        player.vel = createVector(0, 0);
+        if (player.cameraPos) {
+            player.pos = this.pos.copy();
+            player.cameraPos.x = this.pos.x;
+            player.cameraPos.y = this.pos.y;
+            player.grounded = false;
+            player.groundedId = null;
+            player.colliding = false;
+            player.collidedId = null;
+            player.vel = createVector(0, 0);
+        }
         gameParticle.stopAll();
         if (engine.currentScene !== undefined) {
             for (let box of engine.getActiveScene().boxes) {

@@ -4,7 +4,7 @@ function HandleCollision(obj1:CollidableObject,obj2:CollidableObject):boolean {
     }
     let type1 = obj1.getCollisionType()
     let type2 = obj2.getCollisionType()
-    return tCollision(type1,type2,obj1.getCollisionVectors(),obj1.getCollisionVectors(),true)
+    return tCollision(type1,type2,obj1.getCollisionVectors(),obj2.getCollisionVectors(),true)
 }
 function tCollision(type1:collisionTypes, type2:collisionTypes, values1:any[], values2:any[], isVector:boolean):boolean {
     let test = p5.prototype["collide" + type1 + type2 + (isVector ? 'Vector' : '')];

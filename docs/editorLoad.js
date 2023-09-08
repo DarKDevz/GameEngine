@@ -42,19 +42,14 @@ function setup() {
     // transformations in reverse order.
     matrixArray[0].translate([-247, 291, 15]);
     matrixArray[0].scale(20, 43, 11);
-    
     matrixArray[1].translate([631, -212, 8]);
     matrixArray[1].scale(42, 10, 36);
-    
     matrixArray[2].translate([314, -50, 33]);
     matrixArray[2].scale(15, 49, 25);
-    
     matrixArray[3].translate([219, 489, 27]);
     matrixArray[3].scale(11, 12, 48);
-    
     matrixArray[4].translate([256, 205, 47]);
     matrixArray[4].scale(14, 45, 31);
-    
     noStroke();
     let colorArray = window.exampleShader.initializedInstancedAttribute('aMaterialColor', 5);
     colorArray[0] = 178 / 255; // rgb(178, 34, 34)
@@ -76,7 +71,7 @@ function setup() {
     colorArray[16] = 70 / 255; // rgb(70, 130, 180)
     colorArray[17] = 130 / 255;
     colorArray[18] = 180 / 255;
-    colorArray[19] = 50/255;
+    colorArray[19] = 50 / 255;
     colorArray[20] = 70 / 255; // rgb(70, 130, 180)
 }
 function draw() {
@@ -88,11 +83,11 @@ function draw() {
     if (!window?.engine?.getActiveScene)
         return;
     engine.draw();
-    if(window.exampleInst) {
-    shader(window.exampleShader);
-    translate(0,0,-500)
-    box(1);
-    resetShader();
+    if (window.exampleInst) {
+        shader(window.exampleShader);
+        translate(0, 0, -500);
+        box(1);
+        resetShader();
     }
 }
 window.exampleInst = false;
