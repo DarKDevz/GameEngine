@@ -55,7 +55,7 @@ class Engine extends GameEvents {
     }
     tryFirstLoad() {
         if (window?.canvas?.width) {
-            this.resize(canvas.width, canvas.height);
+            this.resize(width, height);
         }
         else {
             setTimeout(() => { this.tryFirstLoad(); }, 500);

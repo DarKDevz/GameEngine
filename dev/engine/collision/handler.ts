@@ -1,10 +1,13 @@
 function HandleCollision(obj1:CollidableObject,obj2:CollidableObject):boolean {
-    if(obj1?.fixture?.m_shape && obj1?.body?.m_xf && obj2?.fixture?.m_shape && obj2?.body?.m_xf) {
-        return Box2D.Collision.Shapes.b2Shape.TestOverlap(obj1.fixture.m_shape,obj1.body.m_xf,obj2.fixture.m_shape,obj2.body.m_xf)
+    if(obj1.getCollisionType && obj2.getCollisionType) {
+        let type1 = obj1.getCollisionType();
+        let type2 = obj2.getCollisionType();
+        return tCollision(type1, type2, obj1.getCollisionVectors(), obj2.getCollisionVectors(), true);
     }
-    let type1 = obj1.getCollisionType()
-    let type2 = obj2.getCollisionType()
-    return tCollision(type1,type2,obj1.getCollisionVectors(),obj2.getCollisionVectors(),true)
+    try{return Box2D.Collision.Shapes.b2Shape.TestOverlap(obj1.fixture.m_shape, obj1.body.m_xf, obj2.fixture.m_shape, obj2.body.m_xf);}
+    catch{
+        throw new Error("Objects insterted is neither of type CollidableObject or has a fixture shape")
+    }
 }
 function tCollision(type1:collisionTypes, type2:collisionTypes, values1:any[], values2:any[], isVector:boolean):boolean {
     let test = p5.prototype["collide" + type1 + type2 + (isVector ? 'Vector' : '')];

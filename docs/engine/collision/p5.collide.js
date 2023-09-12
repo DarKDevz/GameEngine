@@ -166,197 +166,179 @@ p5.prototype.collideFrustumCircleVector = function (a, b, c) {
     //console.log(a.uPMatrix.multiplyVec4(...a.uMVMatrix.multiplyVec4(b.x,b.y,0,1)))
     return this.checkIfVisible(createVector(b.x, b.y, 0), c);
 };
-if (!p5 || !p5.prototype.createCanvas) {
-    console.error('The p5 library has not yet been loaded.');
-}
-else {
-    let p5CreateCanvas = p5.prototype.createCanvas;
-    p5.prototype.createCanvas = function () {
-        let canvas = p5CreateCanvas.apply(this, arguments);
-        if (canvas.drawingContext instanceof WebGLRenderingContext) {
-            canvas.instancedExt = canvas.drawingContext.getExtension('ANGLE_instanced_arrays');
-            if (!canvas.instancedExt) {
-                console.warn('p5.instancedDrawing requires the WebGL 1.0 extension ANGLE_instanced_arrays');
+/*
+ * Initialize both a typed JavaScript array and the WebGL buffer for the
+ * attribute.
+ *
+ * May return either an Typed JavaScript array corresponding to the attribute
+ * type, or in the case of matrices and vectors, an Array of Typed arrays.
+ */
+p5.Shader.prototype.initializedInstancedAttribute = function (attributeName, instanceCount, options) {
+    this.init();
+    const attribute = this.attributes[attributeName];
+    if (!attribute) {
+        throw new Error(`The specified attribute was not found: ${attributeName}`);
+    }
+    const gl = this._renderer.GL;
+    if (attribute.arrayData) {
+        throw new Error(`The attribute ${attributeName} has already been intialized as an instanced array`);
+    }
+    if (!this._instanceCount) {
+        this._instanceCount = instanceCount;
+    }
+    else if (this._instanceCount !== instanceCount) {
+        throw new Error('Instance count mismatch. All instanced attributes must use the same instance count.');
+    }
+    this.useProgram();
+    switch (attribute.type) {
+        //	case gl.BOOL:
+        //		break;
+        //	case gl.INT:
+        //		break;
+        //	case gl.FLOAT:
+        //		break;
+        //	case gl.FLOAT_MAT3:
+        //		break;
+        case gl.FLOAT_MAT4: {
+            const floatsPerMatrix = 16;
+            const matrixData = new Float32Array(instanceCount * floatsPerMatrix);
+            const matrices = [];
+            for (let i = 0; i < instanceCount; ++i) {
+                const byteOffsetToMatrix = i * floatsPerMatrix * 4;
+                let matrix = new p5.Matrix(this._renderer._pInst);
+                // The p5.Matrix constructor won't work because it copies its input unless
+                // it is a normal Array.
+                matrix.set(new Float32Array(matrixData.buffer, byteOffsetToMatrix, floatsPerMatrix));
+                // Initialize each matrix to be the identity matrix
+                // [1, 0, 0, 0,
+                //  0, 1, 0, 0,
+                //  0, 0, 1, 0,
+                //  0, 0, 0, 1]
+                matrix.mat4[0] = 1;
+                matrix.mat4[5] = 1;
+                matrix.mat4[10] = 1;
+                matrix.mat4[15] = 1;
+                matrices.push(matrix);
             }
+            attribute.isInstanced = true;
+            attribute.arrayData = matrixData;
+            attribute.buffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, attribute.buffer);
+            // just allocate the buffer
+            gl.bufferData(gl.ARRAY_BUFFER, matrixData.byteLength, options && options.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW);
+            return matrices;
         }
-    };
-    /*
-     * Initialize both a typed JavaScript array and the WebGL buffer for the
-     * attribute.
-     *
-     * May return either an Typed JavaScript array corresponding to the attribute
-     * type, or in the case of matrices and vectors, an Array of Typed arrays.
-     */
-    p5.Shader.prototype.initializedInstancedAttribute = function (attributeName, instanceCount, options) {
-        if (!this._renderer.instancedExt) {
-            throw new Error('p5.instancedDrawing requires the WebGL 1.0 extension ANGLE_instanced_arrays');
+        //	case gl.FLOAT_VEC2:
+        //		break;
+        //	case gl.FLOAT_VEC3:
+        //		break;
+        case gl.FLOAT_VEC4: {
+            const floatsPerVector = 4;
+            attribute.isInstanced = true;
+            attribute.buffer = gl.createBuffer();
+            attribute.arrayData = new Float32Array(instanceCount * floatsPerVector);
+            gl.bindBuffer(gl.ARRAY_BUFFER, attribute.buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, attribute.arrayData.byteLength, gl.DYNAMIC_DRAW // options && options.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW
+            );
+            // Unfortunately p5.Vector doesn't support wrapping a typed array in the same way p5.Matrix does
+            return attribute.arrayData;
         }
-        this.init();
-        const attribute = this.attributes[attributeName];
-        if (!attribute) {
-            throw new Error(`The specified attribute was not found: ${attributeName}`);
-        }
-        const gl = this._renderer.GL;
-        if (attribute.arrayData) {
-            throw new Error(`The attribute ${attributeName} has already been intialized as an instanced array`);
-        }
-        if (!this._instanceCount) {
-            this._instanceCount = instanceCount;
-        }
-        else if (this._instanceCount !== instanceCount) {
-            throw new Error('Instance count mismatch. All instanced attributes must use the same instance count.');
-        }
-        this.useProgram();
-        switch (attribute.type) {
-            //	case gl.BOOL:
-            //		break;
-            //	case gl.INT:
-            //		break;
-            //	case gl.FLOAT:
-            //		break;
-            //	case gl.FLOAT_MAT3:
-            //		break;
-            case gl.FLOAT_MAT4: {
-                const floatsPerMatrix = 16;
-                const matrixData = new Float32Array(instanceCount * floatsPerMatrix);
-                const matrices = [];
-                for (let i = 0; i < instanceCount; ++i) {
-                    const byteOffsetToMatrix = i * floatsPerMatrix * 4;
-                    let matrix = new p5.Matrix(this._renderer._pInst);
-                    // The p5.Matrix constructor won't work because it copies its input unless
-                    // it is a normal Array.
-                    matrix.set(new Float32Array(matrixData.buffer, byteOffsetToMatrix, floatsPerMatrix));
-                    // Initialize each matrix to be the identity matrix
-                    // [1, 0, 0, 0,
-                    //  0, 1, 0, 0,
-                    //  0, 0, 1, 0,
-                    //  0, 0, 0, 1]
-                    matrix.mat4[0] = 1;
-                    matrix.mat4[5] = 1;
-                    matrix.mat4[10] = 1;
-                    matrix.mat4[15] = 1;
-                    matrices.push(matrix);
-                }
-                attribute.isInstanced = true;
-                attribute.arrayData = matrixData;
-                attribute.buffer = gl.createBuffer();
-                gl.bindBuffer(gl.ARRAY_BUFFER, attribute.buffer);
-                // just allocate the buffer
-                gl.bufferData(gl.ARRAY_BUFFER, matrixData.byteLength, options && options.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW);
-                return matrices;
-            }
-            //	case gl.FLOAT_VEC2:
-            //		break;
-            //	case gl.FLOAT_VEC3:
-            //		break;
-            case gl.FLOAT_VEC4: {
-                const floatsPerVector = 4;
-                attribute.isInstanced = true;
-                attribute.buffer = gl.createBuffer();
-                attribute.arrayData = new Float32Array(instanceCount * floatsPerVector);
-                gl.bindBuffer(gl.ARRAY_BUFFER, attribute.buffer);
-                gl.bufferData(gl.ARRAY_BUFFER, attribute.arrayData.byteLength, gl.DYNAMIC_DRAW // options && options.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW
-                );
-                // Unfortunately p5.Vector doesn't support wrapping a typed array in the same way p5.Matrix does
-                return attribute.arrayData;
-            }
-            //	case gl.INT_VEC2:
-            //		break;
-            //	case gl.INT_VEC3:
-            //		break;
-            //	case gl.INT_VEC4:
-            //		break;
-            default:
-                throw new Error(`Unsupported instanced attribute type: ${attribute.type}`);
-        }
-    };
-    p5.RendererGL.prototype._drawElements = function (drawMode, gId) {
-        const fillShader = this._getRetainedFillShader();
-        const buffers = this.retainedMode.geometry[gId];
-        const gl = this.GL;
-        if (fillShader._instanceCount > 0) {
-            // bind array buffers for relevant instanced attributes
-            for (const attributeName of Object.getOwnPropertyNames(fillShader.attributes)) {
-                const attribute = fillShader.attributes[attributeName];
-                if (attribute.isInstanced) {
-                    const location = attribute.location;
-                    switch (attribute.type) {
-                        //	case gl.BOOL:
-                        //		break;
-                        //	case gl.INT:
-                        //		break;
-                        //	case gl.FLOAT:
-                        //		break;
-                        //	case gl.FLOAT_MAT3:
-                        //		break;
-                        case gl.FLOAT_MAT4: {
-                            const bytesPerRow = 16; // 4 floats per row, 4 bytes per float
-                            // upload the new matrix data
-                            gl.bindBuffer(gl.ARRAY_BUFFER, attribute.buffer);
-                            gl.bufferData(gl.ARRAY_BUFFER, attribute.arrayData, gl.DYNAMIC_DRAW);
-                            // Matrix attributes actually use 4 separate attribute pointers, one per
-                            // row of the matrix, so we have to set the location of each of these.
-                            const bytesPerMatrix = 4 * bytesPerRow;
-                            for (let i = 0; i < 4; i++) {
-                                const loc = location + i;
-                                gl.enableVertexAttribArray(loc);
-                                gl.vertexAttribPointer(loc, // location
-                                4, // size (the number of positions in the array to advance per instance)
-                                gl.FLOAT, // type of data in buffer
-                                false, // normalize
-                                bytesPerMatrix, // stride (the number of bytes to advance to get to next set of values)
-                                i * bytesPerRow // offset in buffer
-                                );
-                                // this line says this attribute only changes for each 1 instance
-                                this.instancedExt.vertexAttribDivisorANGLE(loc, 1);
-                            }
-                            break;
-                        }
-                        //	case gl.FLOAT_VEC2:
-                        //		break;
-                        //	case gl.FLOAT_VEC3:
-                        //		break;
-                        case gl.FLOAT_VEC4: {
-                            gl.bindBuffer(gl.ARRAY_BUFFER, attribute.buffer);
-                            gl.bufferSubData(gl.ARRAY_BUFFER, 0, attribute.arrayData);
-                            gl.enableVertexAttribArray(location);
-                            gl.vertexAttribPointer(location, 4, gl.FLOAT, false, 0, 0);
+        //	case gl.INT_VEC2:
+        //		break;
+        //	case gl.INT_VEC3:
+        //		break;
+        //	case gl.INT_VEC4:
+        //		break;
+        default:
+            throw new Error(`Unsupported instanced attribute type: ${attribute.type}`);
+    }
+};
+p5.RendererGL.prototype._drawElements = function (drawMode, gId) {
+    const fillShader = this._getRetainedFillShader();
+    const buffers = this.retainedMode.geometry[gId];
+    const gl = this.GL;
+    if (fillShader._instanceCount > 0) {
+        // bind array buffers for relevant instanced attributes
+        for (const attributeName of Object.getOwnPropertyNames(fillShader.attributes)) {
+            const attribute = fillShader.attributes[attributeName];
+            if (attribute.isInstanced) {
+                const location = attribute.location;
+                switch (attribute.type) {
+                    //	case gl.BOOL:
+                    //		break;
+                    //	case gl.INT:
+                    //		break;
+                    //	case gl.FLOAT:
+                    //		break;
+                    //	case gl.FLOAT_MAT3:
+                    //		break;
+                    case gl.FLOAT_MAT4: {
+                        const bytesPerRow = 16; // 4 floats per row, 4 bytes per float
+                        // upload the new matrix data
+                        gl.bindBuffer(gl.ARRAY_BUFFER, attribute.buffer);
+                        gl.bufferData(gl.ARRAY_BUFFER, attribute.arrayData, gl.DYNAMIC_DRAW);
+                        // Matrix attributes actually use 4 separate attribute pointers, one per
+                        // row of the matrix, so we have to set the location of each of these.
+                        const bytesPerMatrix = 4 * bytesPerRow;
+                        for (let i = 0; i < 4; i++) {
+                            const loc = location + i;
+                            gl.enableVertexAttribArray(loc);
+                            gl.vertexAttribPointer(loc, // location
+                            4, // size (the number of positions in the array to advance per instance)
+                            gl.FLOAT, // type of data in buffer
+                            false, // normalize
+                            bytesPerMatrix, // stride (the number of bytes to advance to get to next set of values)
+                            i * bytesPerRow // offset in buffer
+                            );
                             // this line says this attribute only changes for each 1 instance
-                            this.instancedExt.vertexAttribDivisorANGLE(location, 1);
-                            break;
+                            gl.vertexAttribDivisor(loc, 1);
                         }
-                        //	case gl.INT_VEC2:
-                        //		break;
-                        //	case gl.INT_VEC3:
-                        //		break;
-                        //	case gl.INT_VEC4:
-                        //		break;
+                        break;
                     }
+                    //	case gl.FLOAT_VEC2:
+                    //		break;
+                    //	case gl.FLOAT_VEC3:
+                    //		break;
+                    case gl.FLOAT_VEC4: {
+                        gl.bindBuffer(gl.ARRAY_BUFFER, attribute.buffer);
+                        gl.bufferSubData(gl.ARRAY_BUFFER, 0, attribute.arrayData);
+                        gl.enableVertexAttribArray(location);
+                        gl.vertexAttribPointer(location, 4, gl.FLOAT, false, 0, 0);
+                        // this line says this attribute only changes for each 1 instance
+                        gl.vertexAttribDivisor(location, 1);
+                        break;
+                    }
+                    //	case gl.INT_VEC2:
+                    //		break;
+                    //	case gl.INT_VEC3:
+                    //		break;
+                    //	case gl.INT_VEC4:
+                    //		break;
                 }
             }
-            // render the fill
-            if (buffers.indexBuffer) {
-                // we're drawing faces
-                this.instancedExt.drawElementsInstancedANGLE(gl.TRIANGLES, buffers.vertexCount, gl.UNSIGNED_SHORT, 0, fillShader._instanceCount);
-            }
-            else {
-                // drawing vertices
-                this.instancedExt.drawArraysInstancedANGLE(drawMode || gl.TRIANGLES, 0, buffers.vertexCount, fillShader._instanceCount);
-            }
+        }
+        // render the fill
+        if (buffers.indexBuffer) {
+            // we're drawing faces
+            gl.drawElementsInstanced(gl.TRIANGLES, buffers.vertexCount, gl.UNSIGNED_SHORT, 0, fillShader._instanceCount);
         }
         else {
-            // render the fill
-            if (buffers.indexBuffer) {
-                // we're drawing faces
-                gl.drawElements(gl.TRIANGLES, buffers.vertexCount, gl.UNSIGNED_SHORT, 0);
-            }
-            else {
-                // drawing vertices
-                gl.drawArrays(drawMode || gl.TRIANGLES, 0, buffers.vertexCount);
-            }
+            // drawing vertices
+            gl.drawArraysInstanced(drawMode || gl.TRIANGLES, 0, buffers.vertexCount, fillShader._instanceCount);
         }
-    };
-}
+    }
+    else {
+        // render the fill
+        if (buffers.indexBuffer) {
+            // we're drawing faces
+            gl.drawElements(gl.TRIANGLES, buffers.vertexCount, gl.UNSIGNED_SHORT, 0);
+        }
+        else {
+            // drawing vertices
+            gl.drawArrays(drawMode || gl.TRIANGLES, 0, buffers.vertexCount);
+        }
+    }
+};
 window.testVert = `
 precision highp float;
 precision highp int;

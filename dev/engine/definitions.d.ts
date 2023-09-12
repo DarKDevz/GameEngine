@@ -611,6 +611,13 @@ interface ParticleRenderer {
     graphics: ReturnType<typeof createGraphics>
     lastFrame: ReturnType<typeof createImage>
 }
+interface SpatialHashMap {
+    cellSize:number;
+    grid: Map;
+    addObject(a:UUID,collider:CollidableObject):void
+    queryObj(collider:CollidableObject):boolean
+    uuidToGrid:any;
+}
 function downloadFile(content: any, arg1: string):void
 /**
  * @description updates frustum planes to use for detecting wheter to draw an object or not
