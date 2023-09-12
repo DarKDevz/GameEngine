@@ -4,6 +4,50 @@ var handler;
 handler = {
     prototype: {}
 };
+class SpatialHashMap {
+    constructor(size = 50) {
+        this.cellSize = size;
+        this.grid = new Map();
+        this.uuidToGrid = {};
+    }
+    addObject(uuid, collider) {
+        switch (collider[0]) {
+            case "Circle":
+                break;
+            case "Rect":
+                let vecs = collider[1];
+                let cellSize = this.cellSize;
+                let AABB = [vecs[0].x / cellSize, vecs[0].y / cellSize, (vecs[0].x + vecs[1].x) / cellSize, (vecs[0].y + vecs[1].y) / cellSize];
+                AABB = AABB.map(Math.floor)
+                let pos = this.generateCoords(AABB, uuid);
+                break;
+            case "Line":
+                break;
+            case "Point":
+                break;
+            case "Frustum":
+                //TODO
+                break;
+        }
+    }
+    queryObj(collider) {
+    }
+    setOrAdd(ind, value) {
+        if (this.grid.has(ind)) {
+            return this.grid.set(ind, this.grid.get(ind).push(value));
+        }
+        this.grid.set(ind, [value]);
+    }
+    generateCoords(pos, uuid) {
+        let positions = [];
+        for (let i = pos[0]; i <= pos[2]; i++) {
+            for (let j = pos[1]; j <= pos[3]; j++) {
+                this.setOrAdd([i, j].toString(), uuid);
+            }
+        }
+        return positions;
+    }
+}
 let cache = {};
 self.addEventListener('message', function (e) {
     let packet = e.data;
