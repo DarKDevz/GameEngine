@@ -30,6 +30,9 @@ class SpatialHashMap {
             case "Line":
                 break;
             case "Point":
+                AABB = [vecs[0].x / cellSize, vecs[0].y / cellSize];
+                AABB = AABB.map(Math.floor)
+                this.generateCoords(AABB, uuid);
                 break;
             case "Frustum":
                 //TODO
@@ -99,9 +102,13 @@ class SpatialHashMap {
     }
     generateCoords(pos, uuid) {
         let positions = [];
+        //.join is slighty faster, sometimes
+        if(pos.length == 2) {
+            return this.setOrAdd(pos.join(), uuid);
+        }
         for (let i = pos[0]; i <= pos[2]; i++) {
             for (let j = pos[1]; j <= pos[3]; j++) {
-                this.setOrAdd([i, j].toString(), uuid);
+                this.setOrAdd([i, j].join(), uuid);
             }
         }
         return positions;
