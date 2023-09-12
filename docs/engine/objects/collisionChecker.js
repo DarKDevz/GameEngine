@@ -10,16 +10,22 @@ class SpatialHashMap {
         this.grid = new Map();
         this.uuidToGrid = {};
     }
-    addObject(uuid, collider) {
+    createObject(uuid, collider) {
+        let vecs = collider[1];
+        let cellSize = this.cellSize;
+        let AABB;
         switch (collider[0]) {
             case "Circle":
+                //Gets aabb of circle
+                AABB = [(vecs[0].x - vecs[1]) / cellSize, (vecs[0].y - vecs[1]) / cellSize, (vecs[0].x + vecs[1]) / cellSize, (vecs[0].y + vecs[1]) / cellSize];
+                AABB = AABB.map(Math.floor)
+                this.generateCoords(AABB, uuid);
                 break;
             case "Rect":
-                let vecs = collider[1];
-                let cellSize = this.cellSize;
-                let AABB = [vecs[0].x / cellSize, vecs[0].y / cellSize, (vecs[0].x + vecs[1].x) / cellSize, (vecs[0].y + vecs[1].y) / cellSize];
+                //Gets aabb of rectangle
+                AABB = [vecs[0].x / cellSize, vecs[0].y / cellSize, (vecs[0].x + vecs[1].x) / cellSize, (vecs[0].y + vecs[1].y) / cellSize];
                 AABB = AABB.map(Math.floor)
-                let pos = this.generateCoords(AABB, uuid);
+                this.generateCoords(AABB, uuid);
                 break;
             case "Line":
                 break;
@@ -30,13 +36,64 @@ class SpatialHashMap {
                 break;
         }
     }
+    addObject(uuid,collider) {
+        this.removeObject(uuid);
+        this.createObject(uuid,collider);
+    }
+    removeObject(uuid) {
+        //delete uuid reference
+        let grids = this.uuidToGrid[uuid]
+        for(let i in grids) {
+            let coords = grids[i];
+            let toRemove = this.grid.get(coords.join());
+            toRemove.splice(toRemove.indexOf(uuid),1)
+            this.grid.set(coords.join(),toRemove)
+            if(toRemove.length === 0) {
+                this.grid.delete(coords.join())
+            }
+        }
+        delete this.uuidToGrid[uuid];
+    }
     queryObj(collider) {
     }
-    setOrAdd(ind, value) {
-        if (this.grid.has(ind)) {
-            return this.grid.set(ind, this.grid.get(ind).push(value));
+    getNearby(uuid) {
+        //No reference to uuid, don't bother
+        if(!this.uuidToGrid[uuid]) return [];
+        let allPossible = [];
+        let startPos = this.uuidToGrid[uuid];
+        for(let toNum of startPos) {
+            let i = toNum.map((a)=>{return parseInt(a)});
+            allPossible.push(i)
+            allPossible.push([i[0]+1,i[1]+1])
+            allPossible.push([i[0]+1,i[1]])
+            allPossible.push([i[0]+1,i[1]-1])
+            allPossible.push([i[0],i[1]+1])
+            allPossible.push([i[0],i[1]-1])
+            allPossible.push([i[0]-1,i[1]+1])
+            allPossible.push([i[0]-1,i[1]])
+            allPossible.push([i[0]-1,i[1]-1])
         }
-        this.grid.set(ind, [value]);
+        let uuidList = {};
+        for(let i of allPossible) {
+            let values = this.grid.get(i.join())
+            for(let i in values) {
+                if(allColliders[values[i]])uuidList[values[i]] = true
+            }
+        }
+        delete uuidList[undefined];
+        delete uuidList[uuid];
+        
+        return uuidList;
+    }
+    setOrAdd(ind, value) {
+        this.uuidToGrid[value] ??= []
+        if(!this.uuidToGrid[value].includes(ind.split(","))){
+            this.uuidToGrid[value].push(ind.split(","))
+        }
+        if(!this.grid.has(ind)) return this.grid.set(ind, [value]);
+        if (!this.grid.get(ind).includes(value)) {
+            return this.grid.set(ind, [...this.grid.get(ind),value]);
+        }
     }
     generateCoords(pos, uuid) {
         let positions = [];
@@ -48,6 +105,9 @@ class SpatialHashMap {
         return positions;
     }
 }
+//150 is a good enough number, smaller only if objects are small bigger if bigger
+//it should be relative to the biggest object
+let spatialMap = new SpatialHashMap(150);
 let cache = {};
 self.addEventListener('message', function (e) {
     let packet = e.data;
@@ -68,24 +128,36 @@ self.addEventListener('message', function (e) {
                     let lengthChange = Object.getOwnPropertyNames(allColliders).length - Object.getOwnPropertyNames(oldColliders).length;
                     console.log("Added new object");
                     for (let newI = oldValues.length; newI < realLength; newI++) {
-                        checkForIndex(Object.getOwnPropertyNames(allColliders)[newI]);
+                        let uuid = Object.getOwnPropertyNames(allColliders)[newI];
+                        spatialMap.addObject(uuid,allColliders[uuid]);
+                        checkForIndex(uuid);
                     }
                 }
                 else {
+                    //Takes care of updating old objects that are moving
+                    //And/or deletino
                     for (let uuid in oldColliders) {
                         if (allColliders.hasOwnProperty(uuid)) {
                             if (JSON.stringify(allColliders[uuid]) !== JSON.stringify(oldColliders[uuid])) {
+                                spatialMap.addObject(uuid,allColliders[uuid]);
                                 checkForIndex(uuid);
                             }
                         }
                         else {
-                            //Deleted element so remove old collided objects
+                            spatialMap.removeObject(uuid);
                             if (cache[uuid]) {
                                 for (let uuid2 in cache[uuid]) {
                                     delete cache[uuid2][uuid];
                                 }
                                 delete cache[uuid];
                             }
+                        }
+                    }
+                    //Takes care of updating new objects that aren't moving
+                    for (let uuid in allColliders) {
+                        if (!oldColliders.hasOwnProperty(uuid)) {
+                                spatialMap.addObject(uuid,allColliders[uuid]);
+                                checkForIndex(uuid);
                         }
                     }
                 }
@@ -142,15 +214,21 @@ function checkAll() {
     }
 }
 function checkForIndex(uuid1) {
-    for (let uuid2 in allColliders) {
-        if (uuid1 !== uuid2) {
-            checkUUID(uuid1, uuid2);
-        }
+    for(let uuid2 in spatialMap.getNearby(uuid1)) {
+        checkUUID(uuid1, uuid2);
     }
+    // for (let uuid2 in allColliders) {
+    //     if (uuid1 !== uuid2) {
+    //         checkUUID(uuid1, uuid2);
+    //     }
+    // }
 }
 function checkUUID(uuid1, uuid2) {
     let collider1 = allColliders[uuid1];
     let collider2 = allColliders[uuid2];
+    if(!collider1||!collider2) {
+        console.log(uuid1,uuid2);
+    }
     return addCache(uuid1, uuid2, checkCollider(collider1, collider2));
 }
 function checkCollider(c1, c2) {
