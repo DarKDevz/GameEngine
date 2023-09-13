@@ -183,6 +183,8 @@ p5.Shader.prototype.initializedInstancedAttribute = function (attributeName, ins
     if (attribute.arrayData) {
         throw new Error(`The attribute ${attributeName} has already been intialized as an instanced array`);
     }
+    //If the number of instances changes for an attribute
+    //It shouldn't run
     if (!this._instanceCount) {
         this._instanceCount = instanceCount;
     }
@@ -253,6 +255,7 @@ p5.Shader.prototype.initializedInstancedAttribute = function (attributeName, ins
             throw new Error(`Unsupported instanced attribute type: ${attribute.type}`);
     }
 };
+let ogDraw = p5.RendererGL.prototype._drawElements
 p5.RendererGL.prototype._drawElements = function (drawMode, gId) {
     const fillShader = this._getRetainedFillShader();
     const buffers = this.retainedMode.geometry[gId];
@@ -328,15 +331,7 @@ p5.RendererGL.prototype._drawElements = function (drawMode, gId) {
         }
     }
     else {
-        // render the fill
-        if (buffers.indexBuffer) {
-            // we're drawing faces
-            gl.drawElements(gl.TRIANGLES, buffers.vertexCount, gl.UNSIGNED_SHORT, 0);
-        }
-        else {
-            // drawing vertices
-            gl.drawArrays(drawMode || gl.TRIANGLES, 0, buffers.vertexCount);
-        }
+        ogDraw.apply(this,arguments);
     }
 };
 window.testVert = `

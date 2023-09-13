@@ -29,6 +29,7 @@ function preload() {
     window.loaded = false;
     setTimeout(checkLoad, 200);
 }
+
 function setup() {
     //Initialize Game things
     createCanvas(windowWidth, windowHeight, WEBGL);
@@ -37,7 +38,14 @@ function setup() {
     document.oncontextmenu = function (e) {
         e.preventDefault();
     };
-    window.exampleShader = createShader(window.testVert, window.testFrag);
+    window._InstanceDrawer = new InstanceDrawer(plane);
+    let x = 20;
+    for(let i = 0; i < 20; i++) {
+        for(let j = 0; j < 20; j++) {
+        _InstanceDrawer.add([(x*i)+200, x*j, 15],[20, 43, 11],[i-j*5,i-j/2,i-j],[70, 130, 180,70])
+        }
+    }
+    /*window.exampleShader = createShader(window.testVert, window.testFrag);
     let matrixArray = window.exampleShader.initializedInstancedAttribute('aWorldMatrix', 5);
     // transformations in reverse order.
     matrixArray[0].translate([-247, 291, 15]);
@@ -76,6 +84,7 @@ function setup() {
     colorArray[20] = 70 / 255; // rgb(70, 130, 180)
     exampleShader.setUniform('useTexture',true);
     //exampleShader.setUniform('uSamplerr',p5.instance._renderer._emptyTexture);
+    */
 }
 function draw() {
     //Make Sure it's loaded correctly
@@ -87,10 +96,11 @@ function draw() {
         return;
     engine.draw();
     if (window.exampleInst) {
-        shader(window.exampleShader);
-        exampleShader.setUniform('uTexture',engine.activeScene.boxes[0].sprite);
-        plane(1,1);
-        resetShader();
+        _InstanceDrawer.draw()
+        // shader(window.exampleShader);
+        // exampleShader.setUniform('uTexture',engine.activeScene.boxes[0].sprite);
+        // plane(1,1);
+        // resetShader();
     }
 }
 window.exampleInst = false;
