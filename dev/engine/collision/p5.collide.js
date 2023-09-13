@@ -173,7 +173,7 @@ p5.prototype.collideFrustumCircleVector = function (a, b, c) {
  * May return either an Typed JavaScript array corresponding to the attribute
  * type, or in the case of matrices and vectors, an Array of Typed arrays.
  */
-p5.Shader.prototype.initializedInstancedAttribute = function (attributeName, instanceCount, options) {
+p5.Shader.prototype.initializedInstancedAttribute = function (attributeName, instanceCount, options,ignore=false) {
     this.init();
     const attribute = this.attributes[attributeName];
     if (!attribute) {
@@ -181,14 +181,12 @@ p5.Shader.prototype.initializedInstancedAttribute = function (attributeName, ins
     }
     const gl = this._renderer.GL;
     if (attribute.arrayData) {
-        throw new Error(`The attribute ${attributeName} has already been intialized as an instanced array`);
+        //throw new Error(`The attribute ${attributeName} has already been intialized as an instanced array`);
     }
-    //If the number of instances changes for an attribute
-    //It shouldn't run
-    if (!this._instanceCount) {
+    if (!this._instanceCount || ignore) {
         this._instanceCount = instanceCount;
     }
-    else if (this._instanceCount !== instanceCount) {
+    else if (this._instanceCount !== instanceCount && !ignore) {
         throw new Error('Instance count mismatch. All instanced attributes must use the same instance count.');
     }
     this.useProgram();
@@ -331,7 +329,7 @@ p5.RendererGL.prototype._drawElements = function (drawMode, gId) {
         }
     }
     else {
-        ogDraw.apply(this,arguments);
+        ogDraw.apply(this,arguments)
     }
 };
 window.testVert = `
@@ -539,3 +537,62 @@ void main(void) {
 	// float avg = (gl_FragColor.r + gl_FragColor.g + gl_FragColor.b) / 3.0;
 	// gl_FragColor.rgb = vec3(avg, avg, avg);
 }`;
+class InstanceDrawer {
+    constructor(shape) {
+      this.shape = shape;
+      this.usesTexture = false;
+      this.shader = createShader(window.testVert, window.testFrag)
+      this.shader.setUniform('useTexture',false);
+
+      this.matrix = [];
+      this.oldMatrix;
+      this.color;
+      this.oldColor;
+      this.length = 0;
+      this.texture;
+    }
+    enableTexture(texture) {
+      this.usesTexture = texture;
+      this.shader.setUniform('useTexture',true);
+    }
+    add(position=[0,0,0],scale=[1,1,1],rotation=[0,0,0],color = [0,0,0,255]) {
+      this.length++;
+      this.oldMatrix = [];
+      for(let i of this.matrix) {
+        this.oldMatrix.push(i.mat4);
+      }
+      this.matrix = this.shader.initializedInstancedAttribute('aWorldMatrix', this.length,{},true);
+      // transformations in reverse order.
+      for(let i in this.oldMatrix) {
+        this.matrix[i].set(...this.oldMatrix[i]);
+      }
+      this.matrix[this.length-1].translate(position);
+      this.matrix[this.length-1].scale(...scale);
+      this.matrix[this.length-1].rotateX(rotation[0]);
+      this.matrix[this.length-1].rotateY(rotation[1]);
+      this.matrix[this.length-1].rotateZ(rotation[2]);
+
+  
+      this.oldColor = this.color;
+      this.color = this.shader.initializedInstancedAttribute('aMaterialColor', this.length,{},true);
+      // transformations in reverse order.
+      for(let i in this.oldColor) {
+        this.color[i] = this.oldColor[i];
+      }
+      //Colors are stored in succession
+      this.color[(this.length*4)-1] = color[3]/255;
+      this.color[(this.length*4)-2] = color[2]/255;
+      this.color[(this.length*4)-3] = color[1]/255;
+      this.color[(this.length*4)-4] = color[0]/255;
+  
+    }
+    removeAll() {
+      this.length = 0;
+    }
+    draw() {
+      shader(this.shader)
+      this.usesTexture?this.shader.setUniform('uTexture',this.usesTexture):()=>{};
+      this.shape((new Array(this.shape.length)).fill(1))
+      resetShader()
+    }
+  }
