@@ -14,6 +14,7 @@ class SpatialHashMap {
         let vecs = collider[1];
         let cellSize = this.cellSize;
         let AABB;
+        let maxX , maxY ,minX ,minY
         switch (collider[0]) {
             case "Circle":
                 //Gets aabb of circle
@@ -28,7 +29,32 @@ class SpatialHashMap {
                 this.generateCoords(AABB, uuid);
                 break;
             case "Line":
+                maxX = Math.max(vecs[0].x,vecs[1].x)
+                maxY = Math.max(vecs[0].y,vecs[1].y)
+                minX = Math.min(vecs[0].x,vecs[1].x)
+                minY = Math.min(vecs[0].y,vecs[1].y)
+
+                AABB = [minX / cellSize, minY / cellSize,maxX/cellSize,maxY/cellSize];
+                AABB = AABB.map(Math.floor);
+                this.generateCoords(AABB, uuid);
                 break;
+            case "Poly":
+                maxX = Infinity
+                maxY = Infinity
+                minX = -Infinity
+                minY = -Infinity
+                for (var current=0; current<vecs[0].length; current++) {
+                    // get the PVectors at our current position this makes our if statement a little cleaner
+                    var vc = vecs[0][current];    // c for "current"
+                    maxX = Math.max(maxX,vc.x)
+                    maxY = Math.max(maxY,vc.y)
+                    minX = Math.min(minX,vc.x)
+                    minY = Math.min(minY,vc.y)             
+                  }
+                AABB = [minX / cellSize, minY / cellSize,maxX/cellSize,maxY/cellSize];
+                AABB = AABB.map(Math.floor);
+                this.generateCoords(AABB, uuid);
+                break
             case "Point":
                 AABB = [vecs[0].x / cellSize, vecs[0].y / cellSize];
                 AABB = AABB.map(Math.floor);
