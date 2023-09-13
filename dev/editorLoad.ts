@@ -78,6 +78,7 @@ function setup() {
     colorArray[18] = 180 / 255;
     colorArray[19] = 50/255;
     colorArray[20] = 70 / 255; // rgb(70, 130, 180)
+    exampleShader.setUniform('useTexture',true);
 }
 function draw() {
     //Make Sure it's loaded correctly
@@ -90,7 +91,7 @@ function draw() {
     engine.draw();
     if(window.exampleInst) {
     shader(window.exampleShader);
-    translate(0,0,-500)
+    exampleShader.setUniform('uTexture',engine.activeScene.boxes[0].sprite);
     box(1);
     resetShader();
     }

@@ -20,6 +20,33 @@ uniform vec3 aPosition
 gl_position = uModelViewMatrix*uProjectionMatrix*vec4(aPosition,1);
  * 
  */
+`precision highp float;
+uniform vec4 uTint;
+uniform sampler2D uSampler;
+uniform bool isTexture
+nuniform bool uEmissive;
+
+varying highp vec2 vVertTexCoord;
+varying vec3 vDiffuseColor;
+varying vec3 vSpecularColor;
+varying vec4 vColor;
+
+void main(void) {
+  if(uEmissive && !isTexture) {
+    gl_FragColor = vColor;
+  }
+  else {
+    vec4 baseColor = isTexture
+      // Textures come in with premultiplied alpha. To apply tint and still have
+      // premultiplied alpha output, we need to multiply the RGB channels by the
+      // tint RGB, and all channels by the tint alpha.
+      ? texture2D(uSampler, vVertTexCoord) * vec4(uTint.rgb/255., 1.) * (uTint.a/255.)
+      // Colors come in with unmultiplied alpha, so we need to multiply the RGB
+      // channels by alpha to convert it to premultiplied alpha.
+      : vec4(vColor.rgb * vColor.a, vColor.a);
+    gl_FragColor = vec4(baseColor.rgb * vDiffuseColor + vSpecularColor, baseColor.a);
+  }
+}`
 
 function checkCircle(position, size) {
   let list = []
@@ -4221,7 +4248,9 @@ let replacements = {
     "Boolean":"boolean"
 }
 function parsePropertiesString(inputString,doExtend=false) {
-    let interfaceRegex = /\n(\w+)\n/m;
+    let interfaceRegex = /
+(\w+)
+/m;
     let result = '';
     let m;
       if ((m = interfaceRegex.exec(inputString)) !== null) {
@@ -4230,7 +4259,8 @@ function parsePropertiesString(inputString,doExtend=false) {
       if(doExtend) {
         interfaceName += ' extends '+doExtend
       }
-      result += `export interface ${interfaceName} {\n`;
+      result += `export interface ${interfaceName} {
+`;
       let regex = /(\w+) : (\w+)/g
       while ((m = regex.exec(inputString)) !== null) {
         // This is necessary to avoid infinite loops with zero-width matches
@@ -4240,7 +4270,8 @@ function parsePropertiesString(inputString,doExtend=false) {
         
         let nameOfValue = m[1]
         let type = m[2];
-        result+= `${nameOfValue} : ${compileType(type)} \n`
+        result+= `${nameOfValue} : ${compileType(type)} 
+`
     }
     regex = /(\w+)\(((?:\w+:\w*(?:, |))*)\):(\w+)/gm;
     let allMathches = inputString.matchAll(regex)
@@ -4262,7 +4293,8 @@ function parsePropertiesString(inputString,doExtend=false) {
         params.forEach(obj=>{
             result += `${obj.identifier}:${obj.type}${obj.identifier===last.identifier?'':', '}`
         })
-        result += `):${compileType(returnType)}\n`;
+        result += `):${compileType(returnType)}
+`;
         }
     result += '}'
       console.log(result);

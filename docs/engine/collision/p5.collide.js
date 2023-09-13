@@ -488,6 +488,7 @@ void totalLight(
 
 attribute vec3 aPosition;
 attribute vec3 aNormal;
+attribute vec2 aTexCoord;
 
 attribute mat4 aWorldMatrix;
 attribute vec4 aMaterialColor;
@@ -499,9 +500,11 @@ uniform mat3 uNormalMatrix;
 varying vec4 vMaterialColor;
 varying vec3 vDiffuseColor;
 varying vec3 vSpecularColor;
+varying vec2 vTexCoord;
 
 void main(void) {
   vMaterialColor = aMaterialColor;
+  vTexCoord = aTexCoord;
 	
   vec4 viewModelPosition = uModelViewMatrix * (aWorldMatrix * vec4(aPosition, 1.0));
   gl_Position = uProjectionMatrix * viewModelPosition;
@@ -517,18 +520,27 @@ void main(void) {
   }
 }
 `;
+var webgl2CompatibilityShader = '#ifdef WEBGL2\n\n#define IN in\n#define OUT out\n\n#ifdef FRAGMENT_SHADER\nout vec4 outColor;\n#define OUT_COLOR outColor\n#endif\n#define TEXTURE texture\n\n#else\n\n#ifdef FRAGMENT_SHADER\n#define IN varying\n#else\n#define IN attribute\n#endif\n#define OUT varying\n#define TEXTURE texture2D\n\n#ifdef FRAGMENT_SHADER\n#define OUT_COLOR gl_FragColor\n#endif\n\n#endif\n';
 window.testFrag = `
 precision highp float;
 
 // uniform vec4 uMaterialColor;
+uniform sampler2D uTexture;
+uniform bool useTexture;
+
+varying vec2 vTexCoord;
 
 varying vec4 vMaterialColor;
 varying vec3 vDiffuseColor;
 varying vec3 vSpecularColor;
 
 void main(void) {
-	gl_FragColor = vMaterialColor; // vec4(1., 1., 1., 1.); // ;
-	gl_FragColor.rgb = gl_FragColor.rgb * vDiffuseColor + vSpecularColor;
+    if(useTexture) {
+    gl_FragColor = texture2D(uTexture, vTexCoord);
+    }else {
+        gl_FragColor = vMaterialColor; // vec4(1., 1., 1., 1.); // ;
+        gl_FragColor.rgb = gl_FragColor.rgb * vDiffuseColor + vSpecularColor;
+        }
 	// naive grayscale, just checking if this is working
 	// float avg = (gl_FragColor.r + gl_FragColor.g + gl_FragColor.b) / 3.0;
 	// gl_FragColor.rgb = vec3(avg, avg, avg);

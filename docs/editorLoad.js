@@ -41,15 +41,16 @@ function setup() {
     let matrixArray = window.exampleShader.initializedInstancedAttribute('aWorldMatrix', 5);
     // transformations in reverse order.
     matrixArray[0].translate([-247, 291, 15]);
-    matrixArray[0].scale(20, 43, 11);
+    matrixArray[0].scale(200, 430, 110);
     matrixArray[1].translate([631, -212, 8]);
-    matrixArray[1].scale(42, 10, 36);
+    matrixArray[1].scale(420, 100, 360);
     matrixArray[2].translate([314, -50, 33]);
-    matrixArray[2].scale(15, 49, 25);
+    matrixArray[2].scale(150, 490, 250);
     matrixArray[3].translate([219, 489, 27]);
-    matrixArray[3].scale(11, 12, 48);
+    matrixArray[3].scale(110, 120, 480);
     matrixArray[4].translate([256, 205, 47]);
-    matrixArray[4].scale(14, 45, 31);
+    matrixArray[4].scale(300, 450, 300);
+    matrixArray[4].rotateX(PI/2);
     noStroke();
     let colorArray = window.exampleShader.initializedInstancedAttribute('aMaterialColor', 5);
     colorArray[0] = 178 / 255; // rgb(178, 34, 34)
@@ -73,6 +74,8 @@ function setup() {
     colorArray[18] = 180 / 255;
     colorArray[19] = 50 / 255;
     colorArray[20] = 70 / 255; // rgb(70, 130, 180)
+    exampleShader.setUniform('useTexture',true);
+    //exampleShader.setUniform('uSamplerr',p5.instance._renderer._emptyTexture);
 }
 function draw() {
     //Make Sure it's loaded correctly
@@ -85,8 +88,8 @@ function draw() {
     engine.draw();
     if (window.exampleInst) {
         shader(window.exampleShader);
-        translate(0, 0, -500);
-        box(1);
+        exampleShader.setUniform('uTexture',engine.activeScene.boxes[0].sprite);
+        plane(1,1);
         resetShader();
     }
 }
