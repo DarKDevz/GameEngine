@@ -614,6 +614,7 @@ interface ParticleRenderer {
 interface SpatialHashMap {
     cellSize:number;
     grid: Map;
+    uuidToGrid: {[x:UUID]:Array[]}
     addObject(a:UUID,collider:CollidableObject):void
     queryObj(collider:CollidableObject):boolean
     uuidToGrid:any;

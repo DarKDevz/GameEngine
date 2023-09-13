@@ -10,7 +10,7 @@ class SpatialHashMap {
         this.grid = new Map();
         this.uuidToGrid = {};
     }
-    createObject(uuid, collider) {
+    createObject(uuid:UUID,collider:[collisionTypes,any[]]) {
         let vecs = collider[1];
         let cellSize = this.cellSize;
         let AABB;
@@ -39,11 +39,11 @@ class SpatialHashMap {
                 break;
         }
     }
-    addObject(uuid,collider) {
+    addObject(uuid:UUID,collider:[collisionTypes,xyObject[]]) {
         this.removeObject(uuid);
         this.createObject(uuid,collider);
     }
-    removeObject(uuid) {
+    removeObject(uuid:UUID) {
         //delete uuid reference
         let grids = this.uuidToGrid[uuid]
         for(let i in grids) {
@@ -57,9 +57,7 @@ class SpatialHashMap {
         }
         delete this.uuidToGrid[uuid];
     }
-    queryObj(collider) {
-    }
-    getNearby(uuid) {
+    getNearby(uuid: UUID) {
         //No reference to uuid, don't bother
         if(!this.uuidToGrid[uuid]) return [];
         let allPossible = [];
@@ -90,7 +88,7 @@ class SpatialHashMap {
         
         return uuidList;
     }
-    setOrAdd(ind, value) {
+    setOrAdd(ind:string, value:UUID) {
         this.uuidToGrid[value] ??= []
         if(!this.uuidToGrid[value].includes(ind.split(","))){
             this.uuidToGrid[value].push(ind.split(","))
@@ -100,7 +98,7 @@ class SpatialHashMap {
             return this.grid.set(ind, [...this.grid.get(ind),value]);
         }
     }
-    generateCoords(pos, uuid) {
+    generateCoords(pos: number[], uuid: string) {
         let positions = [];
         //.join is slighty faster, sometimes
         if(pos.length == 2) {
@@ -117,7 +115,8 @@ class SpatialHashMap {
 //150 is a good enough number, smaller only if objects are small bigger if bigger
 //it should be relative to the biggest object
 let spatialMap = new SpatialHashMap(150);
-let cache = {};
+let cache:{[x:UUID]:{[x:UUID]:boolean}} 
+cache= {};
 self.addEventListener('message', function (e) {
     let packet = e.data;
     switch (String(packet.type).toUpperCase()) {
@@ -195,7 +194,7 @@ self.addEventListener('message', function (e) {
             break;
     }
 });
-function checkCache(uuid1, uuid2) {
+function checkCache(uuid1: UUID, uuid2: UUID) {
     if (cache.hasOwnProperty(uuid1) && cache.hasOwnProperty(uuid2)) {
         if (cache[uuid1].hasOwnProperty(uuid2) && cache[uuid2].hasOwnProperty(uuid1)) {
             return cache[uuid1][uuid2] && cache[uuid2][uuid1];
@@ -203,7 +202,7 @@ function checkCache(uuid1, uuid2) {
     }
     return undefined;
 }
-function addCache(uuid1, uuid2, value) {
+function addCache(uuid1: string, uuid2: string, value: any) {
     cache[uuid1] ??= {};
     cache[uuid1][uuid2] = value;
     cache[uuid2] ??= {};
@@ -222,7 +221,7 @@ function checkAll() {
         checkForIndex(uuid1);
     }
 }
-function checkForIndex(uuid1) {
+function checkForIndex(uuid1: string) {
     for(let uuid2 in spatialMap.getNearby(uuid1)) {
         checkUUID(uuid1, uuid2);
     }
@@ -232,7 +231,7 @@ function checkForIndex(uuid1) {
     //     }
     // }
 }
-function checkUUID(uuid1, uuid2) {
+function checkUUID(uuid1: string, uuid2: string) {
     let collider1 = allColliders[uuid1];
     let collider2 = allColliders[uuid2];
     if(!collider1||!collider2) {
@@ -240,12 +239,12 @@ function checkUUID(uuid1, uuid2) {
     }
     return addCache(uuid1, uuid2, checkCollider(collider1, collider2));
 }
-function checkCollider(c1, c2) {
+function checkCollider(c1: any[], c2: any[]) {
     let t1 = c1[0];
     let t2 = c2[0];
     return testCollision(t1, t2, c1, c2, true);
 }
-function testCollision(type1, type2, values1, values2, isVector) {
+function testCollision(type1: collisionTypes, type2: collisionTypes, values1: any[], values2: any[], isVector: boolean) {
     let test = handler.prototype["collide" + type1 + type2 + (isVector ? 'Vector' : '')];
     if (typeof test === "function") {
         return (test(...values1[1], ...values2[1]));
