@@ -1,9 +1,9 @@
 # Shimmer Engine
 A 2d/3D game engine built on p5.js and WebGL(WIP)
 ## Shimmer editor:
-https://darkdevz.github.io/platformer/map.html
+https://darkdevz.github.io/GameEngine/map.html
 ## Example Site:
-https://darkdevz.github.io/platformer/
+https://darkdevz.github.io/GameEngine/
 ## Features Upcoming
 https://trello.com/b/ATRd0ycb/game-engine
 ## Pros
