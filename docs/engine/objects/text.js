@@ -1,7 +1,7 @@
 class TextObject extends GameObject {
     constructor(x, y, text) {
         super(x, y, "text");
-        this.text = text;
+        this.text = typeof text === "string" ? text:"";
         this.clr = 0;
         this.width = 0;
         this.height = 10;
