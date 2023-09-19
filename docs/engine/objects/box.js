@@ -55,6 +55,7 @@ class Box extends GameObject {
             this?.fixture?.GetShape()?.SetRadius?.((this.hw + this.hh) / 2 //Sets Radius to average of both width and height
             );
         }
+        this.updatePosition();
     }
     init() {
         if (this?.width && this?.height) {
@@ -112,12 +113,7 @@ class Box extends GameObject {
     }
     offSet(x, y) {
         super.offSet(x, y);
-        if (this.body) {
-            this.body.SetPosition({
-                x: this.x + this.hw,
-                y: this.y + this.hh
-            });
-        }
+        this.updatePosition();
     }
     updatePosition() {
         this?.body?.SetPosition?.({
