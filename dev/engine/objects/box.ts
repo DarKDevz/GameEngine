@@ -58,6 +58,7 @@ class Box extends GameObject {
                 (this.hw + this.hh) / 2 //Sets Radius to average of both width and height
             );
         }
+        this.updatePosition();
     }
     init(): void {
         if (this?.width && this?.height) {
@@ -116,12 +117,7 @@ class Box extends GameObject {
     }
     offSet(x: number, y: number): void {
         super.offSet(x, y);
-        if (this.body) {
-            this.body.SetPosition({
-                x: this.x + this.hw,
-                y: this.y + this.hh
-            })
-        }
+        this.updatePosition();
     }
     updatePosition(): void {
         this?.body?.SetPosition?.({
