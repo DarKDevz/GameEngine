@@ -8,6 +8,9 @@ class TextObject extends GameObject {
         this.typeId = 3;
         this.loaded = false;
     }
+    getCollisionType() {
+        return 'Rect'
+        }
     getCollisionVectors():any[]{
     return [{x:this.x,y:this.y},{x:this.width,y:this.height}]
 }
@@ -20,7 +23,7 @@ class TextObject extends GameObject {
     }
     getEditableArray(): EditableObject[] {
         return [...super.getEditableArray(),{
-            name:"radius",
+            name:"text",
             set:(val) => {
                 this.text = val
             },
