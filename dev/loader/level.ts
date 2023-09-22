@@ -391,8 +391,10 @@ class Level extends GameEvents {
         if (window?.editor) {
             DrawAll();
         }
-        for (let t_box of sorted) {
-            t_box.display(OnlyDraw, false);
+        if(sorted) {
+            for (let t_box of sorted) {
+                t_box.display(OnlyDraw, false);
+            }
         }
         if (engine.physics) {
             engine.world.Step(1 / 60, 10, 10);
