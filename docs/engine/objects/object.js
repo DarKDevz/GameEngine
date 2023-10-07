@@ -100,7 +100,7 @@ class GameObject extends GameEvents {
         return ["x", "y"];
     }
     collision(obj, trigger = false) {
-       let collides = HandleCollision(obj,this)
+        let collides = HandleCollision(obj, this);
         if (collides && trigger)
             this.onCollide(obj);
         return collides;

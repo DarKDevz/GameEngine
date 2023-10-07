@@ -8,7 +8,7 @@ class TextObject extends GameObject {
         this.typeId = 3;
         this.loaded = false;
     }
-    getCollisionType() {
+    getCollisionType(): collisionTypes {
         return 'Rect'
         }
     getCollisionVectors():any[]{

@@ -1,7 +1,7 @@
 class TextObject extends GameObject {
     constructor(x, y, text) {
         super(x, y, "text");
-        this.text = typeof text === "string" ? text:"";
+        this.text = typeof text === "string" ? text : "";
         this.clr = 0;
         this.width = 0;
         this.height = 10;
@@ -9,11 +9,11 @@ class TextObject extends GameObject {
         this.loaded = false;
     }
     getCollisionType() {
-        return 'Rect'
-        }
-        getCollisionVectors(){
-    return [{x:this.x,y:this.y},{x:this.width,y:this.height}]
-}
+        return 'Rect';
+    }
+    getCollisionVectors() {
+        return [{ x: this.x, y: this.y }, { x: this.width, y: this.height }];
+    }
     init() {
         this.loaded = true;
         this.width = textWidth(this.t);
