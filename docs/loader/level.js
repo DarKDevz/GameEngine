@@ -568,8 +568,9 @@ class Level extends GameEvents {
             let _box = createDiv(box.constructor.name);
             _box.style("cursor: pointer; width: fit-content;");
             _box.mouseReleased(() => {
-                if(isDragging) return
-                switch(mouseButton) {
+                if (isDragging)
+                    return;
+                switch (mouseButton) {
                     case "left":
                         if (engine.currentScene === this.ind) {
                             editor.setSelection([box.uuid]);

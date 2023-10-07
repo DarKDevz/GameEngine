@@ -50,7 +50,7 @@ content.removeOldContent = function () {
     }
     ContentBrowserPanel.Divs = [];
 };
-function PanelsInit() {}
+function PanelsInit() { }
 async function createZip() {
     var zip = new JSZip();
     let createSketchFile = function () {

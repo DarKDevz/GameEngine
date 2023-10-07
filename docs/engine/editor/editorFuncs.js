@@ -377,15 +377,15 @@ class Editor {
     openContextMenu(uuid) {
         let objContextMenu = select('#objectContext');
         this.contextObj = uuid;
-        objContextMenu.show()
+        objContextMenu.show();
         objContextMenu.elt.style.position = 'absolute';
-        objContextMenu.position(winMouseX, winMouseY)
+        objContextMenu.position(winMouseX, winMouseY);
     }
     openBrowserContext(_file) {
         let fileContext = select('#fileContext');
-        fileContext.show()
+        fileContext.show();
         fileContext.elt.style.position = 'absolute';
-        fileContext.position(winMouseX, winMouseY)
+        fileContext.position(winMouseX, winMouseY);
         this.contextObj = _file;
     }
     removeMapObject() {
@@ -498,7 +498,7 @@ class Editor {
         let holdAll = document.getElementById("bottomDiv");
         ContentBrowserPanel.Holder = createDiv();
         ContentBrowserPanel.Holder.parent(holdAll);
-        ContentBrowserPanel.Holder.size(widthDiv.clientWidth, holdAll.clientHeight);
+        ContentBrowserPanel.Holder.size(window.widthDiv.clientWidth, holdAll.clientHeight);
         ContentBrowserPanel.Main = createDiv();
         ContentBrowserPanel.Main.parent(ContentBrowserPanel.Holder);
         let _ = createDiv();
@@ -574,24 +574,26 @@ class Editor {
         this.cameraPos = createVector(0, 0);
         let fileContext = select('#fileContext');
         fileContext.elt.addEventListener('mouseleave', () => {
-            fileContext.hide()
-        })
+            fileContext.hide();
+        });
         fileContext.mouseReleased((e) => {
             switch (e.target.innerText) {
                 case "Rename":
-                    if(this.contextObj)content.changeName(this.contextObj);
-                    fileContext.hide()
+                    if (this.contextObj)
+                        content.changeName(this.contextObj);
+                    fileContext.hide();
                     break;
                 case "Delete":
-                    if(this.contextObj?.UUID)engine.deleteGameFile(this.contextObj.UUID);
-                    fileContext.hide()
+                    if (this.contextObj?.UUID)
+                        engine.deleteGameFile(this.contextObj.UUID);
+                    fileContext.hide();
                     break;
             }
-        })
+        });
         let objContextMenu = select('#objectContext');
         objContextMenu.elt.addEventListener('mouseleave', () => {
-            objContextMenu.hide()
-        })
+            objContextMenu.hide();
+        });
         objContextMenu.mouseReleased((e) => {
             switch (e.target.innerText) {
                 case "Copy":
@@ -601,9 +603,8 @@ class Editor {
                         components: engine.getfromUUID(this.contextObj).jsonComponents()
                     };
                     this.copiedObjs = [copiedObj];
-                    objContextMenu.hide()
-
-                    break
+                    objContextMenu.hide();
+                    break;
                 case "Paste":
                     let scene = engine.getfromUUID(this.contextObj)?.scene;
                     if (scene && this.copiedObjs) {
@@ -617,7 +618,8 @@ class Editor {
                                 let componentClass = engine.componentList[component.name];
                                 _obj.components.push(new componentClass({ ...component.params, obj: _obj }));
                             }
-                            if (engine.activeScene === engine.scene[scene]) _obj.init()
+                            if (engine.activeScene === engine.scene[scene])
+                                _obj.init();
                             engine.scene[scene].boxes.push(_obj);
                         }
                         setTimeout(() => shouldUpdateLevels = true, 500);
@@ -625,10 +627,10 @@ class Editor {
                     break;
                 case "Delete":
                     removeObject(this.contextObj);
-                    objContextMenu.hide()
+                    objContextMenu.hide();
                     break;
             }
-        })
+        });
     }
     readFileAsDataURL(file) {
         return new Promise(resolve => {
