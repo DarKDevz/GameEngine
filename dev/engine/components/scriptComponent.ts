@@ -274,7 +274,7 @@ class gameScript extends Component {
 		inp.mouseReleased(() => {
 			if (isDragging) return;
 			if (mouseButton === "right") {
-				content.changeName(_file);
+				editor.openBrowserContext(_file);
 			} else {
 				var popupWindow = window.open("popup.html", "Popup Window", "width=400,height=300");
 				window.scriptData = function () {
@@ -403,7 +403,7 @@ class gameSprite extends Component {
 		img.mouseReleased(() => {
 			if (isDragging) return;
 			if (mouseButton === "right") {
-				content.changeName(file);
+                editor.openBrowserContext(file);
 			} else {
 				let popup = window.open('fileInput.html', '_blank', 'width=400,height=400');
 				popup._ImageData = () => {

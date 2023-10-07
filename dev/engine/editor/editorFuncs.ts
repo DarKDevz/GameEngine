@@ -412,7 +412,20 @@ class Editor {
         }
         this.pasted = true;
     }
-
+    openContextMenu(uuid) {
+        let objContextMenu = select('#objectContext');
+        this.contextObj = uuid;
+        objContextMenu.show()
+        objContextMenu.elt.style.position = 'absolute';
+        objContextMenu.position(winMouseX, winMouseY)
+    }
+    openBrowserContext(_file) {
+        let fileContext = select('#fileContext');
+        fileContext.show()
+        fileContext.elt.style.position = 'absolute';
+        fileContext.position(winMouseX, winMouseY)
+        this.contextObj = _file;
+    }
     removeMapObject() {
         for (let selectedId in selectedObjects) {
             let objId = selectedObjects[selectedId];
@@ -536,77 +549,131 @@ class Editor {
         let _ = createDiv()
         let cntentBtn = createDiv('ContentBrowserPanel')
         cntentBtn.parent(_)
-        let select = createSelect();
-        select.parent(_);
-        let newList = ['.js', '.img']
+        let _select = createSelect();
+        _select.parent(_);
+        let newList = ['.js', '.img'];
         for (let name of newList) {
-            select.option(name)
+            _select.option(name);
         }
-        select.elt.title = "Select"
-        let addFilebtn = createButton('add')
+        _select.elt.title = "Select";
+        let addFilebtn = createButton('add');
         addFilebtn.elt.title = "Add new component";
-        addFilebtn.style('cursor:pointer')
+        addFilebtn.style('cursor:pointer');
         addFilebtn.mousePressed(() => {
-            let file = addGameFile('', select.value().toString(), {})
+            let file = addGameFile('', _select.value().toString(), {});
             content.changeName(file);
-        })
+        });
         addFilebtn.parent(_);
-        cntentBtn.mousePressed(showBrowserPanel.bind(this))
-        cntentBtn.style("cursor: pointer; width: fit-content;")
+        cntentBtn.mousePressed(showBrowserPanel.bind(this));
+        cntentBtn.style("cursor: pointer; width: fit-content;");
         //_.class("accordion-content");
         _.parent(ContentBrowserPanel.Main);
         ContentBrowserPanel.HUD = createDiv();
-        ContentBrowserPanel.HUD.parent(ContentBrowserPanel.Main)
+        ContentBrowserPanel.HUD.parent(ContentBrowserPanel.Main);
         //ContentBrowserPanel.Holder.size(windowWidth,windowHeight/4);
         ContentBrowserPanel.Holder.class('contentBrowser');
-        ContentBrowserPanel.HUD.style('display: flex; align-items: center; flex-flow: row wrap; place-content: stretch space-around;     justify-content: flex-start; align-content: center; flex-direction: row; flex-wrap: wrap;')
+        ContentBrowserPanel.HUD.style('display: flex; align-items: center; flex-flow: row wrap; place-content: stretch space-around;     justify-content: flex-start; align-content: center; flex-direction: row; flex-wrap: wrap;');
         ContentBrowserPanel.Main.class("accordion-content");
         ContentBrowserPanel.Main.elt.style.maxHeight = "100%";
         ContentBrowserPanel.Main.maxHeight = '';
         /*display: flex;
         align-items: flex-start;
-        // justify-items: stretch; 
+        // justify-items: stretch;
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: space-around;
         align-content: stretch;*/
         ContentBrowserPanel.Main.style("position:relative;background-color: rgba(0, 0, 0, 0.25);overflow:auto;");
-
         //ContentBrowserPanel.Holder.position(0,windowHeight-windowHeight/4);
         this.uiElement(ContentBrowserPanel.Main);
         actionButtons = createDiv();
         actionButtons.id('actionMenu');
         actionButtons.parent('sideMenu');
-
         copyButton = createButton('Copy').class('allButtons');
         copyButton.mousePressed(this.copyObject.bind(this));
         copyButton.parent('actionMenu');
-        copyButton.elt.title = "Copy Object(s)"
+        copyButton.elt.title = "Copy Object(s)";
         this.uiElement(copyButton);
         removeButton = createButton('Remove').class('allButtons');
         removeButton.mousePressed(this.removeMapObject.bind(this));
         removeButton.parent('actionMenu');
-        removeButton.elt.title = "Remove Object(s)"
+        removeButton.elt.title = "Remove Object(s)";
         this.uiElement(removeButton);
         levelButton = createButton('Level').class('allButtons');
         levelButton.mousePressed(this.levelScreen.bind(this));
         levelButton.parent('actionMenu');
-        levelButton.elt.title = "Show/Hide UI and Scene Variables"
+        levelButton.elt.title = "Show/Hide UI and Scene Variables";
         this.uiElement(levelButton);
-
         button.mousePressed(() => {
             if (this.playingWindow && !this.playingWindow.closed) {
                 //console.log(editorWindow);
                 this.playingWindow.editorData = MapJson();
-                this.playingWindow.doReload()
-            } else {
+                this.playingWindow.doReload();
+            }
+            else {
                 this.playingWindow = window.open("editor.html");
                 this.playingWindow.editorData = MapJson();
             }
         });
-
         lastScene = engine.currentScene;
         this.cameraPos = createVector(0, 0);
+        let fileContext = select('#fileContext');
+        fileContext.elt.addEventListener('mouseleave', () => {
+            fileContext.hide()
+        })
+        fileContext.mouseReleased((e) => {
+            switch (e.target.innerText) {
+                case "Rename":
+                    if(this.contextObj)content.changeName(this.contextObj);
+                    fileContext.hide()
+                    break;
+                case "Delete":
+                    if(this.contextObj?.UUID)engine.deleteGameFile(this.contextObj.UUID);
+                    fileContext.hide()
+                    break;
+            }
+        })
+        let objContextMenu = select('#objectContext');
+        objContextMenu.elt.addEventListener('mouseleave', () => {
+            objContextMenu.hide()
+        })
+        objContextMenu.mouseReleased((e) => {
+            switch (e.target.innerText) {
+                case "Copy":
+                    let copiedObj = {
+                        vals: engine.getfromUUID(this.contextObj).getParameters(),
+                        type: engine.getfromUUID(this.contextObj).typeId,
+                        components: engine.getfromUUID(this.contextObj).jsonComponents()
+                    };
+                    this.copiedObjs = [copiedObj];
+                    objContextMenu.hide()
+
+                    break
+                case "Paste":
+                    let scene = engine.getfromUUID(this.contextObj)?.scene;
+                    if (scene && this.copiedObjs) {
+                        for (let copiedObj of this.copiedObjs) {
+                            if (copiedObj.type === '' || copiedObj.type === undefined) {
+                                console.warn('Empty type means not copyable');
+                                continue;
+                            }
+                            let _obj = addObj(copiedObj.type, copiedObj.vals, scene);
+                            for (let component of copiedObj.components) {
+                                let componentClass = engine.componentList[component.name];
+                                _obj.components.push(new componentClass({ ...component.params, obj: _obj }));
+                            }
+                            if (engine.activeScene === engine.scene[scene]) _obj.init()
+                            engine.scene[scene].boxes.push(_obj);
+                        }
+                        setTimeout(() => shouldUpdateLevels = true, 500);
+                    }
+                    break;
+                case "Delete":
+                    removeObject(this.contextObj);
+                    objContextMenu.hide()
+                    break;
+            }
+        })
     }
     readFileAsDataURL(file: Blob): Promise<string> {
         return new Promise(resolve => {

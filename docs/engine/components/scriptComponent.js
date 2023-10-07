@@ -286,7 +286,7 @@ class gameScript extends Component {
             if (isDragging)
                 return;
             if (mouseButton === "right") {
-                content.changeName(_file);
+                editor.openBrowserContext(_file);
             }
             else {
                 var popupWindow = window.open("popup.html", "Popup Window", "width=400,height=300");
@@ -418,7 +418,7 @@ class gameSprite extends Component {
             if (isDragging)
                 return;
             if (mouseButton === "right") {
-                content.changeName(file);
+                editor.openBrowserContext(file);
             }
             else {
                 let popup = window.open('fileInput.html', '_blank', 'width=400,height=400');

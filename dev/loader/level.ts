@@ -556,11 +556,19 @@ class Level extends GameEvents {
             let _box = createDiv(box.constructor.name);
             _box.style("cursor: pointer; width: fit-content;")
             _box.mouseReleased(() => {
-                if (engine.currentScene === this.ind && !isDragging) {
-                    editor.setSelection([box.uuid])
-                    editor.setCameraPos(box);
+                if(isDragging) return
+                switch(mouseButton) {
+                    case "left":
+                        if (engine.currentScene === this.ind) {
+                            editor.setSelection([box.uuid]);
+                            editor.setCameraPos(box);
+                        }
+                        return;
+                    case "right":
+                        editor.openContextMenu(box.uuid);
+                        return;
                 }
-            })
+            });
             _box.doubleClicked(() => {
                 if (engine.currentScene !== this.ind) {
                     this.loadLevel();

@@ -379,48 +379,14 @@ class Editor {
         this.contextObj = uuid;
         objContextMenu.show()
         objContextMenu.elt.style.position = 'absolute';
-        select('#objectContext').position(winMouseX, winMouseY)
-        objContextMenu.elt.addEventListener('mouseleave', () => {
-            objContextMenu.hide()
-        })
-        objContextMenu.mouseReleased((e) => {
-            switch (e.target.innerText) {
-                case "Copy":
-                    let copiedObj = {
-                        vals: engine.getfromUUID(this.contextObj).getParameters(),
-                        type: engine.getfromUUID(this.contextObj).typeId,
-                        components: engine.getfromUUID(this.contextObj).jsonComponents()
-                    };
-                    this.copiedObjs = [copiedObj];
-                    objContextMenu.hide()
-
-                    break
-                case "Paste":
-                    let scene = engine.getfromUUID(this.contextObj)?.scene;
-                    if (scene && this.copiedObjs) {
-                        for (let copiedObj of this.copiedObjs) {
-                            if (copiedObj.type === '' || copiedObj.type === undefined) {
-                                console.warn('Empty type means not copyable');
-                                continue;
-                            }
-                            let _obj = addObj(copiedObj.type, copiedObj.vals, scene);
-                            for (let component of copiedObj.components) {
-                                let componentClass = engine.componentList[component.name];
-                                _obj.components.push(new componentClass({ ...component.params, obj: _obj }));
-                            }
-                            if (engine.activeScene === engine.scene[scene]) _obj.init()
-                            engine.scene[scene].boxes.push(_obj);
-                        }
-                        setTimeout(() => shouldUpdateLevels = true, 500);
-                    }
-                    break;
-                case "Delete":
-                    removeObject(this.contextObj);
-                    objContextMenu.hide()
-                    break;
-            }
-        })
-        window.dbg = objContextMenu;
+        objContextMenu.position(winMouseX, winMouseY)
+    }
+    openBrowserContext(_file) {
+        let fileContext = select('#fileContext');
+        fileContext.show()
+        fileContext.elt.style.position = 'absolute';
+        fileContext.position(winMouseX, winMouseY)
+        this.contextObj = _file;
     }
     removeMapObject() {
         for (let selectedId in selectedObjects) {
@@ -538,18 +504,18 @@ class Editor {
         let _ = createDiv();
         let cntentBtn = createDiv('ContentBrowserPanel');
         cntentBtn.parent(_);
-        let select = createSelect();
-        select.parent(_);
+        let _select = createSelect();
+        _select.parent(_);
         let newList = ['.js', '.img'];
         for (let name of newList) {
-            select.option(name);
+            _select.option(name);
         }
-        select.elt.title = "Select";
+        _select.elt.title = "Select";
         let addFilebtn = createButton('add');
         addFilebtn.elt.title = "Add new component";
         addFilebtn.style('cursor:pointer');
         addFilebtn.mousePressed(() => {
-            let file = addGameFile('', select.value().toString(), {});
+            let file = addGameFile('', _select.value().toString(), {});
             content.changeName(file);
         });
         addFilebtn.parent(_);
@@ -606,6 +572,63 @@ class Editor {
         });
         lastScene = engine.currentScene;
         this.cameraPos = createVector(0, 0);
+        let fileContext = select('#fileContext');
+        fileContext.elt.addEventListener('mouseleave', () => {
+            fileContext.hide()
+        })
+        fileContext.mouseReleased((e) => {
+            switch (e.target.innerText) {
+                case "Rename":
+                    if(this.contextObj)content.changeName(this.contextObj);
+                    fileContext.hide()
+                    break;
+                case "Delete":
+                    if(this.contextObj?.UUID)engine.deleteGameFile(this.contextObj.UUID);
+                    fileContext.hide()
+                    break;
+            }
+        })
+        let objContextMenu = select('#objectContext');
+        objContextMenu.elt.addEventListener('mouseleave', () => {
+            objContextMenu.hide()
+        })
+        objContextMenu.mouseReleased((e) => {
+            switch (e.target.innerText) {
+                case "Copy":
+                    let copiedObj = {
+                        vals: engine.getfromUUID(this.contextObj).getParameters(),
+                        type: engine.getfromUUID(this.contextObj).typeId,
+                        components: engine.getfromUUID(this.contextObj).jsonComponents()
+                    };
+                    this.copiedObjs = [copiedObj];
+                    objContextMenu.hide()
+
+                    break
+                case "Paste":
+                    let scene = engine.getfromUUID(this.contextObj)?.scene;
+                    if (scene && this.copiedObjs) {
+                        for (let copiedObj of this.copiedObjs) {
+                            if (copiedObj.type === '' || copiedObj.type === undefined) {
+                                console.warn('Empty type means not copyable');
+                                continue;
+                            }
+                            let _obj = addObj(copiedObj.type, copiedObj.vals, scene);
+                            for (let component of copiedObj.components) {
+                                let componentClass = engine.componentList[component.name];
+                                _obj.components.push(new componentClass({ ...component.params, obj: _obj }));
+                            }
+                            if (engine.activeScene === engine.scene[scene]) _obj.init()
+                            engine.scene[scene].boxes.push(_obj);
+                        }
+                        setTimeout(() => shouldUpdateLevels = true, 500);
+                    }
+                    break;
+                case "Delete":
+                    removeObject(this.contextObj);
+                    objContextMenu.hide()
+                    break;
+            }
+        })
     }
     readFileAsDataURL(file) {
         return new Promise(resolve => {
