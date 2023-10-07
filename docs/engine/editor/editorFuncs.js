@@ -374,6 +374,54 @@ class Editor {
         }
         this.pasted = true;
     }
+    openContextMenu(uuid) {
+        let objContextMenu = select('#objectContext');
+        this.contextObj = uuid;
+        objContextMenu.show()
+        objContextMenu.elt.style.position = 'absolute';
+        select('#objectContext').position(winMouseX, winMouseY)
+        objContextMenu.elt.addEventListener('mouseleave', () => {
+            objContextMenu.hide()
+        })
+        objContextMenu.mouseReleased((e) => {
+            switch (e.target.innerText) {
+                case "Copy":
+                    let copiedObj = {
+                        vals: engine.getfromUUID(this.contextObj).getParameters(),
+                        type: engine.getfromUUID(this.contextObj).typeId,
+                        components: engine.getfromUUID(this.contextObj).jsonComponents()
+                    };
+                    this.copiedObjs = [copiedObj];
+                    objContextMenu.hide()
+
+                    break
+                case "Paste":
+                    let scene = engine.getfromUUID(this.contextObj)?.scene;
+                    if (scene && this.copiedObjs) {
+                        for (let copiedObj of this.copiedObjs) {
+                            if (copiedObj.type === '' || copiedObj.type === undefined) {
+                                console.warn('Empty type means not copyable');
+                                continue;
+                            }
+                            let _obj = addObj(copiedObj.type, copiedObj.vals, scene);
+                            for (let component of copiedObj.components) {
+                                let componentClass = engine.componentList[component.name];
+                                _obj.components.push(new componentClass({ ...component.params, obj: _obj }));
+                            }
+                            if (engine.activeScene === engine.scene[scene]) _obj.init()
+                            engine.scene[scene].boxes.push(_obj);
+                        }
+                        setTimeout(() => shouldUpdateLevels = true, 500);
+                    }
+                    break;
+                case "Delete":
+                    removeObject(this.contextObj);
+                    objContextMenu.hide()
+                    break;
+            }
+        })
+        window.dbg = objContextMenu;
+    }
     removeMapObject() {
         for (let selectedId in selectedObjects) {
             let objId = selectedObjects[selectedId];
@@ -484,7 +532,7 @@ class Editor {
         let holdAll = document.getElementById("bottomDiv");
         ContentBrowserPanel.Holder = createDiv();
         ContentBrowserPanel.Holder.parent(holdAll);
-        ContentBrowserPanel.Holder.size(widthDiv.clientWidth,holdAll.clientHeight);
+        ContentBrowserPanel.Holder.size(widthDiv.clientWidth, holdAll.clientHeight);
         ContentBrowserPanel.Main = createDiv();
         ContentBrowserPanel.Main.parent(ContentBrowserPanel.Holder);
         let _ = createDiv();
