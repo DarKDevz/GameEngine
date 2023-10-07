@@ -40,29 +40,29 @@ class Engine extends GameEvents {
         this.eventListener = {}
         this.collisionWorker;
         this.allCollisions = {}
-        if(engine?.collisionWorker) {
+        if (engine?.collisionWorker) {
             engine.collisionWorker.terminate()
         }
         this.collisionWorker ??= new Worker("engine/objects/collisionChecker.js")
-        this.collisionWorker.addEventListener('message',(e) => {
-            if(e.data.type === "cache") {
+        this.collisionWorker.addEventListener('message', (e) => {
+            if (e.data.type === "cache") {
                 this.allCollisions = e.data.value
             }
         })
-        setTimeout(()=>{this.tryFirstLoad()},500)
+        setTimeout(() => { this.tryFirstLoad() }, 500)
         // this.body = new p2.Body({ mass: 1 });
         // this.world.addBody(this.body);
     }
     tryFirstLoad() {
-        if(window?.canvas?.width) {
-            this.resize(width,height);
-        }else {
-            setTimeout(()=>{this.tryFirstLoad()},500)
+        if (window?.canvas?.width) {
+            this.resize(width, height);
+        } else {
+            setTimeout(() => { this.tryFirstLoad() }, 500)
         }
     }
-    checkCache(obj1:any, obj2:any): boolean|undefined {
-        let uuid1 = obj1?.uuid?obj1.uuid:obj1
-        let uuid2 = obj2?.uuid?obj2.uuid:obj2
+    checkCache(obj1: any, obj2: any): boolean | undefined {
+        let uuid1 = obj1?.uuid ? obj1.uuid : obj1
+        let uuid2 = obj2?.uuid ? obj2.uuid : obj2
         if (this.allCollisions.hasOwnProperty(uuid1) && this.allCollisions.hasOwnProperty(uuid2)) {
             if (this.allCollisions[uuid1].hasOwnProperty(uuid2) && this.allCollisions[uuid2].hasOwnProperty(uuid1)) {
                 return this.allCollisions[uuid1][uuid2] && this.allCollisions[uuid2][uuid1]
@@ -101,10 +101,10 @@ class Engine extends GameEvents {
         if (webglVersion === "webgl2") {
             let defaultEyeZ = height / 2 / Math.tan(p5.instance._renderer._curCamera.cameraFOV / 2);
             //offZ1*=2
-            var ratio = (p5.instance._renderer._curCamera.eyeZ)/ defaultEyeZ;
+            var ratio = (p5.instance._renderer._curCamera.eyeZ) / defaultEyeZ;
             //Removes all Z's that are from camera and scale the object correctly
             matrix = new DOMMatrix(p5.instance._renderer.uMVMatrix.mat4);
-            DPoint = new DOMPoint((mouseX - width / 2)*ratio, (mouseY - height / 2)*ratio, -p5.instance._renderer._curCamera.eyeZ);
+            DPoint = new DOMPoint((mouseX - width / 2) * ratio, (mouseY - height / 2) * ratio, -p5.instance._renderer._curCamera.eyeZ);
         }
         else {
             matrix = drawingContext.getTransform();
@@ -238,7 +238,26 @@ class Engine extends GameEvents {
         }));
     }
     deleteGameFile(id: string, value: string | boolean = false) {
-        delete this.files[this.getByReference(id, value).UUID]
+        //Remove references
+        //Set script to none
+        let file = this.files[this.getByReference(id, value).UUID]
+        let whoUses = file.whoUses
+        if(file.type === ".js") {
+            file.data = "";
+            for (let ObjId in whoUses) {
+                let script = whoUses[ObjId];
+                script.loadFile(file);
+            }
+        }
+        for (let i in whoUses) {
+            for (let compInd in whoUses[i].ownObject.components) {
+                let comp = whoUses[i].ownObject.components[compInd]
+                if (whoUses[i] === comp) {
+                    whoUses[i].ownObject.components.splice(compInd, 1)
+                }
+            }
+        }
+        delete this.files[this.getByReference(id, value).UUID];
     }
     getByReference(id: string, value: string | boolean = false): gameFile {
         if (this.files[id]) {
