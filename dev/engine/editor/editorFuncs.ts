@@ -448,7 +448,7 @@ class Editor {
         Engine.removeListeners.push((obj) => {
             shouldUpdateLevels = true;
         })
-        this.fromReference("leftHolder")
+        this.fromReference("leftDiv")
         let bottomDiv = this.fromReference("bottomDiv")
         bottomDiv.elt.ondrop = (event) => {
             this.makeFile(event);
@@ -530,6 +530,7 @@ class Editor {
         let holdAll = document.getElementById("bottomDiv");
         ContentBrowserPanel.Holder = createDiv();
         ContentBrowserPanel.Holder.parent(holdAll);
+        ContentBrowserPanel.Holder.size(window.widthDiv.clientWidth,holdAll.clientHeight);
         ContentBrowserPanel.Main = createDiv();
         ContentBrowserPanel.Main.parent(ContentBrowserPanel.Holder);
         let _ = createDiv()

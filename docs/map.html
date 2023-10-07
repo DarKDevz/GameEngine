@@ -28,10 +28,12 @@
     <script src="loader/level.js"></script>
     <script src="loader/support.js"></script>
     <script type="module" src="map.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.9.0/cdn/themes/dark.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.9.0/cdn/shoelace-autoloader.js"></script>
 </head>
 
 <body oncontextmenu="return false;">
-    <div class="container">
+    <!-- <div class="container">
         <div id="leftHolder">
             <div id="leftDiv">
                 <div id="HeaderHolder">
@@ -61,9 +63,49 @@
             <div id="bottomDiv">
         </div>
         </div>
-    </div>
-    <main>
-    </main>
+    </div> -->
+    <sl-split-panel position="30" style="height: 100vh;">
+        <div id="leftDiv"
+          slot="start"
+          style="height: 100%; background-color: #0a2f5b;  overflow: scroll;"
+        >
+        <div id="HeaderHolder">
+            <select id="addSelect"></select>
+            <button id="addButton">✚</button>
+        </div>
+        </div>
+        <div slot="end">
+          <sl-split-panel vertical id="rightHolder" style="height: 100%; ">
+            <div id="topDiv"
+              slot="start"
+              style="height: 100%;"
+            >
+            <div id="fileHolder" style="position: absolute;">
+                <sl-button-group label="Alignment" style="font-size: x-large;">
+                    <sl-button size="small"  id="loadFile"><sl-icon name="repeat-1"></sl-icon></sl-button>
+                    <sl-button size="small"  id="saveFile"><sl-icon name="save"></sl-icon></sl-button>
+                    <sl-button size="small"  id="exportFile" onclick="createZip()"><sl-icon name="file-earmark-zip"></sl-icon></sl-button>
+                  </sl-button-group>
+            </div>
+            <div style="position: relative; right: -30%; top:0px; z-index: 5;">
+                <sl-button-group label="Alignment">
+                    <sl-button size="small"  id="playButton" ><sl-icon name="play"></sl-icon>Play</sl-button>
+                    <sl-button size="small"  id="newButton" ><sl-icon name="plus-circle"></sl-icon>New</sl-button>
+                    <sl-button size="small"  id="refreshButton" ><sl-icon name="arrow-clockwise"></sl-icon>Refresh</sl-button>
+                  </sl-button-group>
+            </div>
+            </div>
+            <div id="bottomDiv"
+              slot="end"
+              style="height: 100%;     background-color: #0a2f5b; overflow:scroll"
+            >
+            </div>
+            <sl-menu style="max-width: 200px;">
+                <sl-menu-item >Content Browser</sl-menu-item>
+              </sl-menu>
+          </sl-split-panel>
+        </div>
+      </sl-split-panel>
 </body>
 
 </html>

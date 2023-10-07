@@ -1,6 +1,6 @@
 window.topDiv = undefined;
 window.windowResized = function () {
-    engine.resize(window.topDiv.clientWidth, window.topDiv.clientHeight);
+    engine.resize(widthDiv.clientWidth, heightDiv.clientHeight);
     //UI Resize
     editor.onResize();
 };
@@ -15,20 +15,37 @@ window.preload = async function () {
 };
 window.setup = function () {
     //Initialize Game things
-    window.topDiv = document.getElementById("topDiv");
-    createCanvas(window.topDiv.clientWidth, window.topDiv.clientHeight, WEBGL);
-    noSmooth();
-    //Initialize Editor things
-    editor = new Editor();
-    editor.onSetup();
-    PanelsInit();
-    engine.cameraPos = editor.cameraPos;
-    engine.camera.isLocked = true;
-    windowResized();
-    document.getElementById("topDiv").appendChild(canvas);
+    window.widthDiv =  document.getElementById('rightHolder').parentNode;
+    window.heightDiv = document.getElementById('topDiv');
+    let interval = setInterval(()=>{
+        if(heightDiv.clientHeight!==0) {
+        console.log(widthDiv.clientWidth, heightDiv.clientHeight);
+        createCanvas(widthDiv.clientWidth, heightDiv.clientHeight, WEBGL);
+        noSmooth();
+        //Initialize Editor things
+        editor = new Editor();
+        editor.onSetup();
+        PanelsInit();
+        engine.cameraPos = editor.cameraPos;
+        engine.camera.isLocked = true;
+        windowResized();
+        heightDiv.insertBefore(canvas,heightDiv.firstChild)
+        canvas.style.zIndex = -1;
+        canvas.style.position = 'absolute';
+        document.getElementById('rightHolder').addEventListener('sl-reposition', event => {
+            engine.resize(widthDiv.clientWidth, heightDiv.clientHeight)
+          });
+          document.getElementById('leftDiv').parentNode.addEventListener('sl-reposition', event => {
+            engine.resize(widthDiv.clientWidth, heightDiv.clientHeight)
+            ContentBrowserPanel.Holder.size(widthDiv.clientWidth);
+          });
+        clearInterval(interval)
+        }
+    },500)
 };
 window.draw = function () {
     //engine.load();
+    if(editor) {
     clear();
     engine.gui.clear();
     push();
@@ -52,4 +69,5 @@ window.draw = function () {
     else {
         image(engine.gui, 0, 0, width, height);
     }
+}
 };
