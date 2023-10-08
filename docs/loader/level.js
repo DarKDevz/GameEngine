@@ -560,6 +560,7 @@ class Level extends GameEvents {
             let obj = engine.getfromUUID(objUUID);
             console.log(obj, obj.scene);
             removeObject(objUUID);
+            reloadcurrent();
             this.addObj(obj);
             shouldUpdateLevels = true;
         };
