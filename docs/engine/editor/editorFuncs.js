@@ -444,8 +444,13 @@ class Editor {
             inputFile.elt.click(e);
         });
         this.uiElement(visibleInputFile);
+        let addScene = this.fromReference("addScene");
+        addScene.mouseReleased(()=>{
+            engine.scene.push(new Level([],createVector(40,40),400))
+            shouldUpdateLevels = true;
+        })
         addButton = this.fromReference("addButton");
-        addButton.mousePressed(() => {
+        addButton.mouseReleased(() => {
             this.creatingNew = !this.creatingNew;
         });
         addSelect = this.fromReference("addSelect");
@@ -453,10 +458,10 @@ class Editor {
             addSelect.option(element);
         });
         saveButton = this.fromReference("saveFile");
-        saveButton.mousePressed(this.saveMap);
+        saveButton.mouseReleased(this.saveMap);
         this.uiElement(saveButton);
         exampleButton = this.fromReference("newButton");
-        exampleButton.mousePressed(() => {
+        exampleButton.mouseReleased(() => {
             let emptyExample = {
                 version: 1.3,
                 file: [],
