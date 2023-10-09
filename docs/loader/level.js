@@ -33,7 +33,7 @@ function deleteUser(obj) {
         component.deleteUser(false);
     }
 }
-function reloadcurrent() {
+function cleanScene() {
     let test = {};
     for (let scene of engine.scene) {
         test[scene.ind] = {};
@@ -423,7 +423,7 @@ class Level extends GameEvents {
             engine.gui.text(engine.errorText, 50, 150);
         }
         translate(-cameraPos.x, -cameraPos.y);
-        reloadcurrent();
+        cleanScene();
     }
     lateUpdate(shouldRun = true) {
         if (shouldRun) {
@@ -431,7 +431,7 @@ class Level extends GameEvents {
                 t_box.lateUpdate();
             }
         }
-        reloadcurrent();
+        cleanScene();
     }
     earlyUpdate(shouldRun = true) {
         if (!shouldRun)
@@ -440,7 +440,7 @@ class Level extends GameEvents {
         for (let t_box of this.boxes) {
             t_box.earlyUpdate();
         }
-        reloadcurrent();
+        cleanScene();
     }
     set posX(x) {
         this.pos.x = x;
@@ -559,7 +559,7 @@ class Level extends GameEvents {
             let obj = engine.getfromUUID(objUUID);
             console.log(obj, obj.scene);
             removeObject(objUUID);
-            reloadcurrent();
+            cleanScene();
             this.addObj(obj);
             shouldUpdateLevels = true;
         };
