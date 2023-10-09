@@ -268,7 +268,6 @@ function JsonMap(file) {
     if (!(engine instanceof Engine)) {
         console.error("engine hasn't been initialized in setup()");
     }
-    engine = new Engine();
     if (typeof file.data === "object") {
         ScenesfromObject(file.data);
     }
