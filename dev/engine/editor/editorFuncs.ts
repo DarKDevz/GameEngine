@@ -450,6 +450,7 @@ class Editor {
             if (event.dataTransfer.files[0].type === 'application/json') {
                 event.dataTransfer.files[0].text().then(
                     (data: string) => {
+                        engine = new Engine();
                         JsonMap({ data: data })
                         engine.cameraPos = editor.cameraPos;
                     }
@@ -474,6 +475,7 @@ class Editor {
                 forceBrowserUpdate = true;
                 forceMenuUpdate = true;
                 shouldUpdateLevels = true;
+                engine = new Engine();
                 JsonMap(file)
                 engine.cameraPos = editor.cameraPos
             });
@@ -532,6 +534,7 @@ class Editor {
             forceBrowserUpdate = true;
             forceMenuUpdate = true;
             shouldUpdateLevels = true;
+            engine = new Engine();
             JsonMap(file);
             engine.cameraPos = this.cameraPos
         })
