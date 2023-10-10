@@ -433,6 +433,7 @@ class Editor {
             forceBrowserUpdate = true;
             forceMenuUpdate = true;
             shouldUpdateLevels = true;
+            engine = new Engine()
             JsonMap(file);
             engine.cameraPos = editor.cameraPos;
         });
@@ -490,6 +491,7 @@ class Editor {
             forceBrowserUpdate = true;
             forceMenuUpdate = true;
             shouldUpdateLevels = true;
+            engine = new Engine()
             JsonMap(file);
             engine.cameraPos = this.cameraPos;
         });
