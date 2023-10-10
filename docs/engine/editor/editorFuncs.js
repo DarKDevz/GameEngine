@@ -411,6 +411,7 @@ class Editor {
             event.preventDefault();
             if (event.dataTransfer.files[0].type === 'application/json') {
                 event.dataTransfer.files[0].text().then((data) => {
+                    engine = new Engine()
                     JsonMap({ data: data });
                     engine.cameraPos = editor.cameraPos;
                 });
