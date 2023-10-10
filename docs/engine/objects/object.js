@@ -124,6 +124,7 @@ class GameObject extends GameEvents {
     removeBody() {
         if (this.body) {
             engine.world.DestroyBody(this.body);
+            this.body = undefined;
         }
     }
     addScriptByName(name, vals) {
