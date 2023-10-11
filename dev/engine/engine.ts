@@ -27,6 +27,7 @@ class Engine extends GameEvents {
         this.hasUUID = false;
         this.assignedUUID = "";
         this.camera = engine?.camera ? engine.camera : new Camera(0, 0);
+        this.editorZoom = this.camera.zoom;
         this.gui = createGraphics(windowWidth, windowHeight);
         this.guiObjects = Object.assign({}, engine?.guiObjects)
         this.mobile = navigator.userAgent.includes("Mobile");
