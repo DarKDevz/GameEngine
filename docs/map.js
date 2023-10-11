@@ -26,6 +26,7 @@ window.setup = function () {
         //Initialize Editor things
         editor = new Editor();
         editor.onSetup();
+        Object.defineProperty(engine.camera,"zoom",{set:()=>{},get:()=>{return engine.editorZoom}})
         PanelsInit();
         engine.cameraPos = editor.cameraPos;
         engine.camera.isLocked = true;
