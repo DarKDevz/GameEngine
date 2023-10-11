@@ -132,8 +132,9 @@ class Editor {
         }
         /*------------------this.selectionBox Stuff---------------------*/
         this.startSelect();
-        if (mouseIsPressed && !overUI && !this.creatingNew && (mouseButton === CENTER || mouseButton === RIGHT)) {
-            this.moveScreen();
+        if (mouseIsPressed && !overUI && (mouseButton === CENTER || mouseButton === RIGHT)) {
+	        this.creatingNew = false;
+            this.moveScreen()
         }
         if (!this.levelMode && lastWasPressed != Pressed && !mouseIsPressed && !overUI) {
             if (lastWasPressed === 'startedOverUi') {
