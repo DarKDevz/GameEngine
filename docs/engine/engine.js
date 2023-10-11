@@ -27,6 +27,7 @@ class Engine extends GameEvents {
         this.hasUUID = false;
         this.assignedUUID = "";
         this.camera = engine?.camera ? engine.camera : new Camera(0, 0);
+        this.editorZoom = this.camera.zoom;
         this.gui = createGraphics(windowWidth, windowHeight);
         this.guiObjects = Object.assign({}, engine?.guiObjects);
         this.mobile = navigator.userAgent.includes("Mobile");
@@ -155,13 +156,12 @@ class Engine extends GameEvents {
     mouseWheel(e) {
         if (Boolean(window?.editor) && !overUI) {
             if (abs(e.deltaY) > abs(e.deltaX)) {
-                engine.camera.zoom -= constrain(e.deltaY, -8, 8) * .035 * engine.camera.zoom;
-                engine.camera.zoom = constrain(engine.camera.zoom, 0.01, 5);
+                engine.editorZoom -= constrain(e.deltaY, -8, 8) * .035 * engine.editorZoom;
+                engine.editorZoom = constrain(engine.editorZoom, 0.01, 5);
+            } else {
+                editor.cameraPos.x += (e.deltaX) / engine.editorZoom;
             }
-            else {
-                editor.cameraPos.x += (e.deltaX) / engine.camera.zoom;
-            }
-            e.preventDefault();
+            e.preventDefault()
         }
         this.activeScene?.mouseWheel(e, Boolean(window?.editor));
     }
