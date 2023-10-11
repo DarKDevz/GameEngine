@@ -105,7 +105,7 @@ class Player {
             this.dir["up"] = this.dir["up"] ? true : this.shouldJump;
             right = keyIsDown(68) || keyIsDown(39) || this.dir["right"];
             left = keyIsDown(65) || keyIsDown(37) || Math.abs(this.dir["left"] * 1);
-            up = keyIsDown(87) || keyIsDown(38) || this.dir["up"];
+            up = keyIsDown(87) || keyIsDown(38) || keyIsDown(32) || this.dir["up"];
             down = keyIsDown(91) || keyIsDown(16) || keyIsDown(40) || this.dir["down"];
             //Space
             if (up && this.godMode) {
