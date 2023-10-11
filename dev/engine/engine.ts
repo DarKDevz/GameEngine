@@ -154,10 +154,10 @@ class Engine extends GameEvents {
     mouseWheel(e: WheelEvent) {
         if (Boolean(window?.editor) && !overUI) {
             if (abs(e.deltaY) > abs(e.deltaX)) {
-                engine.camera.zoom -= constrain(e.deltaY, -8, 8) * .035 * engine.camera.zoom;
-                engine.camera.zoom = constrain(engine.camera.zoom, 0.01, 5);
+                engine.editorZoom -= constrain(e.deltaY, -8, 8) * .035 * engine.editorZoom;
+                engine.editorZoom = constrain(engine.editorZoom, 0.01, 5);
             } else {
-                editor.cameraPos.x += (e.deltaX) / engine.camera.zoom;
+                editor.cameraPos.x += (e.deltaX) / engine.editorZoom;
             }
             e.preventDefault()
         }
