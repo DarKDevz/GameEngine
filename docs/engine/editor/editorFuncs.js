@@ -133,8 +133,8 @@ class Editor {
         /*------------------this.selectionBox Stuff---------------------*/
         this.startSelect();
         if (mouseIsPressed && !overUI && (mouseButton === CENTER || mouseButton === RIGHT)) {
-	        this.creatingNew = false;
-            this.moveScreen()
+            this.creatingNew = false;
+            this.moveScreen();
         }
         if (!this.levelMode && lastWasPressed != Pressed && !mouseIsPressed && !overUI) {
             if (lastWasPressed === 'startedOverUi') {
@@ -412,7 +412,7 @@ class Editor {
             event.preventDefault();
             if (event.dataTransfer.files[0].type === 'application/json') {
                 event.dataTransfer.files[0].text().then((data) => {
-                    engine = new Engine()
+                    engine = new Engine();
                     JsonMap({ data: data });
                     engine.cameraPos = editor.cameraPos;
                 });
@@ -435,7 +435,7 @@ class Editor {
             forceBrowserUpdate = true;
             forceMenuUpdate = true;
             shouldUpdateLevels = true;
-            engine = new Engine()
+            engine = new Engine();
             JsonMap(file);
             engine.cameraPos = editor.cameraPos;
         });
@@ -448,10 +448,10 @@ class Editor {
         });
         this.uiElement(visibleInputFile);
         let addScene = this.fromReference("addScene");
-        addScene.mouseReleased(()=>{
-            engine.scene.push(new Level([],createVector(40,40),400))
+        addScene.mouseReleased(() => {
+            engine.scene.push(new Level([], createVector(40, 40), 400));
             shouldUpdateLevels = true;
-        })
+        });
         addButton = this.fromReference("addButton");
         addButton.mouseReleased(() => {
             this.creatingNew = !this.creatingNew;
@@ -493,7 +493,7 @@ class Editor {
             forceBrowserUpdate = true;
             forceMenuUpdate = true;
             shouldUpdateLevels = true;
-            engine = new Engine()
+            engine = new Engine();
             JsonMap(file);
             engine.cameraPos = this.cameraPos;
         });

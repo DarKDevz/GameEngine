@@ -36,7 +36,7 @@ class Engine extends GameEvents {
             mouseButton = 'left';
         }
         this.world = new b2World(new b2Vec2(0, 100) //gravity
-            , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
+        , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
         this.componentList = Engine.componentList;
         this.eventListener = {};
         this.collisionWorker;
@@ -158,10 +158,11 @@ class Engine extends GameEvents {
             if (abs(e.deltaY) > abs(e.deltaX)) {
                 engine.editorZoom -= constrain(e.deltaY, -8, 8) * .035 * engine.editorZoom;
                 engine.editorZoom = constrain(engine.editorZoom, 0.01, 5);
-            } else {
+            }
+            else {
                 editor.cameraPos.x += (e.deltaX) / engine.editorZoom;
             }
-            e.preventDefault()
+            e.preventDefault();
         }
         this.activeScene?.mouseWheel(e, Boolean(window?.editor));
     }
@@ -185,7 +186,8 @@ class Engine extends GameEvents {
     }
     Initiate() {
         window.draw ??= this.draw.bind(this);
-        window.windowResized ??= () => this.resize();
+        //This fixes webkit bug with ios
+        window.windowResized ??= () => { this.mobile ? setTimeout(() => this.resize(), 200) : this.resize(); };
     }
     setup() {
         document.oncontextmenu = function (e) {
@@ -243,9 +245,9 @@ class Engine extends GameEvents {
     deleteGameFile(id, value = false) {
         //Remove references
         //Set script to none
-        let file = this.files[this.getByReference(id, value).UUID]
-        let whoUses = file.whoUses
-        if(file.type === ".js") {
+        let file = this.files[this.getByReference(id, value).UUID];
+        let whoUses = file.whoUses;
+        if (file.type === ".js") {
             file.data = "";
             for (let ObjId in whoUses) {
                 let script = whoUses[ObjId];
@@ -254,9 +256,9 @@ class Engine extends GameEvents {
         }
         for (let i in whoUses) {
             for (let compInd in whoUses[i].ownObject.components) {
-                let comp = whoUses[i].ownObject.components[compInd]
+                let comp = whoUses[i].ownObject.components[compInd];
                 if (whoUses[i] === comp) {
-                    whoUses[i].ownObject.components.splice(compInd, 1)
+                    whoUses[i].ownObject.components.splice(compInd, 1);
                 }
             }
         }

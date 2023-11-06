@@ -183,7 +183,8 @@ class Engine extends GameEvents {
     }
     Initiate() {
         window.draw ??= this.draw.bind(this);
-        window.windowResized ??= () => this.resize();
+        //This fixes webkit bug with ios
+        window.windowResized ??= () => {this.mobile?setTimeout(()=>this.resize(),200):this.resize()};
     }
     setup() {
         document.oncontextmenu = function (e) {
