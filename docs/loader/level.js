@@ -547,6 +547,11 @@ class Level extends GameEvents {
             }
         });
         accordionMenu(headerText, inputField, "Scene: " + this.ind, openerState[this.ind]);
+        sceneBtn.mouseReleased(() => {
+            if (mouseButton === "right") {
+                editor.openSceneContext(this.ind);
+            }
+        });
         /*drag and drop behaviour */
         headerText.elt.ondragover = (event) => {
             event.preventDefault();

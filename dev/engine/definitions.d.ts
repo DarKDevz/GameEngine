@@ -122,6 +122,8 @@ interface Editor {
     copiedObjs: any[];
     forceMenuUpdate: boolean;
     tryOffset: { [x: UUID]: xyObject }
+    sceneContext: number;
+    contextObj: any;
 }
 interface EditableObject {
     name:string
@@ -556,6 +558,8 @@ interface Engine extends GameEvents {
      * @type {{ [x: UUID]: { [x: string]: Function } }}
      */
     eventListener: { [x: UUID]: { [x: string]: Function } };
+    
+    editorZoom: number;
 }
 
 interface GUIElement extends GameObject {

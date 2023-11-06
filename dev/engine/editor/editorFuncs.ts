@@ -682,6 +682,61 @@ class Editor {
                     break;
             }
         })
+        let sceneContext = select("#sceneContext")
+        sceneContext.elt.addEventListener('mouseleave', () => {
+            sceneContext.hide()
+        })
+        sceneContext.mouseReleased((e) => {
+            switch (e.target.innerText) {
+                case "Paste":
+                    let scene = this.sceneContext;
+                    if (scene && this.copiedObjs) {
+                        for (let copiedObj of this.copiedObjs) {
+                            if (copiedObj.type === '' || copiedObj.type === undefined) {
+                                console.warn('Empty type means not copyable');
+                                continue;
+                            }
+                            let _obj = addObj(copiedObj.type, copiedObj.vals, "" + scene);
+                            for (let component of copiedObj.components) {
+                                let componentClass = engine.componentList[component.name];
+                                _obj.components.push(new componentClass({ ...component.params, obj: _obj }));
+                            }
+                            if (engine.activeScene === engine.scene[scene]) _obj.init()
+                            engine.scene[scene].boxes.push(_obj);
+                        }
+                        setTimeout(() => shouldUpdateLevels = true, 500);
+                    }
+                    break;
+                case "Delete":
+                    this.removeScene(this.sceneContext);
+                    sceneContext.hide()
+                    break;
+            }
+        })
+    }
+    removeScene(ind) {
+        engine.scene.splice(ind,1)
+        for(let i = ind; i < engine.scene.length; i++) {
+            engine.scene[i].ind = i;
+            for(let obj of engine.scene[i].boxes) {
+                obj.scene = "" + i;
+            }
+        }
+        if(engine.currentScene < this.sceneContext) return;
+        let file = {data: MapJson()}
+        forceBrowserUpdate = true;
+        forceMenuUpdate = true;
+        engine = new Engine()
+        JsonMap(file)
+        engine.cameraPos = editor.cameraPos;
+        shouldUpdateLevels = true;
+    }
+    openSceneContext(id:number) {
+        let sceneContext = select('#sceneContext');
+        this.sceneContext = id;
+        sceneContext.show()
+        sceneContext.elt.style.position = 'absolute';
+        sceneContext.position(winMouseX, winMouseY)
     }
     readFileAsDataURL(file: Blob): Promise<string> {
         return new Promise(resolve => {
