@@ -12,6 +12,7 @@ declare var JSZip: any
 declare function showSaveFilePicker(options:any): Promise<any>
 declare var p5: any
 declare var webglVersion: 'p2d'|'webgl2'
+declare var editor: Editor
 type Vec = ReturnType<typeof createVector>
 type Div = ReturnType<typeof createDiv>
 type b2Shape = Box2D.Collision.Shapes.b2Shape
@@ -120,7 +121,11 @@ interface Editor {
     startPos: any;
     isCircle: boolean;
     copiedObjs: any[];
-    forceMenuUpdate: boolean;
+    updates: {
+        menu: boolean;
+        browser: boolean;
+        level: boolean
+};
     tryOffset: { [x: UUID]: xyObject }
     sceneContext: number;
     contextObj: any;

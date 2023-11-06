@@ -1,7 +1,5 @@
 var editor: Editor;
-var forceMenuUpdate = false,
-    forceBrowserUpdate = false,
-    lastWasPressed: any = false,
+var lastWasPressed: any = false,
     overUI = false,
     Pressed = lastWasPressed,
     button = null,
@@ -30,7 +28,6 @@ var forceMenuUpdate = false,
     addSelect = null,
     id = null,
     openerState = {},
-    shouldUpdateLevels = true,
     sceneHolder = [],
     ContentBrowserPanel: any = {
         set files(value) { engine.files = value },
@@ -40,6 +37,11 @@ var forceMenuUpdate = false,
     OldFiles = [];
 class Editor {
     constructor() {
+        this.updates = {
+            browser:false,
+            menu:false,
+            level:true
+        }
         this.levelMode = false;
         this.cameraPos = createVector(0, 0);
         this.playingWindow;
@@ -203,15 +205,15 @@ class Editor {
             this.OpenEditMenu()
         }
         let newFile = Object.keys(engine.files);
-        if (!newFile.equals(OldFiles) || forceBrowserUpdate) {
-            forceBrowserUpdate = false;
+        if (!newFile.equals(OldFiles) || editor.updates.browser) {
+            editor.updates.browser = false;
             console.warn("added a file!/ changed");
             OldFiles = newFile;
             content.removeOldContent()
             readTypeAndName()
         }
-        if (shouldUpdateLevels && engine?.scene?.length > 0) {
-            shouldUpdateLevels = false;
+        if (editor.updates.level && engine?.scene?.length > 0) {
+            editor.updates.level = false;
             this.updateLevels()
         }
         if (keyIsDown(17) && keyIsDown(86)) {
@@ -461,7 +463,7 @@ class Editor {
         button = this.fromReference("playButton");
         //this.uiElement(button);
         Engine.removeListeners.push((obj) => {
-            shouldUpdateLevels = true;
+            editor.updates.level = true;
         })
         this.fromReference("leftDiv")
         let bottomDiv = this.fromReference("bottomDiv")
@@ -473,9 +475,9 @@ class Editor {
         };
         inputFile = createFileInput(
             (file) => {
-                forceBrowserUpdate = true;
-                forceMenuUpdate = true;
-                shouldUpdateLevels = true;
+                editor.updates.browser = true;
+                editor.updates.menu = true;
+                editor.updates.level = true;
                 engine = new Engine();
                 JsonMap(file)
                 engine.cameraPos = editor.cameraPos
@@ -492,7 +494,7 @@ class Editor {
         let addScene = this.fromReference("addScene");
         addScene.mouseReleased(()=>{
             engine.scene.push(new Level([],createVector(40,40),400))
-            shouldUpdateLevels = true;
+            editor.updates.level = true;
         })
         addButton = this.fromReference("addButton");
         addButton.mouseReleased(() => {
@@ -532,9 +534,9 @@ class Editor {
         refreshButton = this.fromReference("refreshButton");
         refreshButton.mousePressed(() => {
             let file = { data: MapJson() }
-            forceBrowserUpdate = true;
-            forceMenuUpdate = true;
-            shouldUpdateLevels = true;
+            editor.updates.browser = true;
+            editor.updates.menu = true;
+            editor.updates.level = true;
             engine = new Engine();
             JsonMap(file);
             engine.cameraPos = this.cameraPos
@@ -673,7 +675,7 @@ class Editor {
                             if (engine.activeScene === engine.scene[scene]) _obj.init()
                             engine.scene[scene].boxes.push(_obj);
                         }
-                        setTimeout(() => shouldUpdateLevels = true, 500);
+                        setTimeout(() => editor.updates.level = true, 500);
                     }
                     break;
                 case "Delete":
@@ -704,7 +706,7 @@ class Editor {
                             if (engine.activeScene === engine.scene[scene]) _obj.init()
                             engine.scene[scene].boxes.push(_obj);
                         }
-                        setTimeout(() => shouldUpdateLevels = true, 500);
+                        setTimeout(() => editor.updates.level = true, 500);
                     }
                     break;
                 case "Delete":
@@ -724,12 +726,12 @@ class Editor {
         }
         if(engine.currentScene < this.sceneContext) return;
         let file = {data: MapJson()}
-        forceBrowserUpdate = true;
-        forceMenuUpdate = true;
+        editor.updates.browser = true;
+        editor.updates.menu = true;
         engine = new Engine()
         JsonMap(file)
         engine.cameraPos = editor.cameraPos;
-        shouldUpdateLevels = true;
+        editor.updates.level = true;
     }
     openSceneContext(id:number) {
         let sceneContext = select('#sceneContext');
@@ -808,16 +810,16 @@ class Editor {
         }
         let check = deepReadCheck(info, lastInfo);
         //Means same
-        if (check > 0 && !forceMenuUpdate) {
+        if (check > 0 && !editor.updates.menu) {
             return;
         }
         if(lastIndexes.length !== infoIndexes.length) {
             //More values than before
             //Force update
-            forceMenuUpdate = true;
+            editor.updates.menu = true;
         }
         //Means Different Values
-        if (check === 0 && !forceMenuUpdate) {
+        if (check === 0 && !editor.updates.menu) {
             for (let t_info of infoDivs) {
                 t_info.elt.dispatchEvent(this.valChanged);
                 //Hacky solution to fix updating dom every time
@@ -826,7 +828,7 @@ class Editor {
             }
             return;
         }
-        forceMenuUpdate = false;
+        editor.updates.menu = false;
         for (let t_info of infoDivs) {
             t_info.remove();
             infoDivs = [];

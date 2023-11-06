@@ -240,7 +240,7 @@ class gameScript extends Component {
 			//If file isn't a script return
 			if (file.type !== this.fileType) return;
 			this.loadFile(file);
-			forceMenuUpdate = true;
+			editor.updates.menu = true;
 			//Replace old file with new file
 		}
 		inp.elt.ondragover = (event) => {
@@ -334,7 +334,7 @@ class gameScript extends Component {
 		// engine.getfromUUID(this.ownObject.uuid).init()
 		// }
 		//console.error("Not assigned to any level defaulting it to be the active scene", engine.getfromUUID(this.ownObject.uuid).scene);
-		forceMenuUpdate = true;
+		editor.updates.menu = true;
 	}
 	toJson() {
 		return {
@@ -411,7 +411,7 @@ class gameSprite extends Component {
 				}
 				window.jsonImage = (text: string) => {
 					//TODO: info box: Updated:(name of file)
-					forceBrowserUpdate = true;
+					editor.updates.browser = true;
 					//_file.loadFile(addGameFile(val.imageb64,'.img'));
 					file.data = text;
 					//Remove Sprite definition so it reloads it correctly
@@ -439,7 +439,7 @@ class gameSprite extends Component {
 		Component.componentOpen[this.id] ??= { value: false }
 		let shouldOpen = Component.componentOpen[this.id]
 		let mainDiv = addEditableSprite("Image", (val) => {
-			forceBrowserUpdate = true;
+			editor.updates.browser = true;
 			let actValue = val;
 			console.log(val);
 			this.src = actValue;
@@ -487,8 +487,8 @@ class gameSprite extends Component {
 			this.file.customData = loadImage(this.file.data.toString());
 		}
 		this.setSprite(this.file.customData);
-		forceMenuUpdate = true;
-		forceBrowserUpdate = true;
+		editor.updates.menu = true;
+		editor.updates.browser = true;
 	}
 	getSprite() {
 		return this.sprite.get(...arguments)
