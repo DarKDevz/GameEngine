@@ -566,7 +566,7 @@ class Level extends GameEvents {
             removeObject(objUUID);
             cleanScene();
             this.addObj(obj);
-            shouldUpdateLevels = true;
+            editor.updates.level = true;
         };
         for (let box of this.boxes) {
             let isDragging = false;

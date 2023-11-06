@@ -724,6 +724,7 @@ class Editor {
                 obj.scene = "" + i;
             }
         }
+        editor.updates.level = true;
         if(engine.currentScene < this.sceneContext) return;
         let file = {data: MapJson()}
         editor.updates.browser = true;

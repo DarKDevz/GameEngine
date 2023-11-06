@@ -164,6 +164,11 @@ class Player {
             , this.size.y / 2 //half height
             );
         }
+        for(let i in engine.allCollisions.Player) {
+            if(engine.uuidList[i]?.constructor.name !== "Bullet") {
+            engine.uuidList[i]?.onCollide(this);
+            }
+        }
     }
     playerDeath() {
         this.pos = engine.getActiveScene().pos.copy();

@@ -15,8 +15,8 @@ content.changeName = function (_file, tryRename) {
     }
     else {
         file.editReference('name', newName);
-        forceBrowserUpdate = true;
-        forceMenuUpdate = true;
+        editor.updates.browser = true;
+        editor.updates.menu = true;
     }
 };
 function readTypeAndName() {
