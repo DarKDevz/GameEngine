@@ -97,7 +97,6 @@ class GameObject {
         return collides;
     }
     onCollide() {
-        throw new Error("Method not implemented.");
     }
     update() {
     }
@@ -114,7 +113,7 @@ class GameObject {
     }
     removeBody() {
         if (this.body) {
-            engine.world.DestroyBody(this.body);
+            engine.world.removeRigidBody(this.body);
         }
     }
 }
