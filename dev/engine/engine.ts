@@ -43,7 +43,9 @@ class Engine extends GameEvents {
         this.world = new RAPIER.World({
             x: 0.0,
             y: -9.81,
-          }); // wheter to doSleep enabled to true because otherwise it will fuck over performance
+          });
+          //Prevents weird glitches
+          this.world.step() // wheter to doSleep enabled to true because otherwise it will fuck over performance
         this.componentList = Engine.componentList
         this.eventListener = {}
         this.collisionWorker;
