@@ -9,8 +9,13 @@ function doReload() {
     //Clean up all intervals
     preload();
 }
-function checkLoad() {
+async function checkLoad() {
     if (window.loaded) {
+        if(!window.RAPIER) {
+            let obj = await import('https:/' + '/cdn.skypack.dev/@dimforge/rapier2d-compat')
+            await obj.init()
+            window.RAPIER = obj;
+        }
         engine = new Engine();
         window.windowResized = () => { engine.resize(); };
         player = new Player();
@@ -92,6 +97,8 @@ function draw() {
     if (!window?.player?.update)
         return;
     if (!window?.engine?.getActiveScene)
+        return;
+        if (!engine.getActiveScene())
         return;
     engine.draw();
     if (window.exampleInst) {

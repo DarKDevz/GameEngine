@@ -122,48 +122,8 @@ function parseStringNum(str: any, ogVal = str, onlyPositive: boolean = false) {
 function DrawCircle(pos: Vec, r: number) {
     circle(pos.x, pos.y, r * 2)
 }
-//console.log(s.m_type);
-var DrawShape = <SpecialFunc>(function (s: b2Shape & Box2D.Collision.Shapes.b2CircleShape & Box2D.Collision.Shapes.b2PolygonShape, pos: { position: Vec }) {
-    switch (s.m_type) {
-        case DrawShape.e_circleShape:
-            DrawCircle(pos.position, s.m_radius);
-            break;
-        case DrawShape.e_edgeShape:
-            console.log("It's an edge")
-            break;
-        case DrawShape.e_polygonShape:
-            //console.log("it's a polygon", s.GetVertices(),pos);
-            //Translate vertices into real vertices
-            let vlist: Array<Vec> = [];
-            let vertice: Vec;
-            for (vertice of s.GetVertices()) {
-                vlist.push(DrawShape.Math.b2Math.MulX(pos, vertice));
-            }
-            DrawPolygon(vlist);
-            break;
-    }
-})
-
-Import(Box2D.Collision.Shapes.b2Shape, DrawShape);
-Import(Box2D.Common, DrawShape, "Math");
-function DrawPolygon(vertices: Array<Vec>) {
-    //Figure it out
-    beginShape()
-    for (let vertice of vertices) {
-        vertex(vertice.x, vertice.y)
-    }
-    endShape(CLOSE)
-}
 function DrawAll() {
-    for (let b = engine.world.m_bodyList;
-        b; b = b.m_next) {
-        let xf = b.m_xf;
-        for (let f = b.GetFixtureList();
-            f; f = f.m_next) {
-            let s = f.GetShape();
-            DrawShape(s, xf);
-        }
-    }
+    return;
 }
 Array.prototype.equals = function (array: Array<any>) {
     // if the other array is a falsy value, return

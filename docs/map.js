@@ -5,6 +5,11 @@ window.windowResized = function () {
     editor.onResize();
 };
 window.preload = async function () {
+            if(!window.RAPIER) {
+                let obj = await import('https:/' + '/cdn.skypack.dev/@dimforge/rapier2d-compat')
+                await obj.init()
+                window.RAPIER = obj;
+            }
     engine = new Engine();
     player = new Player();
     engine.physics = false;
@@ -47,6 +52,7 @@ window.setup = function () {
 };
 window.draw = function () {
     //engine.load();
+    if(!window?.engine?.getActiveScene()) return;
     if(editor) {
     clear();
     engine.gui.clear();

@@ -35,8 +35,11 @@ class Engine extends GameEvents {
             //Default mouseButton to be left
             mouseButton = 'left';
         }
-        this.world = new b2World(new b2Vec2(0, 100) //gravity
-        , true); // wheter to doSleep enabled to true because otherwise it will fuck over performance
+        this.world = new RAPIER.World({
+            x: 0.0,
+            y: -9.81,
+        });
+        this.world.step()
         this.componentList = Engine.componentList;
         this.eventListener = {};
         this.collisionWorker;
@@ -56,7 +59,7 @@ class Engine extends GameEvents {
     }
     tryFirstLoad() {
         if (window?.canvas?.width) {
-            this.resize(width, height);
+            this.resize(width, height); // wheter to doSleep enabled to true because otherwise it will fuck over performance
         }
         else {
             setTimeout(() => { this.tryFirstLoad(); }, 500);

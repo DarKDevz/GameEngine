@@ -123,41 +123,8 @@ function parseStringNum(str, ogVal = str, onlyPositive = false) {
     }
     return ogVal;
 }
-function DrawCircle(pos, r) {
-    circle(pos.x, pos.y, r * 2);
-}
-//console.log(s.m_type);
-var DrawShape = (function (s, pos) {
-    switch (s.m_type) {
-        case DrawShape.e_circleShape:
-            DrawCircle(pos.position, s.m_radius);
-            break;
-        case DrawShape.e_edgeShape:
-            console.log("It's an edge");
-            break;
-        case DrawShape.e_polygonShape:
-            //console.log("it's a polygon", s.GetVertices(),pos);
-            //Translate vertices into real vertices
-            let vlist = [];
-            let vertice;
-            for (vertice of s.GetVertices()) {
-                vlist.push(DrawShape.Math.b2Math.MulX(pos, vertice));
-            }
-            DrawPolygon(vlist);
-            break;
-    }
-});
-Import(Box2D.Collision.Shapes.b2Shape, DrawShape);
-Import(Box2D.Common, DrawShape, "Math");
-function DrawPolygon(vertices) {
-    //Figure it out
-    beginShape();
-    for (let vertice of vertices) {
-        vertex(vertice.x, vertice.y);
-    }
-    endShape(CLOSE);
-}
 function DrawAll() {
+    return;
     for (let b = engine.world.m_bodyList; b; b = b.m_next) {
         let xf = b.m_xf;
         for (let f = b.GetFixtureList(); f; f = f.m_next) {

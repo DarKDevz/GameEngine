@@ -55,6 +55,13 @@ async function createZip() {
     let createSketchFile = function () {
         return `
         globalThis.preload = async function() {
+            if(!window.RAPIER) {
+                let obj = await import('https://cdn.skypack.dev/@dimforge/rapier2d-compat')
+                await obj.init()
+                window.RAPIER = obj;
+            }
+        });
+    }
             engine = new Engine();
             player = new Player();
             const response = await fetch("./export.json");

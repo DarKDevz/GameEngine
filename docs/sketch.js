@@ -1,5 +1,11 @@
 let lowestFrameRate = 60;
 globalThis.preload = async function () {
+    if(!window.RAPIER) { await import('https:/' + '/cdn.skypack.dev/@dimforge/rapier2d-compat').then((obj) => {
+        obj.init().then(() => {
+            window.RAPIER = obj;
+        });
+    });
+}
     engine = new Engine();
     player = new Player();
     const response = await fetch("./examples/platformer.json");

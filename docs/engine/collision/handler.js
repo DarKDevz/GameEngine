@@ -4,12 +4,7 @@ function HandleCollision(obj1, obj2) {
         let type2 = obj2.getCollisionType();
         return tCollision(type1, type2, obj1.getCollisionVectors(), obj2.getCollisionVectors(), true);
     }
-    try {
-        return Box2D.Collision.Shapes.b2Shape.TestOverlap(obj1.fixture.m_shape, obj1.body.m_xf, obj2.fixture.m_shape, obj2.body.m_xf);
-    }
-    catch {
-        throw new Error("Objects insterted is neither of type CollidableObject or has a fixture shape");
-    }
+    throw new Error("Objects insterted is not of type CollidableObject");
 }
 function tCollision(type1, type2, values1, values2, isVector) {
     let test = p5.prototype["collide" + type1 + type2 + (isVector ? 'Vector' : '')];

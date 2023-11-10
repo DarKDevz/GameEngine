@@ -38,29 +38,13 @@ class Player {
         });
         if (engine.mobile)
             engine.camera.zoom = .7;
-        let bodyDef = new b2BodyDef;
-        var fixDef = new b2FixtureDef;
-        fixDef.density = 1.0;
-        fixDef.friction = 0.5;
-        fixDef.restitution = 0;
-        bodyDef.type = b2Body.b2_dynamicBody;
-        fixDef.shape = new b2PolygonShape;
-        fixDef.shape.SetAsBox(this.size.x / 2 //half width
-        , this.size.y / 2 //half height
-        );
-        bodyDef.position.x = this.posCenter().x;
-        bodyDef.position.y = this.posCenter().y;
+        let rigidBody = RAPIER.RigidBodyDesc.dynamic();
+        rigidBody.setTranslation(this.pos.x / 50, this.pos.y / 50);
         //this.body = new p2.Body({mass:0,position:[this.x,-this.y],fixedRotation : true})
         //this.body.addShape(new p2.Box({ width: this.width,height:this.height}));
-        this.body = engine.world.CreateBody(bodyDef);
-        this.body.CreateFixture(fixDef);
-        this.body.SetFixedRotation(true);
-        //Continuous Collision Detection
-        this.body.SetBullet(true);
-        //User data for contact listener
-        this.body.SetUserData(this);
-        //Custom gravity scale i made
-        this.body.gravityScale = new b2Vec2(0, 0);
+        this.body = engine.world.createRigidBody(rigidBody);
+        let colliderDesc = RAPIER.ColliderDesc.cuboid(this.size.x / 100, this.size.y / 100);
+        engine.world.createCollider(colliderDesc, this.body);
         //We override this so we can use our own physics things
         engine.physics = !window?.editor;
         engine.cameraPos = this.cameraPos;
@@ -158,15 +142,14 @@ class Player {
             this.playerDeath();
         }
         if (this.body) {
-            this.body.SetLinearVelocity({ x: this.vel.x, y: this.vel.y });
-            this.body.SetPosition(this.posCenter());
-            this.body.GetFixtureList().GetShape().SetAsBox(this.size.x / 2 //half width
-            , this.size.y / 2 //half height
-            );
+            this.body.setTranslation(this.posCenter(), true);
+            this.body.collider(0).setShape(new RAPIER.Cuboid(this.size.x / 100 //half width
+            , this.size.y / 100 //half height)
+            ));
         }
-        for(let i in engine.allCollisions.Player) {
-            if(engine.uuidList[i]?.constructor.name !== "Bullet") {
-            engine.uuidList[i]?.onCollide(this);
+        for (let i in engine.allCollisions.Player) {
+            if (engine.uuidList[i]?.constructor.name !== "Bullet") {
+                engine.uuidList[i]?.onCollide(this);
             }
         }
     }

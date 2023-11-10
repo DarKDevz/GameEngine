@@ -1,11 +1,3 @@
-declare var Box2D: Box2D;
-declare var b2World: Box2D.Dynamics.b2World;
-declare var player: Player
-declare var b2Vec2: Box2D.Common.Math.b2Vec2;
-declare var b2BodyDef: Box2D.Dynamics.b2BodyDef;
-declare var b2FixtureDef: Box2D.Dynamics.b2FixtureDef
-declare var b2Body: Box2D.Dynamics.b2Body
-declare var b2PolygonShape: Box2D.Collision.Shapes.b2PolygonShape
 declare var canvas: any
 declare var MapData: { data: any }
 declare var JSZip: any
@@ -15,8 +7,6 @@ declare var webglVersion: 'p2d'|'webgl2'
 declare var editor: Editor
 type Vec = ReturnType<typeof createVector>
 type Div = ReturnType<typeof createDiv>
-type b2Shape = Box2D.Collision.Shapes.b2Shape
-type b2Fixture = Box2D.Dynamics.b2Fixture;
 interface Window {
     [x: string]: any
 }
@@ -105,7 +95,7 @@ interface Player {
     collisionType: 'Rect';
     savedX: number;
     skipNext: boolean;
-    body: Box2D.Dynamics.b2Body;
+    body: RAPIER.RigidBody;
 }
 interface Editor {
     levelMode: boolean;
@@ -433,7 +423,7 @@ interface gameSprite {
     sprite: any;
     ownObject: GameObject
 }
-type World = Box2D.Dynamics.b2World;
+type World = RAPIER.World;
 /**
  * Represents the game engine.
  * @interface

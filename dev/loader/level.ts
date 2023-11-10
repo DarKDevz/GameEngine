@@ -1,24 +1,3 @@
-// var engine.scene = [];
-// var engine.activeScene;
-//var engine = new Engine();
-
-
-//import p2 = require("../engine/collision/p2");
-
-//import World = require("../engine/collision/p2");
-
-//import World = require("../engine/collision/p2");
-
-//Support for Older Projects
-//All needed libraries
-//To know which library you need look
-//into Box2D Flash documentation
-//go into indexes and search for what package you need
-Import(Box2D.Dynamics, this)
-Import(Box2D.Dynamics.Joints, this, "b2MouseJointDef")
-Import(Box2D.Collision.Shapes, this)
-Import(Box2D.Collision, this, "b2AABB")
-Import(Box2D.Common.Math, this, "b2Vec2")
 function getCurrentBoxes() {
     return engine.getActiveScene().boxes
 }
@@ -396,9 +375,7 @@ class Level extends GameEvents {
             }
         }
         if (engine.physics) {
-            engine.world.Step(1 / 60, 10, 10);
-            //engine.world.DrawDebugData();
-            engine.world.ClearForces();
+            engine.world.step();
         }
         for (let t_box of this.boxes) {
             t_box.updateComponents()

@@ -61,21 +61,13 @@ class Box extends GameObject {
         if (this?.width && this?.height) {
             //Avoid making double physics body if initializing twice
             if (!this.body) {
-                let bodyDef = new b2BodyDef;
-                var fixDef = new b2FixtureDef;
-                fixDef.density = 1.0;
-                fixDef.friction = 0.5;
-                fixDef.restitution = 0;
-                bodyDef.type = b2Body.b2_staticBody;
-                fixDef.shape = new b2PolygonShape;
-                fixDef.shape.SetAsBox(this.hw //half width
-                , this.hh //half height
-                );
-                bodyDef.position.x = this.x + this.hw;
-                bodyDef.position.y = this.y + this.hh;
-                this.body = engine.world.CreateBody(bodyDef);
-                this.body.SetUserData(this);
-                this.fixture = this.body.CreateFixture(fixDef);
+                let rigidBody = RAPIER.RigidBodyDesc.dynamic();
+                rigidBody.setTranslation(this.x / 50, this.y / 50);
+                //this.body = new p2.Body({mass:0,position:[this.x,-this.y],fixedRotation : true})
+                //this.body.addShape(new p2.Box({ width: this.width,height:this.height}));
+                this.body = engine.world.createRigidBody(rigidBody);
+                let colliderDesc = RAPIER.ColliderDesc.cuboid(this.width / 100, this.height / 100);
+                engine.world.createCollider(colliderDesc, this.body);
             }
         }
     }
@@ -116,23 +108,23 @@ class Box extends GameObject {
         this.updatePosition();
     }
     updatePosition() {
-        this?.body?.SetPosition?.({
-            x: this.x + this.hw,
-            y: this.y + this.hh
-        });
+        this.body?.setTranslation({
+            x: (this.x + this.hw) / 50,
+            y: (this.y + this.hh) / 50
+        })
     }
     update() {
         if (this.x !== this.oldX || this.y !== this.oldY) {
             this.oldX = this.x;
             this.oldY = this.y;
             if (this.body) {
-                this.body.SetPosition({
-                    x: this.x + this.hw,
-                    y: this.y + this.hh
-                });
-                this?.fixture?.GetShape()?.SetAsBox?.(this.hw //half width
-                , this.hh //half height
-                );
+                this.body.setTranslation({
+                    x: (this.x + this.hw) / 50,
+                    y: (this.y + this.hh) / 50
+                })
+            this.body.collider(0).setShape(new RAPIER.Cuboid(                this.hw / 50 //half width
+            , this.hh / 50 //half height)
+            ));
             }
         }
     }

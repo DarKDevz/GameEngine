@@ -12,25 +12,14 @@ class movingPlatform extends Box {
 		if (!this.width) return;
 		if (this.width && this.height) {
 			if (!this.body) {
-				let bodyDef = new b2BodyDef;
-				var fixDef = new b2FixtureDef;
-				fixDef.density = 1.0;
-				fixDef.friction = 0.5;
-				fixDef.restitution = 0;
-				bodyDef.type = b2Body.b2_kinematicBody;
-				fixDef.shape = new b2PolygonShape;
-				let hw = this.width / 2;
-				let hh = this.height / 2;
-				fixDef.shape.SetAsBox(hw, hh);
-				fixDef.filter.categoryBits = Categories.PLATFORM;
-				fixDef.filter.maskBits = Categories.BOX | Categories.DEFAULT;
-				//console.warn(fixDef.filter);
-				bodyDef.position.x = this.x + hw;
-				bodyDef.position.y = this.y + hh;
-				this.body = engine.world.CreateBody(bodyDef);
-				this.body.SetUserData(this);
-				this.body.CreateFixture(fixDef);
-				this.body.SetFixedRotation(true);
+				let rigidBody = RAPIER.RigidBodyDesc.dynamic()
+				rigidBody.setTranslation(this.x/50,this.y/50);
+				//this.body = new p2.Body({mass:0,position:[this.x,-this.y],fixedRotation : true})
+				//this.body.addShape(new p2.Box({ width: this.width,height:this.height}));
+				this.body = engine.world.createRigidBody(rigidBody)
+				let colliderDesc = RAPIER.ColliderDesc.cuboid(this.width/100, this.height/100);
+		
+				engine.world.createCollider(colliderDesc,this.body);
 			}
 		}
 	}
@@ -83,22 +72,16 @@ class movingPlatform extends Box {
 	}
 	lateUpdate() {
 		if (this.x + this.width < this.x2 && this.direction == "r") {
-			//this.x += 3;
-			if (this.body) {
-				this.body.SetLinearVelocity({ x: 600, y: 0 })
-			}
+			this.x += 3;
 		}
 		else {
 			this.direction = "l";
 		}
 		if (this.direction == "l") {
-			//this.x -= 3;
-			if (this.body) {
-				this.body.SetLinearVelocity({ x: -600, y: 0 })
-			}
+			this.x -= 3;
 		}
 		if (this.x < this.x1) this.direction = "r";
-		this.x = this.body.GetTransform().position.x - this.width / 2;
+		//this.x = this.body.GetTransform().position.x - this.width / 2;
 		//this.phySprite.pos = {x:this.x+this.width/2,y:this.y+this.height/2};
 	}
 	customDraw() {
