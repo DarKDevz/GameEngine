@@ -127,7 +127,7 @@ function DrawAll() {
     for (let i of engine.world.colliders.getAll()) {
         let position = i.translation();
         position.x *= 50;
-        position.y *= -50;
+        position.y *= 50;
         switch (i._shape.type) {
           case 0:
             circle(position.x, position.y, i._shape.radius * 100);
@@ -136,7 +136,7 @@ function DrawAll() {
             let size = i._shape.halfExtents;
             push();
             translate(position.x, position.y); /* Translate to the center of the rectangle*/
-            rotate(-i.rotation());
+            rotate(i.rotation());
             rectMode(CENTER);
             rect(0, 0, size.x * 100, size.y * 100); /* Draw the rectangle at the translated position (0, 0)*/
             pop();
@@ -146,7 +146,7 @@ function DrawAll() {
             let hh = i._shape.halfHeight * 50;
             push(); /* Draw the left ellipse*/
             translate(position.x, position.y); /* Translate to the center of the rectangle*/
-            rotate(-i.rotation());
+            rotate(i.rotation());
             rectMode(CENTER);
             circle(0, hh, radius * 2);
             circle(0, -hh, radius * 2);
@@ -159,8 +159,8 @@ function DrawAll() {
             case 3:
                 push();
                 translate(position.x, position.y);
-                rotate(-i.rotation());
-                line(i._shape.a.x * 50, i._shape.a.y * -50, i._shape.b.x * 50, i._shape.b.y * -50);
+                rotate(i.rotation());
+                line(i._shape.a.x * 50, i._shape.a.y * 50, i._shape.b.x * 50, i._shape.b.y * 50);
                 pop();
                 break;
               case 4:
@@ -169,7 +169,7 @@ function DrawAll() {
                 beginShape();
                 for (let y = 0; y < i._shape.vertices.length; y += 2) {
                   let x = i._shape.vertices[y] * 50;
-                  let y1 = i._shape.vertices[y + 1] * -50;
+                  let y1 = i._shape.vertices[y + 1] * 50;
                   vertex(x, y1);
                 }
                 endShape();

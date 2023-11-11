@@ -37,7 +37,7 @@ class Engine extends GameEvents {
         }
         this.world = new RAPIER.World({
             x: 0.0,
-            y: -9.81,
+            y: 9.81,
         });
         this.world.step()
         this.componentList = Engine.componentList;

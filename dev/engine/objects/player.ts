@@ -38,7 +38,7 @@ class Player {
         });
         if(engine.mobile)engine.camera.zoom = .7;
         let rigidBody = RAPIER.RigidBodyDesc.dynamic();
-        rigidBody.setTranslation((this.pos.x+15) / 50, (this.pos.y + 35) / -50);
+        rigidBody.setTranslation((this.pos.x+15) / 50, (this.pos.y + 35) / 50);
         rigidBody.lockTranslations()
                 rigidBody.lockRotations()
                 rigidBody.gravityScale = 0;
@@ -137,7 +137,7 @@ class Player {
             this.playerDeath();
         }
         if (this.body) {
-            this.body.setTranslation({x:(this.pos.x+this.size.x/2) / 50, y:(this.pos.y + this.size.y/2) / -50},true);
+            this.body.setTranslation({x:(this.pos.x+this.size.x/2) / 50, y:(this.pos.y + this.size.y/2) / 50},true);
             this.body.collider(0).setShape(new RAPIER.Cuboid(this.size.x / 100 //half width
             , this.size.y / 100 //half height)
             ));
