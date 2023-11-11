@@ -154,9 +154,25 @@ function DrawAll() {
             pop();
             break;
           case 3:
-            /*TODO: Segment debug draw*/ break;
-          case 4:
+            push();
+            translate(position.x, position.y);
+            rotate(-i.rotation());
+            line(i._shape.a.x * 50, i._shape.a.y * -50, i._shape.b.x * 50, i._shape.b.y * -50);
+            pop();
             break;
+          case 4:
+            push();
+            noFill();
+            beginShape();
+            for (let y = 0; y < i._shape.vertices.length; y += 2) {
+              let x = i._shape.vertices[y] * 50;
+              let y1 = i._shape.vertices[y + 1] * -50;
+              vertex(x, y1);
+            }
+            endShape();
+            pop();
+            break;
+         
         }
       }
     
