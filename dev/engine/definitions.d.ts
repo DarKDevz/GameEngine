@@ -1,3 +1,4 @@
+declare var engine: Engine
 declare var canvas: any
 declare var MapData: { data: any }
 declare var JSZip: any

@@ -1,7 +1,7 @@
 class GameEvents {
     constructor() {
     }
-    globalDefine(hardDefined=false) {
+    globalDefine(hardDefined = false) {
         let entryPoints = [
             'deviceMoved',
             'deviceTurned',
@@ -22,27 +22,27 @@ class GameEvents {
         ];
         for (let i of entryPoints) {
             window[i] ??= this[i].bind(this);
-            if(hardDefined) {
+            if (hardDefined) {
                 window[i] = this[i].bind(this);
             }
         }
     }
-    deviceMoved   (...args:any):void {}
-    deviceTurned  (...args:any):void {}
-    deviceShaken  (...args:any):void {}
-    doubleClicked (...args:any):void {}
-    mousePressed  (...args:any):void {}
-    mouseReleased (...args:any):void {}
-    mouseMoved    (...args:any):void {}
-    mouseDragged  (...args:any):void {}
-    mouseClicked  (...args:any):void {}
-    mouseWheel    (...args:any):void {}
-    touchStarted  (...args:any):void {}
-    touchMoved    (...args:any):void {}
-    touchEnded    (...args:any):void {}
-    keyPressed    (...args:any):void {}
-    keyReleased   (...args:any):void {}
-    keyTyped      (...args:any):void {}
+    deviceMoved(...args: any): void { }
+    deviceTurned(...args: any): void { }
+    deviceShaken(...args: any): void { }
+    doubleClicked(...args: any): void { }
+    mousePressed(...args: any): void { }
+    mouseReleased(...args: any): void { }
+    mouseMoved(...args: any): void { }
+    mouseDragged(...args: any): void { }
+    mouseClicked(...args: any): void { }
+    mouseWheel(...args: any): void { }
+    touchStarted(...args: any): void { }
+    touchMoved(...args: any): void { }
+    touchEnded(...args: any): void { }
+    keyPressed(...args: any): void { }
+    keyReleased(...args: any): void { }
+    keyTyped(...args: any): void { }
 }
 var overUI: boolean = false;
 function OpenDialog(MainDiv: Div, OnExit = () => { }, headerText: Div = createDiv("Dialog Window")) {
@@ -119,11 +119,47 @@ function parseStringNum(str: any, ogVal = str, onlyPositive: boolean = false) {
     }
     return ogVal;
 }
-function DrawCircle(pos: Vec, r: number) {
-    circle(pos.x, pos.y, r * 2)
-}
+
 function DrawAll() {
-    return;
+    for (let i of engine.world.colliders.getAll()) {
+        let position = i.translation();
+        position.x *= 50;
+        position.y *= -50;
+        switch (i._shape.type) {
+          case 0:
+            circle(position.x, position.y, i._shape.radius * 100);
+            break;
+          case 1:
+            let size = i._shape.halfExtents;
+            push();
+            translate(position.x, position.y); /* Translate to the center of the rectangle*/
+            rotate(-i.rotation());
+            rectMode(CENTER);
+            rect(0, 0, size.x * 100, size.y * 100); /* Draw the rectangle at the translated position (0, 0)*/
+            pop();
+            break;
+          case 2:
+            let radius = i._shape.radius * 50;
+            let hh = i._shape.halfHeight * 50;
+            push(); /* Draw the left ellipse*/
+            translate(position.x, position.y); /* Translate to the center of the rectangle*/
+            rotate(-i.rotation());
+            rectMode(CENTER);
+            circle(0, hh, radius * 2);
+            circle(0, -hh, radius * 2);
+            line(radius, hh, radius, -hh);
+            line(-radius, hh, -radius, -hh);
+            noStroke();
+            rect(0, 0, radius * 2, hh * 2);
+            pop();
+            break;
+          case 3:
+            /*TODO: Segment debug draw*/ break;
+          case 4:
+            break;
+        }
+      }
+    
 }
 Array.prototype.equals = function (array: Array<any>) {
     // if the other array is a falsy value, return
@@ -150,17 +186,17 @@ Array.prototype.equals = function (array: Array<any>) {
 Object.defineProperty(Array.prototype, "equals", {
     enumerable: false,
 });
-function deepReadCheck(obj1,obj2) {
+function deepReadCheck(obj1, obj2) {
     //Returns 1 if the same, 0 if value has changed, -1 if different lengths
     let read = JSON.stringify
-    if(read(obj1)===read(obj2)) {
-      //all values are the same
-      return 1;
-    }else {
-      if(read(Object.getOwnPropertyNames(obj1))===read(Object.getOwnPropertyNames(obj2))) {
-        return 0;
-      }else {
-        return -1;
-      }
+    if (read(obj1) === read(obj2)) {
+        //all values are the same
+        return 1;
+    } else {
+        if (read(Object.getOwnPropertyNames(obj1)) === read(Object.getOwnPropertyNames(obj2))) {
+            return 0;
+        } else {
+            return -1;
+        }
     }
-  }
+}

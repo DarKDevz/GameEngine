@@ -124,14 +124,45 @@ function parseStringNum(str, ogVal = str, onlyPositive = false) {
     return ogVal;
 }
 function DrawAll() {
-    return;
-    for (let b = engine.world.m_bodyList; b; b = b.m_next) {
-        let xf = b.m_xf;
-        for (let f = b.GetFixtureList(); f; f = f.m_next) {
-            let s = f.GetShape();
-            DrawShape(s, xf);
+    for (let i of engine.world.colliders.getAll()) {
+        let position = i.translation();
+        position.x *= 50;
+        position.y *= -50;
+        switch (i._shape.type) {
+          case 0:
+            circle(position.x, position.y, i._shape.radius * 100);
+            break;
+          case 1:
+            let size = i._shape.halfExtents;
+            push();
+            translate(position.x, position.y); /* Translate to the center of the rectangle*/
+            rotate(-i.rotation());
+            rectMode(CENTER);
+            rect(0, 0, size.x * 100, size.y * 100); /* Draw the rectangle at the translated position (0, 0)*/
+            pop();
+            break;
+          case 2:
+            let radius = i._shape.radius * 50;
+            let hh = i._shape.halfHeight * 50;
+            push(); /* Draw the left ellipse*/
+            translate(position.x, position.y); /* Translate to the center of the rectangle*/
+            rotate(-i.rotation());
+            rectMode(CENTER);
+            circle(0, hh, radius * 2);
+            circle(0, -hh, radius * 2);
+            line(radius, hh, radius, -hh);
+            line(-radius, hh, -radius, -hh);
+            noStroke();
+            rect(0, 0, radius * 2, hh * 2);
+            pop();
+            break;
+          case 3:
+            /*TODO: Segment debug draw*/ break;
+          case 4:
+            break;
         }
-    }
+      }
+    
 }
 Array.prototype.equals = function (array) {
     // if the other array is a falsy value, return
