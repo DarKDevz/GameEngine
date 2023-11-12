@@ -54,27 +54,23 @@ async function createZip() {
     var zip = new JSZip();
     let createSketchFile = function () {
         return `
-        globalThis.preload = async function() {
-            if(!window.RAPIER) {
-                let obj = await import('https://cdn.skypack.dev/@dimforge/rapier2d-compat')
-                await obj.init()
+        globalThis.setup = async function () {
+            let obj = await import('https://cdn.skypack.dev/@dimforge/rapier2d-compat')
+            await obj.init()
                 window.RAPIER = obj;
-            }
-        });
-    }
-            engine = new Engine();
-            player = new Player();
-            const response = await fetch("./export.json");
-            const data = await response.json();
-            engine.loadFromObject(data,true);
-        }
-        globalThis.setup = function() {
-            createCanvas(windowWidth, windowHeight);
-            noSmooth();
-            //Remove right click default behaviour
-            engine.setup();
-        }
-
+                engine = new Engine();
+                player = new Player();
+                const response = await fetch("./examples/platformer.json");
+                const data = await response.json();
+                engine.loadFromObject(data, true);
+                createCanvas(windowWidth, windowHeight);
+                noSmooth();
+                //Remove right click default behaviour
+                document.oncontextmenu = function (e) {
+                    e.preventDefault();
+                };
+                engine.setup();
+    };
         `;
     }
     let createMapFile = function () {

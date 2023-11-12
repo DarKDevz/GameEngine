@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ball Blast</title>
+    <title>p5.js platformer</title>
     <style>
         body {
             padding: 0;
@@ -31,31 +31,10 @@
     <script src="engine/objects/movingPlatform.js"></script>
     <script src="loader/level.js"></script>
     <script src="loader/support.js"></script>
-    <script>
-let lowestFrameRate = 60;
-async function setup() {
-    if(!window.RAPIER) {
-                let obj = await import('https://cdn.skypack.dev/@dimforge/rapier2d-compat')
-                await obj.init()
-                window.RAPIER = obj;
-            }
-            engine = new Engine();
-            player = new Player();
-            const response = await fetch("./examples/BallBlast.json");
-            const data = await response.json();
-            engine.loadFromObject(data, true);
-            createCanvas(windowWidth, windowHeight);
-            noSmooth();
-            //Remove right click default behaviour
-            document.oncontextmenu = function (e) {
-                e.preventDefault();
-            };
-            engine.setup();
-};
-    </script>
+    <script type="module" src="dash.js"></script>
 </head>
 
-<body oncontextmenu="return false">
+<body>
     <main>
     </main>
 </body>
