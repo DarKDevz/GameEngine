@@ -66,8 +66,8 @@ function removeObject(objId: UUID | GameObject | number) {
     }
 }
 
-function addObj(ind: string | number, arr: any, sceneId?: string) {
-    const objectMap = {
+function addObj(ind: any, arr: any, sceneId?: string) {
+    let objectMap = {
         0: Box,
         1: End,
         2: movingPlatform,
@@ -75,7 +75,14 @@ function addObj(ind: string | number, arr: any, sceneId?: string) {
         4: Enemy,
         5: Interactive
     };
-    let obj = new (objectMap[ind])(...arr);
+    let obj;
+    if(objectMap.hasOwnProperty(ind)) {
+        obj = new (objectMap[ind])(...arr);
+    //This can introuduce xss exploits
+    //but we already allow code execution any way so who cares
+    }else if(eval(ind)) {
+        obj = new (eval(ind))(...arr);
+    }
     obj.scene = sceneId;
     return obj;
 }
@@ -494,7 +501,7 @@ class Level extends GameEvents {
             return box.typeId !== undefined
         });
         window?.editor?.updateLevels?.();
-        const boxVals = this.boxes.map((t_box) => [t_box.typeId, ...t_box.getParameters()]);
+        const boxVals = this.boxes.map((t_box) => [t_box.constructor.name, ...t_box.getParameters()]);
 
         return boxVals;
     }

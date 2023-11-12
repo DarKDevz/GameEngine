@@ -56,10 +56,11 @@ async function createZip() {
     let createSketchFile = function () {
         return `
         globalThis.preload = async function() {
-                    if(!window.RAPIER) { await import('https:/' + '/cdn.skypack.dev/@dimforge/rapier2d-compat').then((obj) => {
-            obj.init().then(() => {
+            if(!window.RAPIER) {
+                let obj = await import('https://cdn.skypack.dev/@dimforge/rapier2d-compat')
+                await obj.init()
                 window.RAPIER = obj;
-            });
+            }
         });
     }
             engine = new Engine();

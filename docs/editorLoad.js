@@ -11,10 +11,12 @@ function doReload() {
 }
 async function checkLoad() {
     if (window.loaded) {
-        if(!window.RAPIER) {
-            let obj = await import('https:/' + '/cdn.skypack.dev/@dimforge/rapier2d-compat')
-            await obj.init()
-            window.RAPIER = obj;
+        if (!window.RAPIER) {
+            await import('https:/' + '/cdn.skypack.dev/@dimforge/rapier2d-compat').then((obj) => {
+                obj.init().then(() => {
+                    window.RAPIER = obj;
+                });
+            });
         }
         engine = new Engine();
         window.windowResized = () => { engine.resize(); };
@@ -97,8 +99,6 @@ function draw() {
     if (!window?.player?.update)
         return;
     if (!window?.engine?.getActiveScene)
-        return;
-        if (!engine.getActiveScene())
         return;
     engine.draw();
     if (window.exampleInst) {

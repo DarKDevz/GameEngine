@@ -1,4 +1,9 @@
 var engine;
+import('https:/' + '/cdn.skypack.dev/@dimforge/rapier2d-compat').then((obj) => {
+    obj.init().then(() => {
+        window.RAPIER = obj;
+    });
+});
 class Engine extends GameEvents {
     static removeListeners;
     static componentList;
@@ -39,7 +44,8 @@ class Engine extends GameEvents {
             x: 0.0,
             y: 9.81,
         });
-        this.world.step()
+        //Prevents weird glitches
+        this.world.step(); // wheter to doSleep enabled to true because otherwise it will fuck over performance
         this.componentList = Engine.componentList;
         this.eventListener = {};
         this.collisionWorker;
@@ -59,7 +65,7 @@ class Engine extends GameEvents {
     }
     tryFirstLoad() {
         if (window?.canvas?.width) {
-            this.resize(width, height); // wheter to doSleep enabled to true because otherwise it will fuck over performance
+            this.resize(width, height);
         }
         else {
             setTimeout(() => { this.tryFirstLoad(); }, 500);

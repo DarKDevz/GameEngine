@@ -62,9 +62,9 @@ class Box extends GameObject {
             //Avoid making double physics body if initializing twice
             if (!this.body) {
                 let rigidBody = RAPIER.RigidBodyDesc.dynamic();
-				rigidBody.setTranslation((this.x+this.hw)/50,(this.y+this.hh)/50);
-                rigidBody.lockTranslations()
-                rigidBody.lockRotations()
+                rigidBody.setTranslation((this.x + this.hw) / 50, (this.y + this.hh) / 50);
+                rigidBody.lockTranslations();
+                rigidBody.lockRotations();
                 rigidBody.gravityScale = 0;
                 //this.body = new p2.Body({mass:0,position:[this.x,-this.y],fixedRotation : true})
                 //this.body.addShape(new p2.Box({ width: this.width,height:this.height}));
@@ -114,7 +114,7 @@ class Box extends GameObject {
         this.body?.setTranslation({
             x: (this.x + this.hw) / 50,
             y: (this.y + this.hh) / 50
-        })
+        });
     }
     update() {
         if (this.x !== this.oldX || this.y !== this.oldY) {
@@ -124,10 +124,10 @@ class Box extends GameObject {
                 this.body.setTranslation({
                     x: (this.x + this.hw) / 50,
                     y: (this.y + this.hh) / 50
-                })
-            this.body.collider(0).setShape(new RAPIER.Cuboid(                this.hw / 50 //half width
-            , this.hh / 50 //half height)
-            ));
+                });
+                this.body.collider(0).setShape(new RAPIER.Cuboid(this.hw / 50 //half width
+                , this.hh / 50 //half height)
+                ));
             }
         }
     }

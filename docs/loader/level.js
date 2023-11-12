@@ -74,7 +74,7 @@ function removeObject(objId) {
     }
 }
 function addObj(ind, arr, sceneId) {
-    const objectMap = {
+    let objectMap = {
         0: Box,
         1: End,
         2: movingPlatform,
@@ -82,7 +82,12 @@ function addObj(ind, arr, sceneId) {
         4: Enemy,
         5: Interactive
     };
-    let obj = new (objectMap[ind])(...arr);
+    let obj;
+    if (objectMap.hasOwnProperty(ind)) {
+        obj = new (objectMap[ind])(...arr);
+    }else if(eval(ind)) {
+        obj = new (eval(ind))(...arr);
+    }
     obj.scene = sceneId;
     return obj;
 }
@@ -511,7 +516,7 @@ class Level extends GameEvents {
             return box.typeId !== undefined;
         });
         window?.editor?.updateLevels?.();
-        const boxVals = this.boxes.map((t_box) => [t_box.typeId, ...t_box.getParameters()]);
+        const boxVals = this.boxes.map((t_box) => [t_box.constructor.name, ...t_box.getParameters()]);
         return boxVals;
     }
     addSceneBtn(leftDiv, openerState) {

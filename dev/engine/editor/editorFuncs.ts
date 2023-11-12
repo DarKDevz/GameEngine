@@ -652,7 +652,7 @@ class Editor {
                 case "Copy":
                     let copiedObj = {
                         vals: engine.getfromUUID(this.contextObj).getParameters(),
-                        type: engine.getfromUUID(this.contextObj).typeId,
+                        type: engine.getfromUUID(this.contextObj).typeId || engine.getfromUUID(this.contextObj).constructor.name,
                         components: engine.getfromUUID(this.contextObj).jsonComponents()
                     };
                     this.copiedObjs = [copiedObj];

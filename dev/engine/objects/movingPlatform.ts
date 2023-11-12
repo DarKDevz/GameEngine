@@ -13,7 +13,7 @@ class movingPlatform extends Box {
 		if (this.width && this.height) {
 			if (!this.body) {
 				let rigidBody = RAPIER.RigidBodyDesc.dynamic()
-				rigidBody.setTranslation(this.x/50,this.y/50);
+				rigidBody.setTranslation((this.x+this.hw)/50,(this.y+this.hh)/50);
 				//this.body = new p2.Body({mass:0,position:[this.x,-this.y],fixedRotation : true})
 				//this.body.addShape(new p2.Box({ width: this.width,height:this.height}));
 				this.body = engine.world.createRigidBody(rigidBody)
