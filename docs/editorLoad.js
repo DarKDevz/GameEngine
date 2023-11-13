@@ -21,7 +21,7 @@ async function checkLoad() {
         engine = new Engine();
         window.windowResized = () => { engine.resize(); };
         player = new Player();
-        JsonMap(MapData);
+        LoadMap(MapData);
         return;
     }
     else if (window.editorData) {

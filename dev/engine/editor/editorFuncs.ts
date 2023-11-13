@@ -340,7 +340,7 @@ class Editor {
     }
     saveMap() {
         let jsMap = createWriter('map.json');
-        jsMap.write(MapJson());
+        jsMap.write(SaveMap());
         jsMap.close();
     }
     deleteInfoDivs() {
@@ -454,7 +454,7 @@ class Editor {
                 event.dataTransfer.files[0].text().then(
                     (data: string) => {
                         engine = new Engine();
-                        JsonMap({ data: data })
+                        LoadMap({ data: data })
                         engine.cameraPos = editor.cameraPos;
                     }
                 );
@@ -479,7 +479,7 @@ class Editor {
                 editor.updates.menu = true;
                 editor.updates.level = true;
                 engine = new Engine();
-                JsonMap(file)
+                LoadMap(file)
                 engine.cameraPos = editor.cameraPos
             });
         //Fixes some cross platform bugs
@@ -533,12 +533,12 @@ class Editor {
         });
         refreshButton = this.fromReference("refreshButton");
         refreshButton.mousePressed(() => {
-            let file = { data: MapJson() }
+            let file = { data: SaveMap() }
             editor.updates.browser = true;
             editor.updates.menu = true;
             editor.updates.level = true;
             engine = new Engine();
-            JsonMap(file);
+            LoadMap(file);
             engine.cameraPos = this.cameraPos
         })
 
@@ -617,12 +617,12 @@ class Editor {
         button.mousePressed(() => {
             if (this.playingWindow && !this.playingWindow.closed) {
                 //console.log(editorWindow);
-                this.playingWindow.editorData = MapJson();
+                this.playingWindow.editorData = SaveMap();
                 this.playingWindow.doReload();
             }
             else {
                 this.playingWindow = window.open("editor.html");
-                this.playingWindow.editorData = MapJson();
+                this.playingWindow.editorData = SaveMap();
             }
         });
         lastScene = engine.currentScene;
@@ -726,11 +726,11 @@ class Editor {
         }
         editor.updates.level = true;
         if(engine.currentScene < this.sceneContext) return;
-        let file = {data: MapJson()}
+        let file = {data: SaveMap()}
         editor.updates.browser = true;
         editor.updates.menu = true;
         engine = new Engine()
-        JsonMap(file)
+        LoadMap(file)
         engine.cameraPos = editor.cameraPos;
         editor.updates.level = true;
     }

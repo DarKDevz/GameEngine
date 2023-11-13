@@ -74,7 +74,7 @@ async function createZip() {
         `;
     }
     let createMapFile = function () {
-        return MapJson();
+        return SaveMap();
     }
     var scriptTags = [
         { path: 'libs/p5.min.js' },

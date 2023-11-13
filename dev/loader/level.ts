@@ -241,7 +241,7 @@ function ScenesfromObject(levelsObject: ImportInterface) {
     engine.scene[0].loadLevel();
     engine.loading = false;
 }
-function JsonMap(file: { data: any }) {
+function LoadMap(file: { data: any }) {
     if (!(engine instanceof Engine)) {
         console.error("engine hasn't been initialized in setup()")
     }
@@ -680,7 +680,7 @@ class Level extends GameEvents {
     }
 }
 
-function MapJson() {
+function SaveMap() {
     let mapData: any;
     mapData = {};
     let fileList = []
