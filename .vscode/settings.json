@@ -8,7 +8,7 @@
                 "name": "Build",
                 "singleInstance": true,
                 "color": "#af565c",
-                "command": "./node_modules/.bin/esbuild ./dev/*.ts ./dev/**/*.ts ./dev/**/*.js --outdir=docs",
+                "command": "node build.js",
             },
         ]
     },
