@@ -85,7 +85,10 @@ function addObj(ind, arr, sceneId) {
     let obj;
     if (objectMap.hasOwnProperty(ind)) {
         obj = new (objectMap[ind])(...arr);
-    }else if(eval(ind)) {
+        //This can introuduce xss exploits
+        //but we already allow code execution any way so who cares
+    }
+    else if (eval(ind)) {
         obj = new (eval(ind))(...arr);
     }
     obj.scene = sceneId;
@@ -722,6 +725,8 @@ function SaveMap() {
     }
     mapData._font = { default: true, value: "" };
     mapData.version = 1.3;
+    //TODO
+    mapData.is3D = false;
     mapData.file = fileList;
     mapData.scenes = {};
     for (let level of engine.scene) {

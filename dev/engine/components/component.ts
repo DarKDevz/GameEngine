@@ -29,9 +29,12 @@ class Component {
     deleteUser(arg0?) {
 
     }
+    onCreateFile(file: gameFile) {}
 }
 Component.componentOpen = {}
 function addComponent(name: string, componentClass: any, fileExtension?: string) {
-    Engine.fileTypeList[fileExtension] = name;
+    if(fileExtension) {
+        Engine.fileTypeList[fileExtension] = name;
+    }
     return Engine.componentList[name] = componentClass;
 }

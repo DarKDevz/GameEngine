@@ -56,7 +56,7 @@ async function createZip() {
     let createSketchFile = function () {
         return `
         globalThis.setup = async function () {
-            let obj = await import('https:/' + '/cdn.skypack.dev/@dimforge/rapier2d-compat')
+            let obj = await import('https://cdn.skypack.dev/@dimforge/rapier2d-compat')
             await obj.init()
                 window.RAPIER = obj;
                 engine = new Engine();

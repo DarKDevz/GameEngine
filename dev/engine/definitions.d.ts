@@ -98,6 +98,27 @@ interface Player {
     skipNext: boolean;
     body: RAPIER.RigidBody;
 }
+interface BaseEditor {
+    levelMode: boolean;
+    cameraPos: Vec;
+    playingWindow: any;
+    creatingNew: boolean;
+    newObject: any;
+    valChanged: Event;
+    copiedObj: any[];
+    gridSize: number;
+    pasted: boolean;
+    startPos: any;
+    copiedObjs: any[];
+    updates: {
+        menu: boolean;
+        browser: boolean;
+        level: boolean
+};
+    tryOffset: { [x: UUID]: xyObject }
+    sceneContext: number;
+    contextObj: any;
+}
 interface Editor {
     levelMode: boolean;
     cameraPos: Vec;
@@ -416,6 +437,9 @@ interface gameScript extends Component {
     file: gameFile;
     _src: any;
     ownObject: GameObject
+}
+interface gameGlobalScript {
+    file:gameFile
 }
 interface gameSprite {
     fileType: string;

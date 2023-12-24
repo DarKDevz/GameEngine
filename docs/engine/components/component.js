@@ -23,9 +23,12 @@ class Component {
     }
     deleteUser(arg0) {
     }
+    onCreateFile(file) { }
 }
 Component.componentOpen = {};
 function addComponent(name, componentClass, fileExtension) {
-    Engine.fileTypeList[fileExtension] = name;
+    if (fileExtension) {
+        Engine.fileTypeList[fileExtension] = name;
+    }
     return Engine.componentList[name] = componentClass;
 }

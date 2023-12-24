@@ -1,7 +1,7 @@
 class gameScript extends Component {
     constructor({ obj, fn = '', vals = {}, fileUUID = '' }) {
         super("gameScript");
-        this.fileType = ".js";
+        this.type = ".js";
         this.ownObject = obj;
         let temp = {};
         this.vals = {
@@ -58,11 +58,11 @@ class gameScript extends Component {
         if (fileUUID !== '') {
             this.file = engine.files[fileUUID];
             this.fn = this.file.data;
-            this.file.type = this.fileType;
+            this.file.type = this.type;
             this.file.addUser(this, obj.uuid);
         }
         else {
-            this.file = addGameFile(fn, this.fileType);
+            this.file = addGameFile(fn, this.type);
             this.fn = this.file.data;
             this.file.addUser(this, obj.uuid);
         }
@@ -248,7 +248,7 @@ class gameScript extends Component {
             let uuid = event.dataTransfer.getData("UUID");
             let file = engine.files[uuid];
             //If file isn't a script return
-            if (file.type !== this.fileType)
+            if (file.type !== this.type)
                 return;
             this.loadFile(file);
             editor.updates.menu = true;
@@ -320,7 +320,7 @@ class gameScript extends Component {
                 this.loadFile(this.file);
             }
             else {
-                this.loadFile(addGameFile(actValue, this.fileType));
+                this.loadFile(addGameFile(actValue, this.type));
             }
             return actValue;
         }, () => this.fn, parent, [fileHolder], fileHolder, shouldOpen);
@@ -359,13 +359,58 @@ class gameScript extends Component {
         };
     }
 }
+class gameGlobalScript extends Component {
+    constructor({ fileUUID = '' }) {
+        super("globalScript");
+    }
+    ContentBrowser(file, Panel) {
+        let typeOfFile = file.type;
+        let _file = file;
+        let _get = () => { return file.data; };
+        let buttonName = _file.name;
+        buttonName = buttonName + typeOfFile;
+        let isDragging = false;
+        let inp = createButton(buttonName).parent(Panel.HUD);
+        inp.mouseReleased(() => {
+            if (isDragging)
+                return;
+            if (mouseButton === "right") {
+                editor.openBrowserContext(_file);
+            }
+            else {
+                var popupWindow = window.open("popup.html", "Popup Window", "width=400,height=300");
+                window.scriptData = function () {
+                    return [_get().toString(), window];
+                };
+                window.receivePopupText = (text) => {
+                    //TODO: make small info box saying: Updated: (nameoffile)
+					if(_file.data == '' && !_file?.firstCompile) {
+						_file.data = text;
+						this.onCreateFile(_file)
+					}
+                    else {
+                        engine.errorText = 'Refresh Editor to have effect';
+                        setTimeout(() => { delete engine.errorText; }, 10000);
+                        _file.data = text;
+                    }
+                    _file.firstCompile = true;
+                };
+            }
+        });
+        inp.size(140, 140);
+        Panel.Divs.push(inp);
+    }
+    onCreateFile(file) {
+        eval(file.data);
+    }
+}
 class gameSprite extends Component {
     constructor({ obj, src = { imageb64: '' }, fileUUID = '' }) {
         super("gameSprite");
         if (!obj.sprites) {
             debugger;
         }
-        this.fileType = ".img";
+        this.type = ".img";
         obj.sprites.push(this);
         if (fileUUID !== '') {
             this.file = engine.files[fileUUID];
@@ -816,6 +861,9 @@ class gameFile extends Component {
         this.data = parsedImage;
         engine.files[UUID] = this;
         this.whoUses = {};
+        if(Engine.fileTypeList[type]) {
+            Engine.componentList[Engine.fileTypeList[type]]?.prototype?.onCreateFile(this)
+        }
     }
     get name() {
         return this.references?.name ? this.references.name : this.UUID;
@@ -965,6 +1013,7 @@ class gameAnimation {
     }
 }
 addComponent("gameScript", gameScript, ".js");
+addComponent("gameGlobalScript", gameGlobalScript, ".gjs");
 addComponent("gameSprite", gameSprite, ".img");
 addComponent("gameFile", gameFile);
 addComponent("gameParticle", gameParticle);

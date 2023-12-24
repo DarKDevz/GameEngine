@@ -35,7 +35,27 @@ var lastWasPressed: any = false,
         Divs: [],
     },
     OldFiles = [];
-class Editor {
+    /**
+     * VARIABLES
+     * 2D and 3D
+     * updates, levelMode, cameraPos, playingWindow, creatingNew,
+     * newObject, valChanged, copiedObj, gridSize, pasted,
+     * startPos, tryOffset
+     * 
+     * 2D Only
+     * selectionBox, isCircle
+     * 
+     * FUNCTIONS
+     * 2D Only
+     * startSelect, moveScreen, DrawSelection
+     * releaseSelectBox
+     * 
+     * 3D Changes it
+     * moveObjects, setSelection, setCameraPos
+     * onUpdate, mouseCoords, mouseDown, 
+     * pasteObjects, onSetup, 
+     */
+class BaseEditor {
     constructor() {
         this.updates = {
             browser:false,
@@ -49,371 +69,23 @@ class Editor {
         this.newObject;
         this.valChanged = new Event("ValueChanged");
         this.copiedObj = [];
-        this.selectionBox = [];
         this.gridSize = 1;
         this.pasted = false;
         this.startPos = createVector(0, 0);
-        this.isCircle = false;
         this.tryOffset = {}
     }
-    fromReference(id: string) {
-        let _ = select("#" + id)
-        this.uiElement(_)
-        return _;
-    }
-    startSelect() {
-        if (lastWasPressed !== 'startedOverUi' && lastWasPressed != Pressed && Pressed && mouseButton === LEFT) {
-            this.selectionBox.push(this.mouseCoords().array());
-            this.startPos = this.mouseCoords();
-        }
-    }
-    moveScreen() {
-        let diffX = (mouseX - pmouseX) / engine.camera.zoom
-        let diffY = (mouseY - pmouseY) / engine.camera.zoom
-        mouseDiff = { x: diffX, y: diffY };
-        if (selectedObjects.length !== 0) {
-            this.moveObjects(mouseDiff);
-        } else {
-            this.cameraPos.x -= diffX;
-            this.cameraPos.y -= diffY;
-        }
-    }
-    moveObjects(frameDiff: xyObject) {
-        for (let uuid of selectedObjects) {
-            let tempBox = engine.getfromUUID(uuid);
-            if (tempBox) {
-                tempBox.customDraw();
-                let diff = {
-                    x: frameDiff.x,
-                    y: frameDiff.y
-                };
-                if (this.tryOffset[uuid]) {
-                    diff.x += this.tryOffset[uuid].x
-                    diff.y += this.tryOffset[uuid].y
-                }
-                let newPos = {
-                    x: Math.round(tempBox.x / this.gridSize) * this.gridSize,
-                    y: Math.round(tempBox.y / this.gridSize) * this.gridSize
-                }
-                let remainder = { x: diff.x % this.gridSize, y: diff.y % this.gridSize }
-                this.tryOffset[uuid] = remainder;
-                let newDiff = { x: diff.x - remainder.x, y: diff.y - remainder.y };
-                newPos.x += newDiff.x
-                newPos.y += newDiff.y
-                tempBox.offSet(newPos.x, newPos.y, newDiff.x, newDiff.y);
-            } else {
-                selectedObjects.splice(uuid, 1);
-            }
-        }
-    }
-    setSelection(newArr: any[]) {
-        selectedObjects = newArr;
-    }
-    setCameraPos(obj: xyObject) {
-        this.cameraPos.x = obj.x;
-        this.cameraPos.y = obj.y;
-    }
-    updateLevels() {
-        //console.log(engine.scene);
-        let leftDiv = document.getElementById("leftDiv");
-        for (let oldScene of sceneHolder) {
-            oldScene.remove()
-        }
-        for (let scene of engine.scene) {
-            scene.addSceneBtn(leftDiv, openerState);
-        }
-    }
-    removeSelection() {
-        selectedObjects = [];
-        this.tryOffset = {}
-        for (let t_info of infoDivs) {
-            t_info.remove();
-        }
-    }
-    DrawSelection() {
-        fill(0, 0, 0, 25);
-        if (this.creatingNew) {
-            let distance = (dist(this.selectionBox[0][0], this.selectionBox[0][1], this.selectionBox[1][0], this.selectionBox[1][1]));
-            let objClass = classes[addSelect.value()];
-            if (objClass.prototype.getCollisionType() === 'Circle') {
-                circle(this.selectionBox[0][0], this.selectionBox[0][1], distance * 2);
-                this.isCircle = true;
-                return;
-            }
-            this.isCircle = false;
-        }
-        rect(this.selectionBox[0][0], this.selectionBox[0][1],
-            this.selectionBox[1][0] - this.selectionBox[0][0],
-            this.selectionBox[1][1] - this.selectionBox[0][1]);
-    }
-    pressedLevelMode() {
-        let coords = createVector(mouseX,mouseY);
-        for(let UUID in engine.guiObjects) {
-            let GUIElement = engine.guiObjects[UUID];
-            if(GUIElement.collidesPoint(coords)) {
-                selectedObjects = [UUID]
-            }
-        }
-    }
-    onUpdate() {
-        if (mouseIsPressed && overUI) {
-            lastWasPressed = 'startedOverUi'
-        }
-        if (!overUI && lastWasPressed !== 'startedOverUi') {
-            lastWasPressed = Pressed;
-            Pressed = mouseIsPressed && !this.levelMode;
-        }
-        if (this.selectionBox[1]) {
-            this.DrawSelection()
-        }
-        /*------------------this.selectionBox Stuff---------------------*/
-        this.startSelect()
-        if (mouseIsPressed && !overUI && (mouseButton === CENTER || mouseButton === RIGHT)) {
-	    this.creatingNew = false;
-            this.moveScreen()
-        }
-        if (!this.levelMode && lastWasPressed != Pressed && !mouseIsPressed && !overUI) {
-            if (lastWasPressed === 'startedOverUi') {
-                lastWasPressed = false;
-            } else {
-                this.releaseSelectBox();
-            }
-        } else if (Pressed && this.selectionBox[0] && !this.selectionBox[2]) {
-            this.mouseDown();
-        }
-        if(mouseIsPressed&&lastWasPressed!=='startedOverUI'&&this.levelMode) {
-            this.pressedLevelMode()
-        }
-        //If switching scenes remove selected
-        if (lastScene != engine.currentScene) {
-            this.removeSelection()
-        }
-        lastScene = engine.currentScene;
-
-        for (let uuid of selectedObjects) {
-            let tempBox = engine.getfromUUID(uuid);
-            if (tempBox) {
-                tempBox?.customDraw?.();
-            } else {
-                selectedObjects.splice(uuid, 1);
-            }
-        }
-        //Disallow selecting if Playing
-        //if(Playing  && !Paused) this.selectionBox = [];
-
-        if (selectedObjects.length != 0) {
-            this.OpenEditMenu()
-        }
-        let newFile = Object.keys(engine.files);
-        if (!newFile.equals(OldFiles) || editor.updates.browser) {
-            editor.updates.browser = false;
-            console.warn("added a file!/ changed");
-            OldFiles = newFile;
-            content.removeOldContent()
-            readTypeAndName()
-        }
-        if (editor.updates.level && engine?.scene?.length > 0) {
-            editor.updates.level = false;
-            this.updateLevels()
-        }
-        if (keyIsDown(17) && keyIsDown(86)) {
-            this.pasteObjects();
-        } else {
-            this.pasted = false;
-        }
-    }
-    mouseCoords() {
-        return createVector(round(engine.mouseScreen().x), round(engine.mouseScreen().y))
-    }
-    transformCoordinates(drawSelect): { [x: string]: any } {
-        const [x1, y1] = drawSelect[0];
-        const [x2, y2] = drawSelect[1];
-        const x = Math.min(x1, x2);
-        const y = Math.min(y1, y2);
-        const width = Math.abs(x2 - x1);
-        const height = Math.abs(y2 - y1);
-        return {
-            x: x, y: y, width: width, height: height,
-            getCollisionType: () => { return 'Rect' },
-            getCollisionVectors: () => {
-                return [{ x: x, y: y }, { x: width, y: height }]
-            }
-        };
-    }
-    mouseDown(selection = this.selectionBox, creatingNew = this.creatingNew) {
-        if (!selection[0])
-            return;
-        selection[1] = this.mouseCoords().array();
-        let drawSelect = selection;
-        let rect1 = this.transformCoordinates(drawSelect);
-        if (!rect1)
-            return;
-        if (creatingNew) {
-            return this.newObject = rect1;
-        }
-        selectedObjects = [];
-        this.tryOffset = {}
-        let collisionRect: CollidableObject= {
-            getCollisionType : ()=>{return 'Rect'},
-            getCollisionVectors: ()=>{return [{x:rect1.x,y:rect1.y},{x:rect1.width,y:rect1.height}]}
-        }
-        for (let tempBox of engine.getActiveScene().boxes) {
-            if (tempBox.collision) {
-                //Change to use collision types
-                let c = tempBox.collision(collisionRect, false)?1:0;
-                if (c) {
-                    selectedObjects.push(tempBox.uuid);
-                    //console.log(t_box.uuid);
-                }
-                tempBox.clr = c * 50
-                //console.log(c);
-            }
-        }
-        if (selectedObjects.length === 0) {
-            this.removeSelection()
-            info = [];
-        }
-    }
-    onResize() {
-        sideMenu.position(windowWidth - 300, 0);
-    }
-    releaseSelectBox() {
-        if (this.creatingNew) {
-            let objClass = classes[addSelect.value()];
-            if (this.newObject.width || this.newObject.height) {
-                let classParameters = [];
-                if (!this.newObject.width) {
-                    this.newObject.width = 1;
-                }
-                else if (!this.newObject.height) {
-                    this.newObject.height = 1;
-                }
-                if (this.selectionBox[0] && this.selectionBox[1]) {
-                    this.newObject.radius = round(dist(this.selectionBox[0][0], this.selectionBox[0][1], this.selectionBox[1][0], this.selectionBox[1][1]));
-                    if (this.isCircle) {
-                        this.newObject.x = this.startPos.x;
-                        this.newObject.y = this.startPos.y;
-                    }
-                    for (let param of objClass.prototype.parameterNames()) {
-                        let resp = this.newObject[param];
-                        if (resp === undefined) {
-                            let paramResp = param !== "noMenu" ? prompt(param) : ' ';
-                            classParameters.push(parseStringNum(paramResp));
-                        } else {
-                            classParameters.push(parseStringNum(resp));
-                        }
-                    }
-                    let obj = new objClass(...classParameters)
-                    obj.init();
-                    engine.getActiveScene().boxes.push(obj);
-                    selectedObjects.push(obj.uuid);
-                    obj.clr = 50;
-                    this.updateLevels();
-                }
-            } else {
-                this.mouseDown([this.mouseCoords().array()], false);
-                this.creatingNew = false;
-            }
-        }
-        this.selectionBox = [];
-    }
-    copyObject() {
-        for (let _ = selectedObjects.length; _ >= 0; _--) {
-            let objs = selectedObjects[_]
-            if (!engine.getfromUUID(objs)) {
-                selectedObjects.splice(_, 1);
-            }
-        }
-        this.copiedObjs = [];
-        for (let objId of selectedObjects) {
-            let copiedObj = {
-                vals: engine.getfromUUID(objId).getParameters(),
-                type: engine.getfromUUID(objId).typeId,
-                components: engine.getfromUUID(objId).jsonComponents()
-            }
-            this.copiedObjs.push(copiedObj)
-        }
-    }
-    uiElement(element: Div) {
-        element.mouseOver(() => overUI = true);
-        element.mouseOut(() => overUI = false);
-    }
-    saveMap() {
-        let jsMap = createWriter('map.json');
-        jsMap.write(SaveMap());
-        jsMap.close();
+    readFileAsDataURL(file: Blob): Promise<string> {
+        return new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result.toString());
+            reader.readAsDataURL(file);
+        });
     }
     deleteInfoDivs() {
         // Remove existing infoDivs
         for (let t_info of infoDivs) {
             t_info.remove();
         }
-    }
-    levelScreen() {
-        this.levelMode = !this.levelMode;
-        this.deleteInfoDivs()
-
-        if (this.levelMode) {
-            const activeScene = engine.getActiveScene();
-            const levelValues = activeScene.getLevelValues();
-            const levelValueNames = activeScene.getLevelValueNames();
-            const actualLevelValues = activeScene.getActualLevelValues();
-
-            for (let i = 0; i < levelValues.length; i++) {
-                addMenuInput(
-                    levelValueNames[i],
-                    (val: any) => {
-                        const actValue = parseStringNum(val, activeScene[actualLevelValues[i]]);
-                        activeScene[actualLevelValues[i]] = actValue;
-                        levelValues[i] = actValue;
-                    },
-                    () => levelValues[i]
-                );
-            }
-            addMenuInput(
-                "Grid Size",
-                (value: any) => {
-                    this.gridSize = parseStringNum(value, this.gridSize, true);
-                },
-                () => {
-                    return this.gridSize
-                }
-            );
-        } else {
-            this.removeSelection();
-            info = [];
-        }
-    }
-    pasteObjects() {
-        if (this.pasted || overUI) {
-            return;
-        }
-        let firstObjPos;
-        for (let copiedObj of this.copiedObjs) {
-            if (copiedObj.type === '' || copiedObj.type === undefined) {
-                console.warn('Empty type means not copyable');
-                continue;
-            }
-            let _obj = addObj(copiedObj.type, copiedObj.vals);
-            for (let component of copiedObj.components) {
-                let componentClass = engine.componentList[component.name];
-                _obj.components.push(new componentClass({ ...component.params, obj: _obj }));
-            }
-            engine.addObj(_obj);
-            _obj.clr = 50;
-            let offsetPosX = this.mouseCoords().x;
-            let offsetPosY = this.mouseCoords().y;
-            if (!firstObjPos) {
-                firstObjPos = [_obj.x, _obj.y];
-            } else {
-                offsetPosX -= firstObjPos[0] - _obj.x;
-                offsetPosY -= firstObjPos[1] - _obj.y;
-            }
-            _obj.offSet(offsetPosX, offsetPosY);
-            _obj.typeId = copiedObj.type;
-            selectedObjects.push(_obj.uuid);
-        }
-        this.pasted = true;
     }
     openContextMenu(uuid) {
         let objContextMenu = select('#objectContext');
@@ -445,6 +117,8 @@ class Editor {
         this.deleteInfoDivs();
     }
     onSetup() {
+        //TODO
+        //This whole thing stopped working 
         canvas.ondragover = (event) => {
             event.preventDefault();
         };
@@ -508,29 +182,6 @@ class Editor {
         saveButton.mouseReleased(this.saveMap);
         this.uiElement(saveButton);
         exampleButton = this.fromReference("newButton");
-        exampleButton.mouseReleased(() => {
-            let emptyExample = {
-            version:1.3,
-            file:[],
-            GUI:{default:true},
-            scenes:{
-                "0":{
-                    Data:[[0, 100, 100, 500, 50]],
-                    sceneData:[0, 400, -10, 500],
-                }
-            },
-            _font:{default:true,value:''}
-            }
-            engine = new Engine();
-            ScenesfromObject(emptyExample)
-            for (let func of Engine.removeListeners) {
-                if (typeof func === 'function') {
-                    func()
-                }
-            }
-            this.releaseSelectBox();
-            engine.cameraPos = this.cameraPos
-        });
         refreshButton = this.fromReference("refreshButton");
         refreshButton.mousePressed(() => {
             let file = { data: SaveMap() }
@@ -561,7 +212,7 @@ class Editor {
         cntentBtn.parent(_)
         let _select = createSelect();
         _select.parent(_);
-        let newList = ['.js', '.img'];
+        let newList = Object.keys(Engine.fileTypeList);
         for (let name of newList) {
             _select.option(name);
         }
@@ -716,6 +367,41 @@ class Editor {
             }
         })
     }
+    async makeFile(event: any): Promise<gameFile> {
+        event.preventDefault();
+        if (!event?.dataTransfer?.files[0]) return;
+        let dragFile = event.dataTransfer.files[0];
+        let newName: any = dragFile.name.split(".");
+        newName.pop();
+        newName = newName.join(".");
+        let data: string;
+        if (dragFile.type === "text/javascript") {
+            data = await dragFile.text()
+        } else if (dragFile.type.startsWith("image")) {
+            data = await this.readFileAsDataURL(dragFile);
+        } else {
+            return;
+        }
+        //TODO: audio
+        let file = addGameFile(data, dragFile.type === "text/javascript" ? ".js" : ".img");
+        content.changeName(file, newName);
+        return file
+    }
+    fromReference(id: string) {
+        let _ = select("#" + id)
+        this.uiElement(_)
+        return _;
+    }
+    updateLevels() {
+        //console.log(engine.scene);
+        let leftDiv = document.getElementById("leftDiv");
+        for (let oldScene of sceneHolder) {
+            oldScene.remove()
+        }
+        for (let scene of engine.scene) {
+            scene.addSceneBtn(leftDiv, openerState);
+        }
+    }
     removeScene(ind) {
         engine.scene.splice(ind,1)
         for(let i = ind; i < engine.scene.length; i++) {
@@ -741,32 +427,426 @@ class Editor {
         sceneContext.elt.style.position = 'absolute';
         sceneContext.position(winMouseX, winMouseY)
     }
-    readFileAsDataURL(file: Blob): Promise<string> {
-        return new Promise(resolve => {
-            const reader = new FileReader();
-            reader.onload = e => resolve(e.target.result.toString());
-            reader.readAsDataURL(file);
+    saveMap() {
+        let jsMap = createWriter('map.json');
+        jsMap.write(SaveMap());
+        jsMap.close();
+    }
+    onUpdate() {
+
+    }
+    onResize() {
+        sideMenu.position(windowWidth - 300, 0);
+    }
+    uiElement(element: Div) {
+        element.mouseOver(() => overUI = true);
+        element.mouseOut(() => overUI = false);
+    }
+    copyObject() {
+        for (let _ = selectedObjects.length; _ >= 0; _--) {
+            let objs = selectedObjects[_]
+            if (!engine.getfromUUID(objs)) {
+                selectedObjects.splice(_, 1);
+            }
+        }
+        this.copiedObjs = [];
+        for (let objId of selectedObjects) {
+            let copiedObj = {
+                vals: engine.getfromUUID(objId).getParameters(),
+                type: engine.getfromUUID(objId).typeId,
+                components: engine.getfromUUID(objId).jsonComponents()
+            }
+            this.copiedObjs.push(copiedObj)
+        }
+    }
+    levelScreen() {
+        this.levelMode = !this.levelMode;
+        this.deleteInfoDivs()
+
+        if (this.levelMode) {
+            const activeScene = engine.getActiveScene();
+            const levelValues = activeScene.getLevelValues();
+            const levelValueNames = activeScene.getLevelValueNames();
+            const actualLevelValues = activeScene.getActualLevelValues();
+
+            for (let i = 0; i < levelValues.length; i++) {
+                addMenuInput(
+                    levelValueNames[i],
+                    (val: any) => {
+                        const actValue = parseStringNum(val, activeScene[actualLevelValues[i]]);
+                        activeScene[actualLevelValues[i]] = actValue;
+                        levelValues[i] = actValue;
+                    },
+                    () => levelValues[i]
+                );
+            }
+            addMenuInput(
+                "Grid Size",
+                (value: any) => {
+                    this.gridSize = parseStringNum(value, this.gridSize, true);
+                },
+                () => {
+                    return this.gridSize
+                }
+            );
+        } else {
+            this.removeSelection();
+            info = [];
+        }
+    }
+    removeSelection() {
+        selectedObjects = [];
+        this.tryOffset = {}
+        for (let t_info of infoDivs) {
+            t_info.remove();
+        }
+    }
+}
+class Editor3D extends BaseEditor {
+    constructor() {
+        super()
+    }
+    onSetup(): void {
+        super.onSetup();
+        exampleButton.mouseReleased(() => {
+            let emptyExample = {
+            version:1.3,
+            file:[],
+            GUI:{default:true},
+            scenes:{
+                "0":{
+                    Data:[[0, 100, 100, 500, 50]],
+                    sceneData:[0, 400, -10, 500],
+                }
+            },
+            _font:{default:true,value:''}
+            }
+            engine = new Engine();
+            ScenesfromObject(emptyExample)
+            for (let func of Engine.removeListeners) {
+                if (typeof func === 'function') {
+                    func()
+                }
+            }
+            engine.cameraPos = this.cameraPos
         });
     }
-    async makeFile(event: any): Promise<gameFile> {
-        event.preventDefault();
-        if (!event?.dataTransfer?.files[0]) return;
-        let dragFile = event.dataTransfer.files[0];
-        let newName: any = dragFile.name.split(".");
-        newName.pop();
-        newName = newName.join(".");
-        let data: string;
-        if (dragFile.type === "text/javascript") {
-            data = await dragFile.text()
-        } else if (dragFile.type.startsWith("image")) {
-            data = await this.readFileAsDataURL(dragFile);
+}
+class Editor extends BaseEditor {
+    constructor() {
+        super()
+        this.selectionBox = [];
+        this.isCircle = false;
+    }
+    onSetup(): void {
+        super.onSetup();
+        exampleButton.mouseReleased(() => {
+            let emptyExample = {
+            version:1.3,
+            file:[],
+            GUI:{default:true},
+            scenes:{
+                "0":{
+                    Data:[[0, 100, 100, 500, 50]],
+                    sceneData:[0, 400, -10, 500],
+                }
+            },
+            _font:{default:true,value:''}
+            }
+            engine = new Engine();
+            ScenesfromObject(emptyExample)
+            for (let func of Engine.removeListeners) {
+                if (typeof func === 'function') {
+                    func()
+                }
+            }
+            this.releaseSelectBox();
+            engine.cameraPos = this.cameraPos
+        });;
+    }
+    startSelect() {
+        if (lastWasPressed !== 'startedOverUi' && lastWasPressed != Pressed && Pressed && mouseButton === LEFT) {
+            this.selectionBox.push(this.mouseCoords().array());
+            this.startPos = this.mouseCoords();
+        }
+    }
+    moveScreen() {
+        let diffX = (mouseX - pmouseX) / engine.camera.zoom
+        let diffY = (mouseY - pmouseY) / engine.camera.zoom
+        mouseDiff = { x: diffX, y: diffY };
+        if (selectedObjects.length !== 0) {
+            this.moveObjects(mouseDiff);
         } else {
+            this.cameraPos.x -= diffX;
+            this.cameraPos.y -= diffY;
+        }
+    }
+    moveObjects(frameDiff: xyObject) {
+        for (let uuid of selectedObjects) {
+            let tempBox = engine.getfromUUID(uuid);
+            if (tempBox) {
+                tempBox.customDraw();
+                let diff = {
+                    x: frameDiff.x,
+                    y: frameDiff.y
+                };
+                if (this.tryOffset[uuid]) {
+                    diff.x += this.tryOffset[uuid].x
+                    diff.y += this.tryOffset[uuid].y
+                }
+                let newPos = {
+                    x: Math.round(tempBox.x / this.gridSize) * this.gridSize,
+                    y: Math.round(tempBox.y / this.gridSize) * this.gridSize
+                }
+                let remainder = { x: diff.x % this.gridSize, y: diff.y % this.gridSize }
+                this.tryOffset[uuid] = remainder;
+                let newDiff = { x: diff.x - remainder.x, y: diff.y - remainder.y };
+                newPos.x += newDiff.x
+                newPos.y += newDiff.y
+                tempBox.offSet(newPos.x, newPos.y, newDiff.x, newDiff.y);
+            } else {
+                selectedObjects.splice(uuid, 1);
+            }
+        }
+    }
+    setSelection(newArr: any[]) {
+        selectedObjects = newArr;
+    }
+    setCameraPos(obj: xyObject) {
+        this.cameraPos.x = obj.x;
+        this.cameraPos.y = obj.y;
+    }
+    DrawSelection() {
+        fill(0, 0, 0, 25);
+        if (this.creatingNew) {
+            let distance = (dist(this.selectionBox[0][0], this.selectionBox[0][1], this.selectionBox[1][0], this.selectionBox[1][1]));
+            let objClass = classes[addSelect.value()];
+            if (objClass.prototype.getCollisionType() === 'Circle') {
+                circle(this.selectionBox[0][0], this.selectionBox[0][1], distance * 2);
+                this.isCircle = true;
+                return;
+            }
+            this.isCircle = false;
+        }
+        rect(this.selectionBox[0][0], this.selectionBox[0][1],
+            this.selectionBox[1][0] - this.selectionBox[0][0],
+            this.selectionBox[1][1] - this.selectionBox[0][1]);
+    }
+    pressedLevelMode() {
+        let coords = createVector(mouseX,mouseY);
+        for(let UUID in engine.guiObjects) {
+            let GUIElement = engine.guiObjects[UUID];
+            if(GUIElement.collidesPoint(coords)) {
+                selectedObjects = [UUID]
+            }
+        }
+    }
+    onUpdate() {
+        if (mouseIsPressed && overUI) {
+            lastWasPressed = 'startedOverUi'
+        }
+        if (!overUI && lastWasPressed !== 'startedOverUi') {
+            lastWasPressed = Pressed;
+            Pressed = mouseIsPressed && !this.levelMode;
+        }
+        if (this.selectionBox[1]) {
+            this.DrawSelection()
+        }
+        /*------------------this.selectionBox Stuff---------------------*/
+        this.startSelect()
+        if (mouseIsPressed && !overUI && (mouseButton === CENTER || mouseButton === RIGHT)) {
+	    this.creatingNew = false;
+            this.moveScreen()
+        }
+        if (!this.levelMode && lastWasPressed != Pressed && !mouseIsPressed && !overUI) {
+            if (lastWasPressed === 'startedOverUi') {
+                lastWasPressed = false;
+            } else {
+                this.releaseSelectBox();
+            }
+        } else if (Pressed && this.selectionBox[0] && !this.selectionBox[2]) {
+            this.mouseDown();
+        }
+        if(mouseIsPressed&&lastWasPressed!=='startedOverUI'&&this.levelMode) {
+            this.pressedLevelMode()
+        }
+        //If switching scenes remove selected
+        if (lastScene != engine.currentScene) {
+            this.removeSelection()
+        }
+        lastScene = engine.currentScene;
+
+        for (let uuid of selectedObjects) {
+            let tempBox = engine.getfromUUID(uuid);
+            if (tempBox) {
+                tempBox?.customDraw?.();
+            } else {
+                selectedObjects.splice(uuid, 1);
+            }
+        }
+        //Disallow selecting if Playing
+        //if(Playing  && !Paused) this.selectionBox = [];
+
+        if (selectedObjects.length != 0) {
+            this.OpenEditMenu()
+        }
+        let newFile = Object.keys(engine.files);
+        if (!newFile.equals(OldFiles) || editor.updates.browser) {
+            editor.updates.browser = false;
+            console.warn("added a file!/ changed");
+            OldFiles = newFile;
+            content.removeOldContent()
+            readTypeAndName()
+        }
+        if (editor.updates.level && engine?.scene?.length > 0) {
+            editor.updates.level = false;
+            this.updateLevels()
+        }
+        if (keyIsDown(17) && keyIsDown(86)) {
+            this.pasteObjects();
+        } else {
+            this.pasted = false;
+        }
+    }
+    mouseCoords() {
+        return createVector(round(engine.mouseScreen().x), round(engine.mouseScreen().y))
+    }
+    transformCoordinates(drawSelect): { [x: string]: any } {
+        const [x1, y1] = drawSelect[0];
+        const [x2, y2] = drawSelect[1];
+        const x = Math.min(x1, x2);
+        const y = Math.min(y1, y2);
+        const width = Math.abs(x2 - x1);
+        const height = Math.abs(y2 - y1);
+        return {
+            x: x, y: y, width: width, height: height,
+            getCollisionType: () => { return 'Rect' },
+            getCollisionVectors: () => {
+                return [{ x: x, y: y }, { x: width, y: height }]
+            }
+        };
+    }
+    mouseDown(selection = this.selectionBox, creatingNew = this.creatingNew) {
+        if (!selection[0])
+            return;
+        selection[1] = this.mouseCoords().array();
+        let drawSelect = selection;
+        let rect1 = this.transformCoordinates(drawSelect);
+        if (!rect1)
+            return;
+        if (creatingNew) {
+            return this.newObject = rect1;
+        }
+        selectedObjects = [];
+        this.tryOffset = {}
+        let collisionRect: CollidableObject= {
+            getCollisionType : ()=>{return 'Rect'},
+            getCollisionVectors: ()=>{return [{x:rect1.x,y:rect1.y},{x:rect1.width,y:rect1.height}]}
+        }
+        for (let tempBox of engine.getActiveScene().boxes) {
+            if (tempBox.collision) {
+                //Change to use collision types
+                let c = tempBox.collision(collisionRect, false)?1:0;
+                if (c) {
+                    selectedObjects.push(tempBox.uuid);
+                    //console.log(t_box.uuid);
+                }
+                tempBox.clr = c * 50
+                //console.log(c);
+            }
+        }
+        if (selectedObjects.length === 0) {
+            this.removeSelection()
+            info = [];
+        }
+    }
+    releaseSelectBox() {
+        if (this.creatingNew) {
+            let objClass = classes[addSelect.value()];
+            if (this.newObject.width || this.newObject.height) {
+                let classParameters = [];
+                if (!this.newObject.width) {
+                    this.newObject.width = 1;
+                }
+                else if (!this.newObject.height) {
+                    this.newObject.height = 1;
+                }
+                if (this.selectionBox[0] && this.selectionBox[1]) {
+                    this.newObject.radius = round(dist(this.selectionBox[0][0], this.selectionBox[0][1], this.selectionBox[1][0], this.selectionBox[1][1]));
+                    if (this.isCircle) {
+                        this.newObject.x = this.startPos.x;
+                        this.newObject.y = this.startPos.y;
+                    }
+                    for (let param of objClass.prototype.parameterNames()) {
+                        let resp = this.newObject[param];
+                        if (resp === undefined) {
+                            let paramResp = param !== "noMenu" ? prompt(param) : ' ';
+                            classParameters.push(parseStringNum(paramResp));
+                        } else {
+                            classParameters.push(parseStringNum(resp));
+                        }
+                    }
+                    let obj = new objClass(...classParameters)
+                    obj.init();
+                    engine.getActiveScene().boxes.push(obj);
+                    selectedObjects.push(obj.uuid);
+                    obj.clr = 50;
+                    this.updateLevels();
+                }
+            } else {
+                this.mouseDown([this.mouseCoords().array()], false);
+                this.creatingNew = false;
+            }
+        }
+        this.selectionBox = [];
+    }
+    copyObject() {
+        for (let _ = selectedObjects.length; _ >= 0; _--) {
+            let objs = selectedObjects[_]
+            if (!engine.getfromUUID(objs)) {
+                selectedObjects.splice(_, 1);
+            }
+        }
+        this.copiedObjs = [];
+        for (let objId of selectedObjects) {
+            let copiedObj = {
+                vals: engine.getfromUUID(objId).getParameters(),
+                type: engine.getfromUUID(objId).typeId,
+                components: engine.getfromUUID(objId).jsonComponents()
+            }
+            this.copiedObjs.push(copiedObj)
+        }
+    }
+    pasteObjects() {
+        if (this.pasted || overUI) {
             return;
         }
-        //TODO: audio
-        let file = addGameFile(data, dragFile.type === "text/javascript" ? ".js" : ".img");
-        content.changeName(file, newName);
-        return file
+        let firstObjPos;
+        for (let copiedObj of this.copiedObjs) {
+            if (copiedObj.type === '' || copiedObj.type === undefined) {
+                console.warn('Empty type means not copyable');
+                continue;
+            }
+            let _obj = addObj(copiedObj.type, copiedObj.vals);
+            for (let component of copiedObj.components) {
+                let componentClass = engine.componentList[component.name];
+                _obj.components.push(new componentClass({ ...component.params, obj: _obj }));
+            }
+            engine.addObj(_obj);
+            _obj.clr = 50;
+            let offsetPosX = this.mouseCoords().x;
+            let offsetPosY = this.mouseCoords().y;
+            if (!firstObjPos) {
+                firstObjPos = [_obj.x, _obj.y];
+            } else {
+                offsetPosX -= firstObjPos[0] - _obj.x;
+                offsetPosY -= firstObjPos[1] - _obj.y;
+            }
+            _obj.offSet(offsetPosX, offsetPosY);
+            _obj.typeId = copiedObj.type;
+            selectedObjects.push(_obj.uuid);
+        }
+        this.pasted = true;
     }
     countChildren(obj,stack=0) {
         let count = 0;
@@ -974,12 +1054,12 @@ class Editor {
         if (typeof obj.value === "object") {
             let divHolder = createDiv().parent(parent);
             let headerText = createDiv();
-            Holder = accordionMenu(headerText, createDiv(), i, opened);
+            Holder = accordionMenu(headerText, createDiv(), "", opened);
             headerText.parent(divHolder);
             Holder.parent(divHolder);
             infoDivs.push(headerText);
-            opened[i] ??= { value: false };
-            this.addNewEditObj(obj.value, Holder, opened[i],()=>{obj.set(obj.value)});
+            opened[""] ??= { value: false };
+            this.addNewEditObj(obj.value, Holder, opened[""],()=>{obj.set(obj.value)});
         } else {
             addMenuInput(obj.name, (_) => {
                 obj.set(parseStringNum(_));

@@ -346,6 +346,49 @@ class gameScript extends Component {
 		};
 	}
 }
+class gameGlobalScript extends Component{
+	constructor({fileUUID = ''}: {fileUUID:UUID}) {
+		super("globalScript");
+	}
+	ContentBrowser(file: gameFile, Panel: any) {
+		let typeOfFile = file.type;
+		let _file = file;
+		let _get = () => { return file.data }
+		let buttonName = _file.name
+		buttonName = buttonName + typeOfFile
+		let isDragging = false;
+		let inp = createButton(buttonName).parent(Panel.HUD);
+		inp.mouseReleased(() => {
+			if (isDragging) return;
+			if (mouseButton === "right") {
+				editor.openBrowserContext(_file);
+			} else {
+				var popupWindow = window.open("popup.html", "Popup Window", "width=400,height=300");
+				window.scriptData = function () {
+					return [_get().toString(), window]
+				}
+				window.receivePopupText = (text) => {
+					//TODO: make small info box saying: Updated: (nameoffile)
+					if(_file.data == '' && !_file?.firstCompile) {
+						_file.data = text;
+						this.onCreateFile(_file)
+					}
+                    else {
+                        engine.errorText = 'Refresh Editor to have effect';
+                        setTimeout(() => { delete engine.errorText; }, 10000);
+                        _file.data = text;
+                    }
+                    _file.firstCompile = true;
+				};
+			}
+		});
+		inp.size(140, 140);
+		Panel.Divs.push(inp);
+	}
+	onCreateFile(file: gameFile) {
+		eval(file.data);
+	}
+}
 class gameSprite extends Component {
 	constructor({ obj, src = { imageb64: '' }, fileUUID = '' }: { obj: GameObject, src: any, fileUUID: UUID }) {
 		super("gameSprite");
@@ -798,6 +841,9 @@ class gameFile extends Component {
 		this.data = parsedImage;
 		engine.files[UUID] = this;
 		this.whoUses = {};
+		if(Engine.fileTypeList[type]) {
+            Engine.componentList[Engine.fileTypeList[type]]?.prototype?.onCreateFile(this)
+        }
 	}
 	get name(): string {
 		return this.references?.name ? this.references.name : this.UUID
@@ -952,6 +998,7 @@ class gameAnimation {
 
 }
 addComponent("gameScript", gameScript, ".js");
+addComponent("gameGlobalScript", gameGlobalScript, ".gjs");
 addComponent("gameSprite", gameSprite, ".img");
 addComponent("gameFile", gameFile);
 addComponent("gameParticle", gameParticle)
