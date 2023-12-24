@@ -1,3 +1,17 @@
+function tryRun(funcCall: Function, funcContext: any, funcArgs: IArguments, funcName: string, onError?: Function) {
+	let _;
+	try {
+		_ = funcCall.call(funcContext, ...funcArgs);
+	} catch (e) {
+		//Log Error
+		console.error(funcName + " has an error: " + e);
+		console.error(funcCall);
+		//Remove function call
+		onError(e);
+		return;
+	}
+	return _;
+}
 class gameScript extends Component {
 	constructor({ obj, fn = '', vals = {}, fileUUID = '' }: { obj: GameObject, fn: string, vals: object, fileUUID: UUID }) {
 		super("gameScript");
@@ -118,20 +132,6 @@ class gameScript extends Component {
 		delete this.newOverrides.shown
 		//console.log(this);
 		this.overrides = this.newOverrides;
-		function tryRun(funcCall: Function, funcContext: any, funcArgs: IArguments, funcName: string, onError?: Function) {
-			let _;
-			try {
-				_ = funcCall.call(funcContext, ...funcArgs);
-			} catch (e) {
-				//Log Error
-				console.error(funcName + " has an error: " + e);
-				console.error(funcCall);
-				//Remove function call
-				onError(e);
-				return;
-			}
-			return _;
-		}
 		for (let i in this.overrides) {
 			//console.log(i);
 			//check if the overriden value even exists and if we want to replace with a function
@@ -385,6 +385,9 @@ class gameGlobalScript extends Component{
 		inp.size(140, 140);
 		Panel.Divs.push(inp);
 	}
+	get isAddable(): boolean {
+        return false;
+    }
 	onCreateFile(file: gameFile) {
 		eval(file.data);
 	}
@@ -845,6 +848,9 @@ class gameFile extends Component {
             Engine.componentList[Engine.fileTypeList[type]]?.prototype?.onCreateFile(this)
         }
 	}
+	get isAddable(): boolean {
+        return false;
+    }
 	get name(): string {
 		return this.references?.name ? this.references.name : this.UUID
 	}

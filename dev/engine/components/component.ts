@@ -30,6 +30,9 @@ class Component {
 
     }
     onCreateFile(file: gameFile) {}
+    get isAddable(){
+        return true
+    }
 }
 Component.componentOpen = {}
 function addComponent(name: string, componentClass: any, fileExtension?: string) {

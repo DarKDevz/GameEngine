@@ -924,7 +924,7 @@ class Editor extends BaseEditor {
                     let divHolder = createDiv();
                     let ComponentSelect = createSelect();
                     for (const [key, value] of Object.entries(engine.componentList)) {
-                        if (key !== "gameFile")
+                        if (value.prototype.isAddable)
                             ComponentSelect.option(key);
                     }
                     ComponentSelect.style('cursor: pointer;');

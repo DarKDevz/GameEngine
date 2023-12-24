@@ -424,12 +424,12 @@ interface Component {
     shouldUpdateMenu: boolean;
     componentName: string;
     ownObject: GameObject;
-    fileType: string;
+    type: string;
     [x: string]: any
     new(...arg0: any): Component
 }
 interface gameScript extends Component {
-    fileType: string;
+    type: string;
     vals: { shown: any; editableVals: {}; };
     id: any;
     overrides: any;
@@ -442,7 +442,7 @@ interface gameGlobalScript {
     file:gameFile
 }
 interface gameSprite {
-    fileType: string;
+    type: string;
     file: gameFile;
     _src: { imageb64: string; };
     sprite: any;
@@ -529,7 +529,7 @@ interface Engine extends GameEvents {
      * List of available components.
      * @type {{ [x: string]: class }}
      */
-    componentList: { [x: string]: class };
+    componentList: { [x: string]: Object };
 
     /**
      * List of remove listeners functions.
