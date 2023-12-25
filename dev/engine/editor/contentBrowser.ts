@@ -55,13 +55,12 @@ async function createZip() {
     let createSketchFile = function () {
         return `
         globalThis.setup = async function () {
-            let obj = await import('/engine/test/rapier2d.test.js')
-            await obj.init()
+                const response = await fetch("./examples/platformer.json");
+                const data = await response.json();
+                await waitForEngine()
                 window.RAPIER = obj;
                 engine = new Engine();
                 player = new Player();
-                const response = await fetch("./examples/platformer.json");
-                const data = await response.json();
                 engine.loadFromObject(data, true);
                 createCanvas(windowWidth, windowHeight);
                 noSmooth();
@@ -79,7 +78,7 @@ async function createZip() {
     var scriptTags = [
         { path: 'libs/p5.min.js' },
         { path: 'libs/p5.camera.js'},
-        { path: 'engine/test/rapier2d.js'},
+        { path: 'libs/rapier2d.js'},
         { path: 'rapier_wasm2d_bg.wasm'},
         { path: 'engine/utils.js' },
         { path: 'engine/engine.js' },

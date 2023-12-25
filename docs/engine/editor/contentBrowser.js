@@ -48,7 +48,7 @@ async function createZip() {
   let createSketchFile = function() {
     return `
         globalThis.setup = async function () {
-            let obj = await import('/engine/test/rapier2d.test.js')
+            let obj = await import('/libs/rapier2d.js')
             await obj.init()
                 window.RAPIER = obj;
                 engine = new Engine();
@@ -72,7 +72,7 @@ async function createZip() {
   var scriptTags = [
     { path: "libs/p5.min.js" },
     { path: "libs/p5.camera.js" },
-    { path: "engine/test/rapier2d.js" },
+    { path: "libs/rapier2d.js" },
     { path: "rapier_wasm2d_bg.wasm" },
     { path: "engine/utils.js" },
     { path: "engine/engine.js" },

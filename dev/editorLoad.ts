@@ -11,11 +11,7 @@ function doReload() {
 }
 async function checkLoad() {
     if (window.loaded) {
-        if(!window.RAPIER) { await import('https:/' + '/cdn.skypack.dev/@dimforge/rapier2d-compat').then((obj) => {
-            obj.init().then(() => {
-                window.RAPIER = obj;
-            });
-        });
+        await waitForEngine()
     }
         engine = new Engine();
         window.windowResized = () => { engine.resize(); };

@@ -34,11 +34,7 @@
     <script>
 let lowestFrameRate = 60;
 async function setup() {
-    if(!window.RAPIER) {
-                let obj = await import('/engine/test/rapier2d.test.js')
-                await obj.init()
-                window.RAPIER = obj;
-            }
+            await waitForEngine()
             engine = new Engine();
             player = new Player();
             const response = await fetch("./examples/BallBlast.json");

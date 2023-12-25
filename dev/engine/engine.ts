@@ -1,9 +1,25 @@
 var engine: Engine;
-import('/engine/test/rapier2d.test.js').then((obj) => {
+import('/libs/rapier2d.js').then((obj) => {
     obj.init().then(() => {
         window.RAPIER = obj;
     });
 });
+function waitForEngine() {
+    return new Promise((resolve, reject) => {
+      const checkRapier = () => {
+        if (window.RAPIER) {
+          resolve(clearInterval(intervalID));
+        } else if (++counter > 20) {
+          clearInterval(intervalID);
+          reject(new Error("Couldn't load rapier"));
+        }
+      };
+  
+      let counter = 0;
+      const intervalID = setInterval(checkRapier, 300);
+      checkRapier(); // Check immediately in case RAPIER is already available.
+    });
+  }
 class Engine extends GameEvents {
     static removeListeners: Function[];
     static componentList: { [x: string]: Component };

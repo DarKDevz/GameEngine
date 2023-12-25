@@ -1,4 +1,4 @@
-import('/engine/test/rapier2d.test.js').then((obj) => {
+import('/libs/rapier2d.js').then((obj) => {
     obj.init().then(() => {
         window.RAPIER = obj;
     });
