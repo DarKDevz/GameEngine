@@ -87,7 +87,8 @@ function addObj(ind: any, arr: any, sceneId?: string) {
     return obj;
 }
 function ScenesfromObject(levelsObject: ImportInterface) {
-    engine.loading = true
+    engine.loading = true;
+    engine.is3D = Boolean(levelsObject.is3D);
     let t_levels = {};
     var newLevels = levelsObject;
     if (newLevels.file) {

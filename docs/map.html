@@ -4,8 +4,8 @@
     <title>Shimmer Game Engine</title>
     <link rel="stylesheet" href="engine/editor/style.css">
     <script src="libs/p5.min.js"></script>
+    <script src="libs/p5.camera.js"></script>
     <script src="libs/jszip.min.js"></script>
-    <script src="engine/collision/Box2D.js"></script>
     <script src="engine/utils.js"></script>
     <script src="engine/engine.js"></script>
     <script src="engine/collision/p5.collide.js"></script>
@@ -95,7 +95,7 @@
       </sl-menu>
       <sl-menu id="sceneMaker" label="Create Scene" style=" display:none; position:absolute; right:40%; top:30% ; --width: 30vw; background-color: #273647;">
         <sl-menu-item style="background-color: #273647; ">        
-          <input type="checkbox" style="cursor: pointer;">3D Scene</input>
+          <input id="is3D" type="checkbox" style="cursor: pointer;">3D Scene</input>
         </sl-menu-item>
         <sl-menu-item style="background-color: #273647; cursor: pointer;">
           <sl-button id="newButton">

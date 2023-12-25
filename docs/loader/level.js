@@ -84,6 +84,7 @@ function addObj(ind, arr, sceneId) {
 }
 function ScenesfromObject(levelsObject) {
   engine.loading = true;
+  engine.is3D = Boolean(levelsObject.is3D);
   let t_levels = {};
   var newLevels = levelsObject;
   if (newLevels.file) {

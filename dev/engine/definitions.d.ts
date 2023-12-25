@@ -38,6 +38,7 @@ interface ImportInterface {
     scenes: {
         [x: number]: SceneConstructor
     }
+    is3D?: boolean
 }
 interface FileConstructor { references: {}, data: string, type: string }
 interface SceneConstructor {
@@ -580,6 +581,8 @@ interface Engine extends GameEvents {
     eventListener: { [x: UUID]: { [x: string]: Function } };
     
     editorZoom: number;
+
+    is3D: boolean;
 }
 
 interface GUIElement extends GameObject {

@@ -1,5 +1,5 @@
 var engine: Engine;
-import('https:/'+'/cdn.skypack.dev/@dimforge/rapier2d-compat').then((obj) => {
+import('/engine/test/rapier2d.test.js').then((obj) => {
     obj.init().then(() => {
         window.RAPIER = obj;
     });
@@ -60,6 +60,7 @@ class Engine extends GameEvents {
             }
         })
         setTimeout(() => { this.tryFirstLoad() }, 500)
+        this.is3D;
         // this.body = new p2.Body({ mass: 1 });
         // this.world.addBody(this.body);
     }

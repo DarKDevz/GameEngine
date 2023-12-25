@@ -1,4 +1,4 @@
-import('https://cdn.skypack.dev/@dimforge/rapier2d-compat').then((obj) => {
+import('/engine/test/rapier2d.test.js').then((obj) => {
     obj.init().then(() => {
         window.RAPIER = obj;
     });

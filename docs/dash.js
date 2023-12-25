@@ -1,6 +1,6 @@
 
         globalThis.setup = async function() {
-            let obj = await import('https://cdn.skypack.dev/@dimforge/rapier2d-compat')
+            let obj = await import('/engine/test/rapier2d.test.js')
             await obj.init()
                 window.RAPIER = obj;
             engine = new Engine();

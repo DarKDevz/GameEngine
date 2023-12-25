@@ -11,7 +11,7 @@
         }
     </style>
     <script src="libs/p5.min.js"></script>
-    <script src="engine/collision/Box2D.js"></script>
+    <script src="libs/p5.camera.js"></script>
     <script src="engine/utils.js"></script>
     <script src="engine/engine.js"></script>
     <script src="engine/collision/p5.collide.js"></script>
@@ -35,7 +35,7 @@
 let lowestFrameRate = 60;
 async function setup() {
     if(!window.RAPIER) {
-                let obj = await import('https://cdn.skypack.dev/@dimforge/rapier2d-compat')
+                let obj = await import('/engine/test/rapier2d.test.js')
                 await obj.init()
                 window.RAPIER = obj;
             }

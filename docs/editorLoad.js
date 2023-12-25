@@ -11,7 +11,7 @@ function doReload() {
 async function checkLoad() {
   if (window.loaded) {
     if (!window.RAPIER) {
-      await import("https://cdn.skypack.dev/@dimforge/rapier2d-compat").then((obj) => {
+      await import("/engine/test/rapier2d.test.js").then((obj) => {
         obj.init().then(() => {
           window.RAPIER = obj;
         });

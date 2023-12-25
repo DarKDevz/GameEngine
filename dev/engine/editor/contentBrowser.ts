@@ -55,7 +55,7 @@ async function createZip() {
     let createSketchFile = function () {
         return `
         globalThis.setup = async function () {
-            let obj = await import('https://cdn.skypack.dev/@dimforge/rapier2d-compat')
+            let obj = await import('/engine/test/rapier2d.test.js')
             await obj.init()
                 window.RAPIER = obj;
                 engine = new Engine();
@@ -78,7 +78,9 @@ async function createZip() {
     }
     var scriptTags = [
         { path: 'libs/p5.min.js' },
-        { path: 'engine/collision/Box2D.js' },
+        { path: 'libs/p5.camera.js'},
+        { path: 'engine/test/rapier2d.js'},
+        { path: 'rapier_wasm2d_bg.wasm'},
         { path: 'engine/utils.js' },
         { path: 'engine/engine.js' },
         { path: 'engine/collision/p5.collide.js' },

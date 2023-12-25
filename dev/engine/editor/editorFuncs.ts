@@ -3,7 +3,7 @@ var lastWasPressed: any = false,
     overUI = false,
     Pressed = lastWasPressed,
     button = null,
-    exampleButton = null,
+    exampleButton:any = null,
     refreshButton = null,
     addButton = null,
     selectedObjects = [],
@@ -117,6 +117,7 @@ class BaseEditor {
         this.deleteInfoDivs();
     }
     onSetup() {
+        if(button) return;
         //TODO
         //This whole thing stopped working 
         canvas.ondragover = (event) => {
@@ -187,6 +188,31 @@ class BaseEditor {
             sceneMaker.show()
         })
         exampleButton = this.fromReference("newButton");
+        exampleButton.mouseReleased(() => {
+            let emptyExample = {
+            version:1.3,
+            file:[],
+            GUI:{default:true},
+            scenes:{
+                "0":{
+                    Data:[[0, 100, 100, 500, 50]],
+                    sceneData:[0, 400, -10, 500],
+                }
+            },
+            _font:{default:true,value:''},
+            is3D:select('#is3D').checked()
+            }
+            engine = new Engine();
+            ScenesfromObject(emptyExample)
+            for (let func of Engine.removeListeners) {
+                if (typeof func === 'function') {
+                    func()
+                }
+            }
+            engine.cameraPos = this.cameraPos
+            let sceneMaker = select('#sceneMaker')
+            sceneMaker.hide()
+        });
         let closeButton = this.fromReference("closeButton");
         closeButton.mousePressed(()=>{
             let sceneMaker = select('#sceneMaker')
@@ -520,30 +546,6 @@ class Editor3D extends BaseEditor {
     }
     onSetup(): void {
         super.onSetup();
-        exampleButton.mouseReleased(() => {
-            let emptyExample = {
-            version:1.3,
-            file:[],
-            GUI:{default:true},
-            scenes:{
-                "0":{
-                    Data:[[0, 100, 100, 500, 50]],
-                    sceneData:[0, 400, -10, 500],
-                }
-            },
-            _font:{default:true,value:''}
-            }
-            engine = new Engine();
-            ScenesfromObject(emptyExample)
-            for (let func of Engine.removeListeners) {
-                if (typeof func === 'function') {
-                    func()
-                }
-            }
-            engine.cameraPos = this.cameraPos
-            let sceneMaker = select('#sceneMaker')
-            sceneMaker.hide()
-        });
     }
 }
 class Editor extends BaseEditor {
@@ -554,31 +556,6 @@ class Editor extends BaseEditor {
     }
     onSetup(): void {
         super.onSetup();
-        exampleButton.mouseReleased(() => {
-            let emptyExample = {
-            version:1.3,
-            file:[],
-            GUI:{default:true},
-            scenes:{
-                "0":{
-                    Data:[[0, 100, 100, 500, 50]],
-                    sceneData:[0, 400, -10, 500],
-                }
-            },
-            _font:{default:true,value:''}
-            }
-            engine = new Engine();
-            ScenesfromObject(emptyExample)
-            for (let func of Engine.removeListeners) {
-                if (typeof func === 'function') {
-                    func()
-                }
-            }
-            this.releaseSelectBox();
-            engine.cameraPos = this.cameraPos;
-            let sceneMaker = select('#sceneMaker')
-            sceneMaker.hide()
-        });;
     }
     startSelect() {
         if (lastWasPressed !== 'startedOverUi' && lastWasPressed != Pressed && Pressed && mouseButton === LEFT) {
