@@ -128,7 +128,17 @@ class BaseEditor {
     saveButton = this.fromReference("saveFile");
     saveButton.mouseReleased(this.saveMap);
     this.uiElement(saveButton);
+    let showScenePanel = this.fromReference("createScene");
+    showScenePanel.mousePressed(() => {
+      let sceneMaker = select("#sceneMaker");
+      sceneMaker.show();
+    });
     exampleButton = this.fromReference("newButton");
+    let closeButton = this.fromReference("closeButton");
+    closeButton.mousePressed(() => {
+      let sceneMaker = select("#sceneMaker");
+      sceneMaker.hide();
+    });
     refreshButton = this.fromReference("refreshButton");
     refreshButton.mousePressed(() => {
       let file = { data: SaveMap() };
@@ -463,6 +473,8 @@ class Editor3D extends BaseEditor {
         }
       }
       engine.cameraPos = this.cameraPos;
+      let sceneMaker = select("#sceneMaker");
+      sceneMaker.hide();
     });
   }
 }
@@ -496,6 +508,8 @@ class Editor extends BaseEditor {
       }
       this.releaseSelectBox();
       engine.cameraPos = this.cameraPos;
+      let sceneMaker = select("#sceneMaker");
+      sceneMaker.hide();
     });
     ;
   }

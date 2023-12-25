@@ -529,7 +529,7 @@ interface Engine extends GameEvents {
      * List of available components.
      * @type {{ [x: string]: class }}
      */
-    componentList: { [x: string]: Object };
+    componentList: { [x: string]: any };
 
     /**
      * List of remove listeners functions.
