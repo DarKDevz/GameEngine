@@ -88,7 +88,6 @@ async function createZip() {
         { path: 'engine/components/component.js' },
         { path: 'engine/components/scriptComponent.js' },
         { path: 'engine/objects/object.js' },
-        { path: 'engine/objects/contactListener.js' },
         { path: 'engine/objects/box.js' },
         { path: 'engine/objects/player.js' },
         { path: 'engine/objects/end.js' },
