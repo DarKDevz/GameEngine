@@ -48,13 +48,12 @@ async function createZip() {
   let createSketchFile = function() {
     return `
         globalThis.setup = async function () {
-            let obj = await import('/libs/rapier2d.js')
-            await obj.init()
+                const response = await fetch("./examples/platformer.json");
+                const data = await response.json();
+                await waitForEngine()
                 window.RAPIER = obj;
                 engine = new Engine();
                 player = new Player();
-                const response = await fetch("./examples/platformer.json");
-                const data = await response.json();
                 engine.loadFromObject(data, true);
                 createCanvas(windowWidth, windowHeight);
                 noSmooth();

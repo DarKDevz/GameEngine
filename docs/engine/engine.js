@@ -14,10 +14,9 @@ function waitForEngine() {
         reject(new Error("Couldn't load rapier"));
       }
     };
-
     let counter = 0;
     const intervalID = setInterval(checkRapier, 300);
-    checkRapier(); // Check immediately in case RAPIER is already available.
+    checkRapier();
   });
 }
 class Engine extends GameEvents {
