@@ -343,7 +343,7 @@ class BaseEditor {
             switch (e.target.innerText) {
                 case "Paste":
                     let scene = this.sceneContext;
-                    if (scene && this.copiedObjs) {
+                    if ((scene!==undefined) && this.copiedObjs) {
                         for (let copiedObj of this.copiedObjs) {
                             if (copiedObj.type === '' || copiedObj.type === undefined) {
                                 console.warn('Empty type means not copyable');
@@ -421,6 +421,8 @@ class BaseEditor {
         editor.updates.level = true;
     }
     openSceneContext(id:number) {
+    //means objectContext menu is already open
+        if(select('#objectContext').elt.style.display === 'block') return;
         let sceneContext = select('#sceneContext');
         this.sceneContext = id;
         sceneContext.show()
@@ -1134,8 +1136,10 @@ function accordionMenu(headerText, inputField, name, Opened = { value: false }):
     UpdateExpansion();
     byOpened = false;
     headerText.mousePressed(() => {
+    if(mouseButton === LEFT ) {
         isExpanded = !isExpanded;
         UpdateExpansion();
+        }
     });
     return inputField;
 }
