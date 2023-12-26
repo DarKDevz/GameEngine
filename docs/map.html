@@ -28,6 +28,18 @@
   <script src="loader/support.js"></script>
   <script type="module" src="map.js"></script>
   <link rel="stylesheet" href="libs/shoelace/cdn/themes/dark.css" />
+  <link rel="manifest" href="/manifest.json">
+  <script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/engine/editor/serviceWorker.js')
+            .then(registration => {
+                console.log('Service Worker registered with scope:', registration.scope);
+            })
+            .catch(error => {
+                console.error('Service Worker registration failed:', error);
+            });
+    }
+</script>
   <script type="module" src="libs/shoelace/cdn/shoelace.js"></script>
 </head>
 
