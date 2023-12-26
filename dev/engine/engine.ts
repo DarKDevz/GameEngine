@@ -1,5 +1,5 @@
 var engine: Engine;
-import('/libs/rapier2d.js').then((obj) => {
+import('../libs/rapier2d.js').then((obj) => {
     obj.init().then(() => {
         window.RAPIER = obj;
     });
