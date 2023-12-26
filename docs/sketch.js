@@ -2,6 +2,7 @@ let lowestFrameRate = 60;
 globalThis.setup = async function () {
             const response = await fetch("./examples/platformer.json");
             const data = await response.json();
+            await waitForEngine()
             engine = new Engine();
             player = new Player();
             engine.loadFromObject(data, true);

@@ -1,110 +1,118 @@
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shimmer Game Engine</title>
-    <link rel="stylesheet" href="engine/editor/style.css">
-    <script src="libs/p5.min.js"></script>
-    <script src="libs/p5.camera.js"></script>
-    <script src="libs/jszip.min.js"></script>
-    <script src="engine/utils.js"></script>
-    <script src="engine/engine.js"></script>
-    <script src="engine/collision/p5.collide.js"></script>
-    <script src="engine/collision/handler.js"></script>
-    <script src="engine/objects/collision.js"></script>
-    <script src="engine/components/component.js"></script>
-    <script src="engine/components/scriptComponent.js"></script>
-    <script src="engine/objects/object.js"></script>
-    <script src="engine/objects/box.js"></script>
-    <script src="engine/objects/player.js"></script>
-    <script src="engine/objects/end.js"></script>
-    <script src="engine/objects/text.js"></script>
-    <script src="engine/objects/enemyBox.js"></script>
-    <script src="engine/objects/interactive.js"></script>
-    <script src="engine/objects/bullet.js"></script>
-    <script src="engine/objects/movingPlatform.js"></script>
-    <script src="engine/editor/contentBrowser.js"></script>
-    <script src="engine/editor/editorFuncs.js"></script>
-    <script src="loader/level.js"></script>
-    <script src="loader/support.js"></script>
-    <script type="module" src="map.js"></script>
-    <link rel="stylesheet" href="libs/shoelace/cdn/themes/dark.css" />
-    <script type="module" src="libs/shoelace/cdn/shoelace.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shimmer Game Engine</title>
+  <link rel="stylesheet" href="engine/editor/style.css">
+  <script src="libs/p5.min.js"></script>
+  <script src="libs/p5.camera.js"></script>
+  <script src="libs/jszip.min.js"></script>
+  <script src="engine/utils.js"></script>
+  <script src="engine/engine.js"></script>
+  <script src="engine/collision/p5.collide.js"></script>
+  <script src="engine/collision/handler.js"></script>
+  <script src="engine/objects/collision.js"></script>
+  <script src="engine/components/component.js"></script>
+  <script src="engine/components/scriptComponent.js"></script>
+  <script src="engine/objects/object.js"></script>
+  <script src="engine/objects/box.js"></script>
+  <script src="engine/objects/player.js"></script>
+  <script src="engine/objects/end.js"></script>
+  <script src="engine/objects/text.js"></script>
+  <script src="engine/objects/enemyBox.js"></script>
+  <script src="engine/objects/interactive.js"></script>
+  <script src="engine/objects/bullet.js"></script>
+  <script src="engine/objects/movingPlatform.js"></script>
+  <script src="engine/editor/contentBrowser.js"></script>
+  <script src="engine/editor/editorFuncs.js"></script>
+  <script src="loader/level.js"></script>
+  <script src="loader/support.js"></script>
+  <script type="module" src="map.js"></script>
+  <link rel="stylesheet" href="libs/shoelace/cdn/themes/dark.css" />
+  <script type="module" src="libs/shoelace/cdn/shoelace.js"></script>
 </head>
 
 <body oncontextmenu="return false;">
-    <sl-split-panel position="30" style="height: 100vh;">
-        <div id="leftDiv"
-          slot="start"
-          style="height: 100%; background-color: #0a2f5b;  overflow: scroll;"
-        >
-        <div id="HeaderHolder">
-            <sl-button-group label="Alignment" style="font-size: large;">
-                <select id="addSelect"></select>
-                <sl-button size="small" style="background-color: white;" id="addButton" ><sl-icon name="plus-circle"></sl-icon>Add</sl-button>
-                <sl-button size="small" style="background-color: white;" id="addScene" ><sl-icon name="plus-circle"></sl-icon>Scene</sl-button>
+  <sl-split-panel position="30" style="height: 100vh;">
+    <div id="leftDiv" slot="start" style="height: 100%; background-color: #0a2f5b;  overflow: scroll;">
+      <div id="HeaderHolder">
+        <sl-button-group label="Alignment" style="font-size: large;">
+          <select id="addSelect"></select>
+          <sl-button size="small" style="background-color: white;" id="addButton"><sl-icon
+              name="plus-circle"></sl-icon>Add</sl-button>
+          <sl-button size="small" style="background-color: white;" id="addScene"><sl-icon
+              name="plus-circle"></sl-icon>Scene</sl-button>
+        </sl-button-group>
+      </div>
+    </div>
+    <div slot="end">
+      <sl-split-panel vertical id="rightHolder" style="height: 100%; ">
+        <div id="topDiv" slot="start" style="height: 100%;">
+          <div id="fileHolder" style="position: absolute;">
+            <sl-button-group label="Alignment" style="font-size: x-large;">
+              <sl-button size="small" style="background-color: white;" id="loadFile"><sl-icon
+                  name="repeat-1"></sl-icon></sl-button>
+              <sl-button size="small" style="background-color: white;" id="saveFile"><sl-icon
+                  name="save"></sl-icon></sl-button>
+              <sl-button size="small" style="background-color: white;" id="exportFile" onclick="createZip()"><sl-icon
+                  name="file-earmark-zip"></sl-icon></sl-button>
             </sl-button-group>
-            </div>
+          </div>
+          <div style="position: relative; right: -30%; top:0px;">
+            <sl-button-group label="Alignment">
+              <sl-button size="small" style="background-color: white;" id="playButton"><sl-icon
+                  name="play"></sl-icon>Play</sl-button>
+              <sl-button size="small" style="background-color: white;" id="createScene"><sl-icon
+                  name="plus-circle"></sl-icon>New</sl-button>
+              <sl-button size="small" style="background-color: white;" id="refreshButton"><sl-icon
+                  name="arrow-clockwise"></sl-icon>Refresh</sl-button>
+            </sl-button-group>
+          </div>
         </div>
-        <div slot="end">
-          <sl-split-panel vertical id="rightHolder" style="height: 100%; ">
-            <div id="topDiv"
-              slot="start"
-              style="height: 100%;"
-            >
-            <div id="fileHolder" style="position: absolute;">
-                <sl-button-group label="Alignment" style="font-size: x-large;">
-                    <sl-button size="small" style="background-color: white;" id="loadFile"><sl-icon name="repeat-1"></sl-icon></sl-button>
-                    <sl-button size="small" style="background-color: white;" id="saveFile"><sl-icon name="save"></sl-icon></sl-button>
-                    <sl-button size="small" style="background-color: white;" id="exportFile" onclick="createZip()"><sl-icon name="file-earmark-zip"></sl-icon></sl-button>
-                  </sl-button-group>
-            </div>
-            <div style="position: relative; right: -30%; top:0px;">
-                <sl-button-group label="Alignment">
-                    <sl-button size="small" style="background-color: white;" id="playButton" ><sl-icon name="play"></sl-icon>Play</sl-button>
-                    <sl-button size="small" style="background-color: white;" id="createScene" ><sl-icon name="plus-circle"></sl-icon>New</sl-button>
-                    <sl-button size="small" style="background-color: white;" id="refreshButton" ><sl-icon name="arrow-clockwise"></sl-icon>Refresh</sl-button>
-                  </sl-button-group>
-            </div>
-            </div>
-            <div id="bottomDiv"
-              slot="end"
-              style="height: 100%;     background-color: #0a2f5b; overflow:scroll"
-            >
+        <div id="bottomDiv" slot="end" style="height: 100%;     background-color: #0a2f5b; overflow:scroll">
         </div>
-        </div>
-      </sl-split-panel>
+    </div>
+  </sl-split-panel>
 
-    </sl-split-panel>
-    <sl-menu id="fileContext" style="display: none; background-color: darkgray;">
-      <sl-menu-item >Rename</sl-menu-item>
-      <sl-divider></sl-divider>
-      <sl-menu-item >Delete</sl-menu-item>
-    </sl-menu>
-    <sl-menu id="objectContext" style="display: none; background-color: darkgray">
-      <sl-menu-item >Copy</sl-menu-item>
-            <sl-divider></sl-divider>
-      <sl-menu-item >Paste</sl-menu-item>
-      <sl-divider></sl-divider>
-      <sl-menu-item >Delete</sl-menu-item>
-    </sl-menu>
-    <sl-menu id="sceneContext" style="display: none; background-color: darkgray;">
-        <sl-menu-item >Paste</sl-menu-item>
-        <sl-divider></sl-divider>
-        <sl-menu-item >Delete</sl-menu-item>
-      </sl-menu>
-      <sl-menu id="sceneMaker" label="Create Scene" style=" display:none; position:absolute; right:40%; top:30% ; --width: 30vw; background-color: #273647;">
-        <sl-menu-item style="background-color: #273647; ">        
-          <input id="is3D" type="checkbox" style="cursor: pointer;">3D Scene</input>
-        </sl-menu-item>
-        <sl-menu-item style="background-color: #273647; cursor: pointer;">
-          <sl-button id="newButton">
-            Create
-          </sl-button>
-          <sl-button id="closeButton">
-            Close
-          </sl-button>
-        </sl-menu-item>
-      </sl-menu>
+  </sl-split-panel>
+  <sl-menu id="fileContext" style="display: none; background-color: darkgray;">
+    <sl-menu-item>Rename</sl-menu-item>
+    <sl-divider></sl-divider>
+    <sl-menu-item>Delete</sl-menu-item>
+  </sl-menu>
+  <sl-menu id="objectContext" style="display: none; background-color: darkgray">
+    <sl-menu-item>Copy</sl-menu-item>
+    <sl-divider></sl-divider>
+    <sl-menu-item>Paste</sl-menu-item>
+    <sl-divider></sl-divider>
+    <sl-menu-item>Delete</sl-menu-item>
+  </sl-menu>
+  <sl-menu id="renameFile" style="display: none; background-color: #09478a; position:absolute; right:40%; top:30%;">
+    
+    <input id="newName" style="display: inline-block; padding: 4px 8px; border-radius: 15px; text-align: center; text-decoration: none; cursor: pointer; background-color: rgb(60, 60, 60); color: white"></input>
+    <br>
+    <sl-button id="submitName" size="large" pill outline>Submit</sl-button>
+    <sl-button id="cancelName" size="large" pill outline>Close</sl-button>
+    </br>
+  </sl-menu>
+  <sl-menu id="sceneContext" style="display: none; background-color: darkgray;">
+    <sl-menu-item>Paste</sl-menu-item>
+    <sl-divider></sl-divider>
+    <sl-menu-item>Delete</sl-menu-item>
+  </sl-menu>
+  <sl-menu id="sceneMaker" label="Create Scene"
+    style=" display:none; position:absolute; right:40%; top:30% ; --width: 30vw; background-color: #273647;">
+    <sl-menu-item style="background-color: #273647; ">
+      <input id="is3D" type="checkbox" style="cursor: pointer;">3D Scene</input>
+    </sl-menu-item>
+    <sl-menu-item style="background-color: #273647; cursor: pointer;">
+      <sl-button id="newButton">
+        Create
+      </sl-button>
+      <sl-button id="closeButton">
+        Close
+      </sl-button>
+    </sl-menu-item>
+  </sl-menu>
 </body>
 
 </html>

@@ -88,14 +88,14 @@ class BaseEditor {
         }
     }
     openContextMenu(uuid) {
-        let objContextMenu = select('#objectContext');
+        let objContextMenu = this.fromReference('#objectContext');
         this.contextObj = uuid;
         objContextMenu.show()
         objContextMenu.elt.style.position = 'absolute';
         objContextMenu.position(winMouseX, winMouseY)
     }
     openBrowserContext(_file) {
-        let fileContext = select('#fileContext');
+        let fileContext = this.fromReference('#fileContext');
         fileContext.show()
         fileContext.elt.style.position = 'absolute';
         fileContext.position(winMouseX, winMouseY)
@@ -184,7 +184,7 @@ class BaseEditor {
         this.uiElement(saveButton);
         let showScenePanel = this.fromReference("createScene");
         showScenePanel.mousePressed(()=>{
-            let sceneMaker = select('#sceneMaker')
+            let sceneMaker = this.fromReference('#sceneMaker')
             sceneMaker.show()
         })
         exampleButton = this.fromReference("newButton");
@@ -200,7 +200,7 @@ class BaseEditor {
                 }
             },
             _font:{default:true,value:''},
-            is3D:select('#is3D').checked()
+            is3D:this.fromReference('#is3D').checked()
             }
             engine = new Engine();
             ScenesfromObject(emptyExample)
@@ -210,12 +210,12 @@ class BaseEditor {
                 }
             }
             engine.cameraPos = this.cameraPos
-            let sceneMaker = select('#sceneMaker')
+            let sceneMaker = this.fromReference('#sceneMaker')
             sceneMaker.hide()
         });
         let closeButton = this.fromReference("closeButton");
         closeButton.mousePressed(()=>{
-            let sceneMaker = select('#sceneMaker')
+            let sceneMaker = this.fromReference('#sceneMaker')
             sceneMaker.hide()
         })
         refreshButton = this.fromReference("refreshButton");
@@ -314,7 +314,7 @@ class BaseEditor {
         });
         lastScene = engine.currentScene;
         this.cameraPos = createVector(0, 0);
-        let fileContext = select('#fileContext');
+        let fileContext = this.fromReference('#fileContext');
         fileContext.elt.addEventListener('mouseleave', () => {
             fileContext.hide()
         })
@@ -330,7 +330,7 @@ class BaseEditor {
                     break;
             }
         })
-        let objContextMenu = select('#objectContext');
+        let objContextMenu = this.fromReference('#objectContext');
         objContextMenu.elt.addEventListener('mouseleave', () => {
             objContextMenu.hide()
         })
@@ -371,7 +371,7 @@ class BaseEditor {
                     break;
             }
         })
-        let sceneContext = select("#sceneContext")
+        let sceneContext = this.fromReference("#sceneContext")
         sceneContext.elt.addEventListener('mouseleave', () => {
             sceneContext.hide()
         })
@@ -424,7 +424,7 @@ class BaseEditor {
         return file
     }
     fromReference(id: string) {
-        let _ = select("#" + id)
+        let _ = select(id.includes('#')?id:"#" + id)
         this.uiElement(_)
         return _;
     }
@@ -458,8 +458,8 @@ class BaseEditor {
     }
     openSceneContext(id:number) {
     //means objectContext menu is already open
-        if(select('#objectContext').elt.style.display === 'block') return;
-        let sceneContext = select('#sceneContext');
+        if(this.fromReference('#objectContext').elt.style.display === 'block') return;
+        let sceneContext = this.fromReference('#sceneContext');
         this.sceneContext = id;
         sceneContext.show()
         sceneContext.elt.style.position = 'absolute';

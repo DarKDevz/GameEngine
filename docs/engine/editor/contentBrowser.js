@@ -1,18 +1,20 @@
 var oldScroll = 0;
 var content = {};
-content.changeName = function(_file, tryRename) {
-  let newName = tryRename ? tryRename : prompt("Change file name", _file.name);
-  if (newName === null || newName === _file.name) {
-    return;
-  }
+content.changeName = function(_file, newName) {
   let file = engine.files[_file.UUID];
-  if (engine.getByReference("name", newName)) {
-    alert("already used name");
-    content.changeName(file);
+  if (newName) {
+    if (engine.getByReference("name", newName)) {
+      alert("already used name");
+      content.changeName(_file);
+    } else {
+      file.editReference("name", newName);
+      editor.updates.browser = true;
+      editor.updates.menu = true;
+    }
   } else {
-    file.editReference("name", newName);
-    editor.updates.browser = true;
-    editor.updates.menu = true;
+    content.currentFile = _file;
+    content.nameInput.value(newName ? newName : _file.name);
+    content.renameWindow.show();
   }
 };
 function readTypeAndName() {
@@ -42,6 +44,17 @@ content.removeOldContent = function() {
   ContentBrowserPanel.Divs = [];
 };
 function PanelsInit() {
+  content.renameWindow = editor.fromReference("#renameFile");
+  content.nameInput = editor.fromReference("#newName");
+  content.submitName = editor.fromReference("#submitName");
+  content.cancelRename = editor.fromReference("#cancelName");
+  content.submitName.mousePressed(() => {
+    content.changeName(content.currentFile, content.nameInput.value());
+    content.renameWindow.hide();
+  });
+  content.cancelRename.mousePressed(() => {
+    content.renameWindow.hide();
+  });
 }
 async function createZip() {
   var zip = new JSZip();
