@@ -133,6 +133,7 @@ class GUIElement extends GameObject {
     }
     display(...args: any) { }
     update(...args: any) { }
+    customDraw() {}
 }
 class Button extends GUIElement {
     constructor(x: number, y: number, radius: number, pressed: Function, notPressed: Function) {
@@ -170,6 +171,9 @@ class Button extends GUIElement {
             engine.gui.fill(150, 50)
         }
         engine.gui.circle(this.position.x, this.position.y, this.size)
+    }
+    offSet(x,y) {
+        this.position.add(mouseX-pmouseX,mouseY-pmouseY)
     }
 }
 class Joystick extends GUIElement {
@@ -273,4 +277,7 @@ class Joystick extends GUIElement {
         this.isDragging = false;
         this.stickPosition = this.position.copy();
     }
+    offSet(x,y) {
+        this.position.add(mouseX-pmouseX,mouseY-pmouseY)
+        }
 }
