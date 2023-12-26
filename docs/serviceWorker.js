@@ -1,6 +1,5 @@
 const cacheName = "your-pwa-cache-v1";
 const filesToCache = [
-  "/",
   "map.html",
   "libs/p5.min.js",
   "libs/p5.camera.js",
