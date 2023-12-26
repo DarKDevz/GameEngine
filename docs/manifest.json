@@ -2,13 +2,13 @@
     "name": "Shimmer Engine",
     "short_name": "Shimmer",
     "description": "A javascript game engine",
-    "start_url": "/map.html",
+    "start_url": "map.html",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#0000ff",
     "icons": [
         {
-            "src": "/android-chrome-192x192.png",
+            "src": "android-chrome-192x192.png",
             "sizes": "192x192",
             "type": "image/png"
         }
