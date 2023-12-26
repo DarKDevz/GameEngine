@@ -1,6 +1,0 @@
-export interface b2WeldJointDef {
-localAnchorA : Box2D.Common.Math.b2Vec2 
-localAnchorB : Box2D.Common.Math.b2Vec2 
-referenceAngle : number 
-Initialize(bA:b2Body, bB:b2Body, anchor:Box2D.Common.Math.b2Vec2):void
-}

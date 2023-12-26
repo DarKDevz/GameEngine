@@ -32,8 +32,8 @@ const allFolders = getAllFoldersRecursive(directoryPath);
 const filteredFolders = allFolders.filter(folder => !excludedWords.some(word => folder.includes(word)));
 
 // Add "*.ts" to each folder path
-const foldersWithTS = [...filteredFolders.map(folder => path.join('./dev/'+ folder, '*.ts')),...filteredFolders.map(folder => path.join('./dev/'+ folder, '*.js'))];
-
+let foldersWithTS = [...filteredFolders.map(folder => path.join('./dev/'+ folder, '*.ts')),...filteredFolders.map(folder => path.join('./dev/'+ folder, '*.js'))];
+foldersWithTS.push("./dev/*.ts","./dev/*.js");
 // Display the list of folders with "*.ts" in their paths
 console.log('All folders with "*.ts" in their paths inside "dev" directory (excluding words):', foldersWithTS);
 async function Build() {

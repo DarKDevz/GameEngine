@@ -10,13 +10,7 @@ function doReload() {
 }
 async function checkLoad() {
   if (window.loaded) {
-    if (!window.RAPIER) {
-      await import("/libs/rapier2d.js").then((obj) => {
-        obj.init().then(() => {
-          window.RAPIER = obj;
-        });
-      });
-    }
+    await waitForEngine();
     engine = new Engine();
     window.windowResized = () => {
       engine.resize();

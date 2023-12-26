@@ -12,7 +12,6 @@ function doReload() {
 async function checkLoad() {
     if (window.loaded) {
         await waitForEngine()
-    }
         engine = new Engine();
         window.windowResized = () => { engine.resize(); };
         player = new Player();
