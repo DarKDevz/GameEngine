@@ -25,7 +25,7 @@ window.setup = function () {
         createCanvas(widthDiv.clientWidth, heightDiv.clientHeight, WEBGL);
         noSmooth();
         //Initialize Editor things
-        editor = new Editor();
+        editor = new EditorManager();
         editor.onSetup();
         Object.defineProperty(engine.camera,"zoom",{set:()=>{},get:()=>{return engine.editorZoom}})
         PanelsInit();

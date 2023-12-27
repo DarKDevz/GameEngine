@@ -477,12 +477,21 @@ class BaseEditor {
 class Editor3D extends BaseEditor {
   constructor() {
     super();
+    rover = createRoverCam();
+    rover.usePointerLock();
+    rover.setState({
+      // optional
+      position: [-400, -200, -200],
+      rotation: [0.4, 0.3, 0],
+      sensitivity: 0.1,
+      speed: 1.5
+    });
   }
   onSetup() {
     super.onSetup();
   }
 }
-class Editor extends BaseEditor {
+class Editor2D extends BaseEditor {
   constructor() {
     super();
     this.selectionBox = [];
@@ -951,6 +960,62 @@ class Editor extends BaseEditor {
         );
       }
     }
+  }
+}
+class EditorManager {
+  constructor() {
+    this.editor;
+    this.init();
+  }
+  init() {
+    this.editor = engine.is3D ? new Editor3D() : new Editor2D();
+  }
+  get updates() {
+    return this.editor.updates;
+  }
+  set updates(x) {
+    this.editor.updates = x;
+  }
+  // Redirect variable access to the appropriate editor instance
+  get levelMode() {
+    return this.editor.levelMode;
+  }
+  set levelMode(value) {
+    this.editor.levelMode = value;
+  }
+  get cameraPos() {
+    return this.editor.cameraPos;
+  }
+  set cameraPos(value) {
+    this.editor.cameraPos = value;
+  }
+  setCameraPos() {
+    this.editor.setCameraPos(...arguments);
+  }
+  openSceneContext() {
+    this.editor.openSceneContext(...arguments);
+  }
+  setSelection() {
+    this.editor.setSelection(...arguments);
+  }
+  openBrowserContext() {
+    this.editor.openBrowserContext(...arguments);
+  }
+  openContextMenu() {
+    this.editor.openContextMenu(...arguments);
+  }
+  fromReference() {
+    return this.editor.fromReference(...arguments);
+  }
+  onResize() {
+    this.editor.onResize(...arguments);
+  }
+  // Redirect function calls to the appropriate editor instance
+  onUpdate() {
+    this.editor.onUpdate();
+  }
+  onSetup() {
+    this.editor.onSetup();
   }
 }
 function accordionMenu(headerText, inputField, name, Opened = { value: false }) {

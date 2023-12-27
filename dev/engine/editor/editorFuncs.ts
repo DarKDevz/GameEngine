@@ -3,7 +3,7 @@ var lastWasPressed: any = false,
     overUI = false,
     Pressed = lastWasPressed,
     button = null,
-    exampleButton:any = null,
+    exampleButton: any = null,
     refreshButton = null,
     addButton = null,
     selectedObjects = [],
@@ -35,32 +35,32 @@ var lastWasPressed: any = false,
         Divs: [],
     },
     OldFiles = [];
-    /**
-     * VARIABLES
-     * 2D and 3D
-     * updates, levelMode, cameraPos, playingWindow, creatingNew,
-     * newObject, valChanged, copiedObj, gridSize, pasted,
-     * startPos, tryOffset
-     * 
-     * 2D Only
-     * selectionBox, isCircle
-     * 
-     * FUNCTIONS
-     * 2D Only
-     * startSelect, moveScreen, DrawSelection
-     * releaseSelectBox
-     * 
-     * 3D Changes it
-     * moveObjects, setSelection, setCameraPos
-     * onUpdate, mouseCoords, mouseDown, 
-     * pasteObjects, onSetup, 
-     */
+/**
+ * VARIABLES
+ * 2D and 3D
+ * updates, levelMode, cameraPos, playingWindow, creatingNew,
+ * newObject, valChanged, copiedObj, gridSize, pasted,
+ * startPos, tryOffset
+ * 
+ * 2D Only
+ * selectionBox, isCircle
+ * 
+ * FUNCTIONS
+ * 2D Only
+ * startSelect, moveScreen, DrawSelection
+ * releaseSelectBox
+ * 
+ * 3D Changes it
+ * moveObjects, setSelection, setCameraPos
+ * onUpdate, mouseCoords, mouseDown, 
+ * pasteObjects, onSetup, 
+ */
 class BaseEditor {
     constructor() {
         this.updates = {
-            browser:false,
-            menu:false,
-            level:true
+            browser: false,
+            menu: false,
+            level: true
         }
         this.levelMode = false;
         this.cameraPos = createVector(0, 0);
@@ -117,7 +117,7 @@ class BaseEditor {
         this.deleteInfoDivs();
     }
     onSetup() {
-        if(button) return;
+        if (button) return;
         //TODO
         //This whole thing stopped working 
         canvas.ondragover = (event) => {
@@ -167,8 +167,8 @@ class BaseEditor {
         this.uiElement(visibleInputFile);
 
         let addScene = this.fromReference("addScene");
-        addScene.mouseReleased(()=>{
-            engine.scene.push(new Level([],createVector(40,40),400))
+        addScene.mouseReleased(() => {
+            engine.scene.push(new Level([], createVector(40, 40), 400))
             editor.updates.level = true;
         })
         addButton = this.fromReference("addButton");
@@ -183,25 +183,25 @@ class BaseEditor {
         saveButton.mouseReleased(this.saveMap);
         this.uiElement(saveButton);
         let showScenePanel = this.fromReference("createScene");
-        showScenePanel.mousePressed(()=>{
+        showScenePanel.mousePressed(() => {
             let sceneMaker = this.fromReference('#sceneMaker')
             sceneMaker.show()
         })
         exampleButton = this.fromReference("newButton");
         exampleButton.mouseReleased(() => {
             let emptyExample = {
-            version:1.3,
-            file:[],
-            GUI:{default:true},
-            scenes:{
-                "0":{
-                    Data:[[0, 100, 100, 500, 50]],
-                    sceneData:[0, 400, -10, 500],
-                }
-            },
-            _font:{default:true,value:''},
-            is3D:this.fromReference('#is3D').checked(),
-            defaultPlayer:this.fromReference('#defaultPlayer').checked()
+                version: 1.3,
+                file: [],
+                GUI: { default: true },
+                scenes: {
+                    "0": {
+                        Data: [[0, 100, 100, 500, 50]],
+                        sceneData: [0, 400, -10, 500],
+                    }
+                },
+                _font: { default: true, value: '' },
+                is3D: this.fromReference('#is3D').checked(),
+                defaultPlayer: this.fromReference('#defaultPlayer').checked()
             }
             engine = new Engine();
             ScenesfromObject(emptyExample)
@@ -215,7 +215,7 @@ class BaseEditor {
             sceneMaker.hide()
         });
         let closeButton = this.fromReference("closeButton");
-        closeButton.mousePressed(()=>{
+        closeButton.mousePressed(() => {
             let sceneMaker = this.fromReference('#sceneMaker')
             sceneMaker.hide()
         })
@@ -241,7 +241,7 @@ class BaseEditor {
         let holdAll = document.getElementById("bottomDiv");
         ContentBrowserPanel.Holder = createDiv();
         ContentBrowserPanel.Holder.parent(holdAll);
-        ContentBrowserPanel.Holder.size(window.widthDiv.clientWidth,holdAll.clientHeight);
+        ContentBrowserPanel.Holder.size(window.widthDiv.clientWidth, holdAll.clientHeight);
         ContentBrowserPanel.Main = createDiv();
         ContentBrowserPanel.Main.parent(ContentBrowserPanel.Holder);
         let _ = createDiv()
@@ -322,11 +322,11 @@ class BaseEditor {
         fileContext.mouseReleased((e) => {
             switch (e.target.innerText) {
                 case "Rename":
-                    if(this.contextObj)content.changeName(this.contextObj);
+                    if (this.contextObj) content.changeName(this.contextObj);
                     fileContext.hide()
                     break;
                 case "Delete":
-                    if(this.contextObj?.UUID)engine.deleteGameFile(this.contextObj.UUID);
+                    if (this.contextObj?.UUID) engine.deleteGameFile(this.contextObj.UUID);
                     fileContext.hide()
                     break;
             }
@@ -380,7 +380,7 @@ class BaseEditor {
             switch (e.target.innerText) {
                 case "Paste":
                     let scene = this.sceneContext;
-                    if ((scene!==undefined) && this.copiedObjs) {
+                    if ((scene !== undefined) && this.copiedObjs) {
                         for (let copiedObj of this.copiedObjs) {
                             if (copiedObj.type === '' || copiedObj.type === undefined) {
                                 console.warn('Empty type means not copyable');
@@ -425,7 +425,7 @@ class BaseEditor {
         return file
     }
     fromReference(id: string) {
-        let _ = select(id.includes('#')?id:"#" + id)
+        let _ = select(id.includes('#') ? id : "#" + id)
         this.uiElement(_)
         return _;
     }
@@ -440,16 +440,16 @@ class BaseEditor {
         }
     }
     removeScene(ind) {
-        engine.scene.splice(ind,1)
-        for(let i = ind; i < engine.scene.length; i++) {
+        engine.scene.splice(ind, 1)
+        for (let i = ind; i < engine.scene.length; i++) {
             engine.scene[i].ind = i;
-            for(let obj of engine.scene[i].boxes) {
+            for (let obj of engine.scene[i].boxes) {
                 obj.scene = "" + i;
             }
         }
         editor.updates.level = true;
-        if(engine.currentScene < this.sceneContext) return;
-        let file = {data: SaveMap()}
+        if (engine.currentScene < this.sceneContext) return;
+        let file = { data: SaveMap() }
         editor.updates.browser = true;
         editor.updates.menu = true;
         engine = new Engine()
@@ -457,9 +457,9 @@ class BaseEditor {
         engine.cameraPos = editor.cameraPos;
         editor.updates.level = true;
     }
-    openSceneContext(id:number) {
-    //means objectContext menu is already open
-        if(this.fromReference('#objectContext').elt.style.display === 'block') return;
+    openSceneContext(id: number) {
+        //means objectContext menu is already open
+        if (this.fromReference('#objectContext').elt.style.display === 'block') return;
         let sceneContext = this.fromReference('#sceneContext');
         this.sceneContext = id;
         sceneContext.show()
@@ -544,12 +544,20 @@ class BaseEditor {
 class Editor3D extends BaseEditor {
     constructor() {
         super()
+        rover = createRoverCam();
+        rover.usePointerLock();    // optional; default is keyboard control only
+        rover.setState({           // optional
+          position: [-400,-200,-200],
+          rotation: [0.4,0.3,0],
+          sensitivity: 0.1,
+          speed: 1.5
+        });
     }
     onSetup(): void {
         super.onSetup();
     }
 }
-class Editor extends BaseEditor {
+class Editor2D extends BaseEditor {
     constructor() {
         super()
         this.selectionBox = [];
@@ -627,10 +635,10 @@ class Editor extends BaseEditor {
             this.selectionBox[1][1] - this.selectionBox[0][1]);
     }
     pressedLevelMode() {
-        let coords = createVector(mouseX,mouseY);
-        for(let UUID in engine.guiObjects) {
+        let coords = createVector(mouseX, mouseY);
+        for (let UUID in engine.guiObjects) {
             let GUIElement = engine.guiObjects[UUID];
-            if(GUIElement.collidesPoint(coords)) {
+            if (GUIElement.collidesPoint(coords)) {
                 selectedObjects = [UUID]
             }
         }
@@ -649,7 +657,7 @@ class Editor extends BaseEditor {
         /*------------------this.selectionBox Stuff---------------------*/
         this.startSelect()
         if (mouseIsPressed && !overUI && (mouseButton === CENTER || mouseButton === RIGHT)) {
-	    this.creatingNew = false;
+            this.creatingNew = false;
             this.moveScreen()
         }
         if (!this.levelMode && lastWasPressed != Pressed && !mouseIsPressed && !overUI) {
@@ -661,7 +669,7 @@ class Editor extends BaseEditor {
         } else if (Pressed && this.selectionBox[0] && !this.selectionBox[2]) {
             this.mouseDown();
         }
-        if(mouseIsPressed&&lastWasPressed!=='startedOverUI'&&this.levelMode) {
+        if (mouseIsPressed && lastWasPressed !== 'startedOverUI' && this.levelMode) {
             this.pressedLevelMode()
         }
         //If switching scenes remove selected
@@ -733,14 +741,14 @@ class Editor extends BaseEditor {
         }
         selectedObjects = [];
         this.tryOffset = {}
-        let collisionRect: CollidableObject= {
-            getCollisionType : ()=>{return 'Rect'},
-            getCollisionVectors: ()=>{return [{x:rect1.x,y:rect1.y},{x:rect1.width,y:rect1.height}]}
+        let collisionRect: CollidableObject = {
+            getCollisionType: () => { return 'Rect' },
+            getCollisionVectors: () => { return [{ x: rect1.x, y: rect1.y }, { x: rect1.width, y: rect1.height }] }
         }
         for (let tempBox of engine.getActiveScene().boxes) {
             if (tempBox.collision) {
                 //Change to use collision types
-                let c = tempBox.collision(collisionRect, false)?1:0;
+                let c = tempBox.collision(collisionRect, false) ? 1 : 0;
                 if (c) {
                     selectedObjects.push(tempBox.uuid);
                     //console.log(t_box.uuid);
@@ -842,19 +850,19 @@ class Editor extends BaseEditor {
         }
         this.pasted = true;
     }
-    countChildren(obj,stack=0) {
+    countChildren(obj, stack = 0) {
         let count = 0;
         //it's iterating too many times, stop it
-        if(stack > 20) {
+        if (stack > 20) {
             return 1;
         }
-        for(let index in obj) {
+        for (let index in obj) {
             let i = obj[index]
-            if(typeof i !== "object") {
+            if (typeof i !== "object") {
                 count++;
-            }else {
+            } else {
                 stack++;
-                count+=this.countChildren(i,stack);
+                count += this.countChildren(i, stack);
             }
         }
         return count;
@@ -869,13 +877,13 @@ class Editor extends BaseEditor {
             let tempBox = engine.getfromUUID(objectId);
             if (tempBox) {
                 info[tempBox.uuid] = tempBox.getEditableArray();
-                for(let index in new Array(this.countChildren(tempBox.getEditableArray()))) {
-                    infoIndexes.push(objectId+""+index);
+                for (let index in new Array(this.countChildren(tempBox.getEditableArray()))) {
+                    infoIndexes.push(objectId + "" + index);
                 }
                 if (tempBox.components) {
                     for (let componentId in tempBox.components) {
                         info[tempBox.uuid].push({ isComponent: true, componentId });
-                        infoIndexes.push(""+objectId+""+componentId);
+                        infoIndexes.push("" + objectId + "" + componentId);
                     }
                 }
                 if (!(tempBox?.noComponents)) {
@@ -888,7 +896,7 @@ class Editor extends BaseEditor {
         if (check > 0 && !editor.updates.menu) {
             return;
         }
-        if(lastIndexes.length !== infoIndexes.length) {
+        if (lastIndexes.length !== infoIndexes.length) {
             //More values than before
             //Force update
             editor.updates.menu = true;
@@ -914,7 +922,7 @@ class Editor extends BaseEditor {
             for (let editable of edit) {
                 if (editable?.isComponent) {
                     engine.getfromUUID(uuid)?.components[editable.componentId].MenuEdit?.('sideMenu')
-                }                else if (editable?.addComponent) {
+                } else if (editable?.addComponent) {
                     let divHolder = createDiv();
                     let ComponentSelect = createSelect();
                     for (const [key, value] of Object.entries(engine.componentList)) {
@@ -967,83 +975,13 @@ class Editor extends BaseEditor {
                     addButton.style('cursor: pointer;');
                     divHolder.parent('sideMenu');
                     infoDivs.push(divHolder);
-                }else {
-                    this.useEditObj(editable,'sideMenu',{});
+                } else {
+                    this.useEditObj(editable, 'sideMenu', {});
                 }
             }
         }
-        /*         for (let i = 0; i < info.length; i += 4) {
-                    //console.log(info[i]);
-                    if (info[i + 1] === "noMenu" || info[i + 1] === "component" || info[i + 1] === "AddComponent") {
-                        //console.log("works");
-                        if (info[i + 1] === "noMenu") { // if (boxes[info[i]].components[info[i + 2]]) {
-                            //     boxes[info[i]].components[info[i + 2]].MenuEdit('sideMenu');
-                            // }
-                        } else if (info[i + 1] === "component") {
-                            if (engine.getfromUUID(info[i]).components[info[i + 2]]) {
-                                engine.getfromUUID(info[i]).components[info[i + 2]].MenuEdit('sideMenu');
-                            }
-                        } else {
-                            let divHolder = createDiv();
-                            let ComponentSelect = createSelect();
-                            for (const [key, value] of Object.entries(engine.componentList)) {
-                                if (key !== "gameFile")
-                                    ComponentSelect.option(key);
-                            }
-                            ComponentSelect.style('cursor: pointer;')
-                            ComponentSelect.parent(divHolder);
-                            let addButton = createButton("Add");
-                            addButton.elt.title = "Add component"
-                            divHolder.elt.ondrop = (event: { dataTransfer: DataTransfer }) => {
-                                //console.log(event);
-                                if (event.dataTransfer.getData("UUID") === "") return;
-                                console.warn(event.dataTransfer.getData("UUID"));
-                                if (event.dataTransfer.files.length > 0) {
-                                    this.makeFile(event).then((file: gameFile) => {
-                                        let className = Engine.fileTypeList[file.type];
-                                        engine.getfromUUID(info[i]).components.push(new engine.componentList[className]({
-                                            obj: engine.getfromUUID(info[i]),
-                                            fileUUID: file.UUID
-                                        }));
-                                    })
-                                } else {
-                                    let uuid = event.dataTransfer.getData("UUID");
-                                    let file = engine.files[uuid];
-                                    let className = Engine.fileTypeList[file.type];
-                                    console.log(className);
-                                    engine.getfromUUID(info[i]).components.push(new engine.componentList[className]({
-                                        obj: engine.getfromUUID(info[i]),
-                                        fileUUID: uuid
-                                    }));
-                                    console.warn(file);
-                                }
-                            };
-                            divHolder.elt.ondragover = (event) => {
-                                event.preventDefault();
-                                //console.warn(event.dataTransfer.getData("UUID"));
-                            };
-                            addButton.mousePressed(() => {
-                                engine.getfromUUID(info[i]).components.push(new engine.componentList[ComponentSelect.value()]({
-                                    obj: engine.getfromUUID(info[i])
-                                }));
-                            });
-                            addButton.parent(divHolder);
-                            addButton.style('cursor: pointer;')
-                            divHolder.parent('sideMenu');
-                            infoDivs.push(divHolder);
-                        }
-                    } else {
-                        addMenuInput(info[i + 1], (val) => {
-                            let actValue = parseStringNum(val);
-                            engine.getfromUUID(info[i])[info[i + 3]] = actValue;
-                            engine.getfromUUID(info[i])?.updateShape?.()
-                            engine.getfromUUID(info[i])?.updatePosition?.()
-                            info[i + 2] = actValue;
-                        }, () => info[i + 2])
-                    }
-                } */
-    }
-    useEditObj(obj:EditableObject, parent = 'sideMenu', opened) {
+   }
+    useEditObj(obj: EditableObject, parent = 'sideMenu', opened) {
         let Holder;
         if (typeof obj.value === "object") {
             let divHolder = createDiv().parent(parent);
@@ -1053,7 +991,7 @@ class Editor extends BaseEditor {
             Holder.parent(divHolder);
             infoDivs.push(headerText);
             opened[""] ??= { value: false };
-            this.addNewEditObj(obj.value, Holder, opened[""],()=>{obj.set(obj.value)});
+            this.addNewEditObj(obj.value, Holder, opened[""], () => { obj.set(obj.value) });
         } else {
             addMenuInput(obj.name, (_) => {
                 obj.set(parseStringNum(_));
@@ -1066,35 +1004,96 @@ class Editor extends BaseEditor {
             //console.log("final Object", obj[i]);
         }
     }
-    addNewEditObj(obj:any, parent = 'sideMenu', opened, onUpdate=()=>{}) {
-		let Holder;
-		//console.log(obj)
-		for (let i in obj) {
-			//console.log(i, obj[i], typeof obj[i]);
-			if (typeof obj[i] === "object") {
-				let divHolder = createDiv().parent(parent);
-				let headerText = createDiv();
-				Holder = accordionMenu(headerText, createDiv(), i, opened);
-				headerText.parent(divHolder);
-				Holder.parent(divHolder);
-				infoDivs.push(headerText);
-				opened[i] ??= { value: false };
-				this.addNewEditObj(obj[i], Holder, opened[i],onUpdate);
-			} else {
-				addMenuInput(obj[i], (_) => {
-					obj[i] = (parseStringNum(_));
+    addNewEditObj(obj: any, parent = 'sideMenu', opened, onUpdate = () => { }) {
+        let Holder;
+        //console.log(obj)
+        for (let i in obj) {
+            //console.log(i, obj[i], typeof obj[i]);
+            if (typeof obj[i] === "object") {
+                let divHolder = createDiv().parent(parent);
+                let headerText = createDiv();
+                Holder = accordionMenu(headerText, createDiv(), i, opened);
+                headerText.parent(divHolder);
+                Holder.parent(divHolder);
+                infoDivs.push(headerText);
+                opened[i] ??= { value: false };
+                this.addNewEditObj(obj[i], Holder, opened[i], onUpdate);
+            } else {
+                addMenuInput(obj[i], (_) => {
+                    obj[i] = (parseStringNum(_));
                     onUpdate()
-					return obj[i]
-				}
-					, () => {
-						return obj[i].get()
-					}
-					, parent)
-				//console.log("final Object", obj[i]);
-			}
-		}
-	}
+                    return obj[i]
+                }
+                    , () => {
+                        return obj[i].get()
+                    }
+                    , parent)
+                //console.log("final Object", obj[i]);
+            }
+        }
+    }
 }
+class EditorManager {
+    constructor() {
+        this.editor;
+        this.init();
+    }
+
+    init() {
+        this.editor = engine.is3D ? new Editor3D() : new Editor2D();
+    }
+    get updates() {
+        return this.editor.updates;
+    }
+    set updates(x) {
+        this.editor.updates = x;
+    }
+    // Redirect variable access to the appropriate editor instance
+    get levelMode() {
+        return this.editor.levelMode;
+    }
+
+    set levelMode(value) {
+        this.editor.levelMode = value;
+    }
+
+    get cameraPos() {
+        return this.editor.cameraPos;
+    }
+    set cameraPos(value) {
+        this.editor.cameraPos = value;
+    }
+    setCameraPos() {
+        this.editor.setCameraPos(...arguments)
+    }
+    openSceneContext() {
+        this.editor.openSceneContext(...arguments)
+    }
+    setSelection() {
+        this.editor.setSelection(...arguments)
+    }
+    openBrowserContext() {
+        this.editor.openBrowserContext(...arguments)
+    }
+    openContextMenu() {
+        this.editor.openContextMenu(...arguments);
+    }
+    fromReference() {
+        return this.editor.fromReference(...arguments)
+    }
+    onResize() {
+        this.editor.onResize(...arguments);
+    }
+    // Redirect function calls to the appropriate editor instance
+    onUpdate() {
+        this.editor.onUpdate();
+    }
+
+    onSetup() {
+        this.editor.onSetup();
+    }
+}
+
 //Accordion menu, menu edit, script edit, image edit
 //Don't touch could break everything
 function accordionMenu(headerText, inputField, name, Opened = { value: false }): Div {
@@ -1128,9 +1127,9 @@ function accordionMenu(headerText, inputField, name, Opened = { value: false }):
     UpdateExpansion();
     byOpened = false;
     headerText.mousePressed(() => {
-    if(mouseButton === LEFT ) {
-        isExpanded = !isExpanded;
-        UpdateExpansion();
+        if (mouseButton === LEFT) {
+            isExpanded = !isExpanded;
+            UpdateExpansion();
         }
     });
     return inputField;
@@ -1144,12 +1143,12 @@ function addEditableScript(name, set, get, parentName: string | Div = "sideMenu"
     let inputField = createDiv();
     inputField.child(...additionalDiv);
     let inp;
-        inp = replaceButton;
-        inp.elt.title = "Script Editor"
+    inp = replaceButton;
+    inp.elt.title = "Script Editor"
     inp.mousePressed(() => {
         var popupWindow = window.open("popup.html", "Popup Window", "width=400,height=300");
         window.scriptData = function () {
-            return [_get().toString(),window]
+            return [_get().toString(), window]
         }
         window.receivePopupText = (text) => {
             console.log(text);

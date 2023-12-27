@@ -225,9 +225,9 @@ function ScenesfromObject(levelsObject) {
     t_levels[sceneInd] = t_boxes;
     addLevel(t_boxes, createVector(scene.sceneData[1], scene.sceneData[2]), scene.sceneData[3]);
   }
+  engine.finishedLoading();
   engine.scene[0].loadLevel();
   engine.loading = false;
-  engine.finishedLoading();
 }
 function LoadMap(file) {
   if (!(engine instanceof Engine)) {
@@ -675,7 +675,7 @@ function SaveMap() {
     fileList.push(obj2);
   }
   mapData._font = { default: true, value: "" };
-  mapData.version = 1.3;
+  mapData.version = 1.4;
   mapData.is3D = engine.is3D;
   mapData.defaultPlayer = engine.defaultPlayer;
   mapData.file = fileList;
