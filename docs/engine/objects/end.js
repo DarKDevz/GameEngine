@@ -8,6 +8,9 @@ class End extends Box {
   }
   init() {
     super.init();
+    if (!player)
+      this.earlyUpdate = () => {
+      };
   }
   draw() {
     this.clr = color(255, 255, 0);

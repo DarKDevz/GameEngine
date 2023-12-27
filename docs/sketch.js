@@ -4,7 +4,7 @@ globalThis.setup = async function () {
             const data = await response.json();
             await waitForEngine()
             engine = new Engine();
-            player = new Player();
+            
             engine.loadFromObject(data, true);
             createCanvas(windowWidth, windowHeight);
             noSmooth();

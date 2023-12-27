@@ -7,7 +7,7 @@ window.windowResized = function () {
 window.preload = async function () {
             await waitForEngine()
     engine = new Engine();
-    player = new Player();
+    
     engine.physics = false;
     const response = await fetch("./examples/platformer.json");
     const data = await response.json();

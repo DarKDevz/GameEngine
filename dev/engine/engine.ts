@@ -77,8 +77,14 @@ class Engine extends GameEvents {
         })
         setTimeout(() => { this.tryFirstLoad() }, 500)
         this.is3D;
+        this.defaultPlayer;
         // this.body = new p2.Body({ mass: 1 });
         // this.world.addBody(this.body);
+    }
+    finishedLoading() {
+        if(this.defaultPlayer) {
+            window.player = new Player();
+        }
     }
     tryFirstLoad() {
         if (window?.canvas?.width) {
@@ -222,13 +228,13 @@ class Engine extends GameEvents {
         push()
         background(150, 230, 240);
         //Update
-        player.update();
+        player?.update?.();
         //Early Update
         this.activeScene?.earlyUpdate();
-        player.camera();
-        player.checkCollisions();
+        player?.camera?.();
+        player?.checkCollisions?.();
         this.activeScene?.display();
-        player.display();
+        player?.display?.();
         //Late Update
         this.activeScene?.lateUpdate();
         pop()

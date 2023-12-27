@@ -66,7 +66,7 @@ async function createZip() {
                 await waitForEngine()
                 window.RAPIER = obj;
                 engine = new Engine();
-                player = new Player();
+                
                 engine.loadFromObject(data, true);
                 createCanvas(windowWidth, windowHeight);
                 noSmooth();

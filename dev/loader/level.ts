@@ -21,8 +21,8 @@ function cleanScene() {
         test[scene.ind] = {}
         for (let boxesId = scene.boxes.length; boxesId >= 0; boxesId--) {
             if (typeof scene.boxes[boxesId] === "object") {
-                if(test[scene.ind][scene.boxes[boxesId].uuid]) {
-                   scene.boxes.splice(boxesId, 1);
+                if (test[scene.ind][scene.boxes[boxesId].uuid]) {
+                    scene.boxes.splice(boxesId, 1);
                 }
                 test[scene.ind][scene.boxes[boxesId].uuid] ??= scene.boxes[boxesId]
                 if (engine.uuidList[scene.boxes[boxesId].uuid] === undefined) {
@@ -35,12 +35,14 @@ function cleanScene() {
      * Gets all collision types and vectors and put them in the collision worker
      */
     let allCollision = {};
-    engine.activeScene.boxes.forEach((b)=>{ 
-    allCollision[b.uuid] = ([b.getCollisionType(),b.getCollisionVectors()])})
-    if(player?.getCollisionType) {
+    engine.activeScene.boxes.forEach((b) => {
+        allCollision[b.uuid] = ([b.getCollisionType(), b.getCollisionVectors()])
+    })
+    if (player?.getCollisionType) {
         allCollision['Player'] = [player.getCollisionType(), player.getCollisionVectors()];
-    }    engine.collisionWorker.postMessage({type:"update",value:allCollision})
-    engine.collisionWorker.postMessage({type:"getcache"})
+    } 
+    engine.collisionWorker.postMessage({ type: "update", value: allCollision })
+    engine.collisionWorker.postMessage({ type: "getcache" })
 }
 function removeObject(objId: UUID | GameObject | number) {
     if (typeof objId === "string" && objId.startsWith("0x")) {
@@ -76,11 +78,11 @@ function addObj(ind: any, arr: any, sceneId?: string) {
         5: Interactive
     };
     let obj;
-    if(objectMap.hasOwnProperty(ind)) {
+    if (objectMap.hasOwnProperty(ind)) {
         obj = new (objectMap[ind])(...arr);
-    //This can introuduce xss exploits
-    //but we already allow code execution any way so who cares
-    }else if(eval(ind)) {
+        //This can introuduce xss exploits
+        //but we already allow code execution any way so who cares
+    } else if (eval(ind)) {
         obj = new (eval(ind))(...arr);
     }
     obj.scene = sceneId;
@@ -89,6 +91,7 @@ function addObj(ind: any, arr: any, sceneId?: string) {
 function ScenesfromObject(levelsObject: ImportInterface) {
     engine.loading = true;
     engine.is3D = Boolean(levelsObject.is3D);
+    engine.defaultPlayer = 'defaultPlayer' in levelsObject ? Boolean(levelsObject.defaultPlayer): true;
     let t_levels = {};
     var newLevels = levelsObject;
     if (newLevels.file) {
@@ -241,6 +244,7 @@ function ScenesfromObject(levelsObject: ImportInterface) {
     }
     engine.scene[0].loadLevel();
     engine.loading = false;
+    engine.finishedLoading();
 }
 function LoadMap(file: { data: any }) {
     if (!(engine instanceof Engine)) {
@@ -281,7 +285,7 @@ class Level extends GameEvents {
         box.init();
         this.boxes = [...this.boxes, box];
         engine.uuidList[box.uuid] ??= box
-        box.scene = ""+this.ind
+        box.scene = "" + this.ind
     }
     customDraw(shouldRun = true) {
         if (!shouldRun) return 1;
@@ -298,8 +302,10 @@ class Level extends GameEvents {
         if (webglVersion === "p2d") translate(width / 2, height / 2);
         let camera = engine.camera
         let cameraPos = camera.updateCameraPos()
+        if(!engine.is3D) {
         scale(camera.zoom);
         translate(-cameraPos.x, -cameraPos.y)
+        }
         //Call without drawing
         //Do Update First Only if you can
         let collisionVectors = []
@@ -313,7 +319,7 @@ class Level extends GameEvents {
         let drawable = [];
         let matrix = webglVersion == "p2d" ? drawingContext.getTransform().inverse() : null;
         let pointFirst = new DOMPoint(0, 0);
-        let pointSecond = new DOMPoint(width*pixelDensity(), height*pixelDensity());
+        let pointSecond = new DOMPoint(width * pixelDensity(), height * pixelDensity());
         let sorted;
         if (webglVersion == "webgl2") {
             //Update plane collider
@@ -324,7 +330,7 @@ class Level extends GameEvents {
             updateColliders()
             for (let t_box of this.boxes) {
                 var frustum = {
-                    getCollisionType():collisionTypes {
+                    getCollisionType(): collisionTypes {
                         return 'Frustum';
                     },
                     getCollisionVectors() {
@@ -333,7 +339,7 @@ class Level extends GameEvents {
                 };
                 let collides: boolean;
                 //To remove useless frustum collision check
-                if(t_box.alwaysDraw) {
+                if (t_box.alwaysDraw) {
                     collides = true
                 }
                 collides ??= HandleCollision(t_box, frustum);
@@ -345,14 +351,14 @@ class Level extends GameEvents {
                 //Does nothing
                 sorted = drawable;
             }
-        }else {
-            collisionVectors = [matrix.transformPoint(pointFirst),matrix.transformPoint(pointSecond)];
+        } else {
+            collisionVectors = [matrix.transformPoint(pointFirst), matrix.transformPoint(pointSecond)];
             let s = collisionVectors[0]
             let b = collisionVectors[1];
             collisionVectors[1] = { x: b.x - collisionVectors[0].x, y: b.y - collisionVectors[0].y };
             for (let t_box of this.boxes) {
                 var frustum = {
-                    getCollisionType():collisionTypes {
+                    getCollisionType(): collisionTypes {
                         return 'Rect';
                     },
                     getCollisionVectors() {
@@ -360,7 +366,7 @@ class Level extends GameEvents {
                     }
                 };
                 let collides: boolean;
-                if(t_box.alwaysDraw) {
+                if (t_box.alwaysDraw) {
                     collides = true
                 }
                 collides ??= HandleCollision(t_box, frustum);
@@ -377,7 +383,7 @@ class Level extends GameEvents {
         if (window?.editor) {
             DrawAll();
         }
-        if(sorted) {
+        if (sorted) {
             for (let t_box of sorted) {
                 t_box.display(OnlyDraw, false);
             }
@@ -437,15 +443,15 @@ class Level extends GameEvents {
         return ["level Index", "starting Position x", "starting Position y", "Max Y Pos"]
     }
     loadLevel() {
-        if(player.cameraPos) {
-        player.pos = this.pos.copy();
-        player.cameraPos.x = this.pos.x;
-        player.cameraPos.y = this.pos.y;
-        player.grounded = false;
-        player.groundedId = null;
-        player.colliding = false;
-        player.collidedId = null;
-        player.vel = createVector(0, 0);
+        if (player && player.cameraPos) {
+            player.pos = this.pos.copy();
+            player.cameraPos.x = this.pos.x;
+            player.cameraPos.y = this.pos.y;
+            player.grounded = false;
+            player.groundedId = null;
+            player.colliding = false;
+            player.collidedId = null;
+            player.vel = createVector(0, 0);
         }
         gameParticle.stopAll()
         if (engine.currentScene !== undefined) {
@@ -522,8 +528,8 @@ class Level extends GameEvents {
         })
         accordionMenu(headerText, inputField, "Scene: " + this.ind, openerState[this.ind]);
 
-        sceneBtn.mouseReleased(()=>{
-            if(mouseButton==="right") {
+        sceneBtn.mouseReleased(() => {
+            if (mouseButton === "right") {
                 editor.openSceneContext(this.ind);
             }
         })
@@ -547,8 +553,8 @@ class Level extends GameEvents {
             let _box = createDiv(box.constructor.name);
             _box.style("cursor: pointer; width: fit-content;")
             _box.mouseReleased(() => {
-                if(isDragging) return
-                switch(mouseButton) {
+                if (isDragging) return
+                switch (mouseButton) {
                     case "left":
                         if (engine.currentScene === this.ind) {
                             editor.setSelection([box.uuid]);
@@ -695,6 +701,7 @@ function SaveMap() {
     mapData.version = 1.3;
     //TODO
     mapData.is3D = engine.is3D;
+    mapData.defaultPlayer = engine.defaultPlayer;
     mapData.file = fileList;
     mapData.scenes = {}
     for (let level of engine.scene) {

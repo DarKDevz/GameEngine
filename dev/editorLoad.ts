@@ -14,7 +14,6 @@ async function checkLoad() {
         await waitForEngine()
         engine = new Engine();
         window.windowResized = () => { engine.resize(); };
-        player = new Player();
         LoadMap(MapData);
         return;
     }
@@ -90,8 +89,6 @@ function setup() {
 function draw() {
     //Make Sure it's loaded correctly
     if (!window.loaded)
-        return;
-    if (!window?.player?.update)
         return;
     if (!window?.engine?.getActiveScene)
         return;

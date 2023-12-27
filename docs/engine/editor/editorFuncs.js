@@ -148,7 +148,8 @@ class BaseEditor {
           }
         },
         _font: { default: true, value: "" },
-        is3D: this.fromReference("#is3D").checked()
+        is3D: this.fromReference("#is3D").checked(),
+        defaultPlayer: this.fromReference("#defaultPlayer").checked()
       };
       engine = new Engine();
       ScenesfromObject(emptyExample);

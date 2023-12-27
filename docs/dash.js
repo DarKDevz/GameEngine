@@ -4,7 +4,7 @@
             const response = await fetch("../examples/GeoQuiz.json");
             const data = await response.json();
             engine = new Engine();
-            player = new Player();
+            
             engine.loadFromObject(data,true);
             createCanvas(windowWidth, windowHeight);
             noSmooth();

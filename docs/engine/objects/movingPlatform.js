@@ -22,6 +22,9 @@ class movingPlatform extends Box {
         engine.world.createCollider(colliderDesc, this.body);
       }
     }
+    if (!player)
+      this.earlyUpdate = () => {
+      };
   }
   getClassName() {
     return "movingPlatform";

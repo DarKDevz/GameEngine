@@ -15,7 +15,6 @@ async function checkLoad() {
     window.windowResized = () => {
       engine.resize();
     };
-    player = new Player();
     LoadMap(MapData);
     return;
   } else if (window.editorData) {
@@ -45,8 +44,6 @@ function setup() {
 }
 function draw() {
   if (!window.loaded)
-    return;
-  if (!window?.player?.update)
     return;
   if (!window?.engine?.getActiveScene)
     return;

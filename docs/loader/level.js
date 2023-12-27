@@ -85,6 +85,7 @@ function addObj(ind, arr, sceneId) {
 function ScenesfromObject(levelsObject) {
   engine.loading = true;
   engine.is3D = Boolean(levelsObject.is3D);
+  engine.defaultPlayer = "defaultPlayer" in levelsObject ? Boolean(levelsObject.defaultPlayer) : true;
   let t_levels = {};
   var newLevels = levelsObject;
   if (newLevels.file) {
@@ -226,6 +227,7 @@ function ScenesfromObject(levelsObject) {
   }
   engine.scene[0].loadLevel();
   engine.loading = false;
+  engine.finishedLoading();
 }
 function LoadMap(file) {
   if (!(engine instanceof Engine)) {
@@ -283,7 +285,7 @@ class Level extends GameEvents {
       translate(width / 2, height / 2);
     let camera = engine.camera;
     let cameraPos = camera.updateCameraPos();
-    if(!engine.is3D){
+    if (!engine.is3D) {
       scale(camera.zoom);
       translate(-cameraPos.x, -cameraPos.y);
     }
@@ -410,7 +412,7 @@ class Level extends GameEvents {
     return ["level Index", "starting Position x", "starting Position y", "Max Y Pos"];
   }
   loadLevel() {
-    if (player.cameraPos) {
+    if (player && player.cameraPos) {
       player.pos = this.pos.copy();
       player.cameraPos.x = this.pos.x;
       player.cameraPos.y = this.pos.y;
@@ -675,6 +677,7 @@ function SaveMap() {
   mapData._font = { default: true, value: "" };
   mapData.version = 1.3;
   mapData.is3D = engine.is3D;
+  mapData.defaultPlayer = engine.defaultPlayer;
   mapData.file = fileList;
   mapData.scenes = {};
   for (let level of engine.scene) {

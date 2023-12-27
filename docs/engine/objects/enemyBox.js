@@ -6,6 +6,9 @@ class Enemy extends Box {
   }
   init() {
     super.init();
+    if (!player)
+      this.earlyUpdate = () => {
+      };
   }
   getClassName() {
     return "Enemy";
