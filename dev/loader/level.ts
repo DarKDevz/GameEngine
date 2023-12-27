@@ -694,7 +694,7 @@ function SaveMap() {
     mapData._font = { default: true, value: "" }
     mapData.version = 1.3;
     //TODO
-    mapData.is3D = false;
+    mapData.is3D = engine.is3D;
     mapData.file = fileList;
     mapData.scenes = {}
     for (let level of engine.scene) {

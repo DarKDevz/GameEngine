@@ -283,8 +283,10 @@ class Level extends GameEvents {
       translate(width / 2, height / 2);
     let camera = engine.camera;
     let cameraPos = camera.updateCameraPos();
-    scale(camera.zoom);
-    translate(-cameraPos.x, -cameraPos.y);
+    if(!engine.is3D){
+      scale(camera.zoom);
+      translate(-cameraPos.x, -cameraPos.y);
+    }
     let collisionVectors = [];
     if (!OnlyDraw) {
       for (let t_box of this.boxes) {
@@ -672,7 +674,7 @@ function SaveMap() {
   }
   mapData._font = { default: true, value: "" };
   mapData.version = 1.3;
-  mapData.is3D = false;
+  mapData.is3D = engine.is3D;
   mapData.file = fileList;
   mapData.scenes = {};
   for (let level of engine.scene) {

@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="libs/shoelace/cdn/themes/dark.css" />
   <link rel="manifest" href="manifest.json">
   <script>
-    if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator && location.protocol !== 'blob:') {
         navigator.serviceWorker.register('serviceWorker.js')
             .then(registration => {
                 console.log('Service Worker registered with scope:', registration.scope);
@@ -115,6 +115,9 @@
     style=" display:none; position:absolute; right:40%; top:30% ; --width: 30vw; background-color: #273647;">
     <sl-menu-item style="background-color: #273647; ">
       <input id="is3D" type="checkbox" style="cursor: pointer;">3D Scene</input>
+    </sl-menu-item>
+    <sl-menu-item style="background-color: #273647; ">
+      <input id="defaultPlayer" type="checkbox" style="cursor: pointer;">Player</input>
     </sl-menu-item>
     <sl-menu-item style="background-color: #273647; cursor: pointer;">
       <sl-button id="newButton">
