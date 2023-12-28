@@ -494,22 +494,122 @@ class Editor3D extends BaseEditor {
         super()
         this.rover = createRoverCam();
         this.rover.setState({           // optional
-            position: [-400, -200, -200],
-            rotation: [0.4, 0.3, 0],
+            position: [0, 0, (height / 2.0) / tan(PI * 30.0 / 180.0)],
+            rotation: [-PI / 2, 0, 0],
             sensitivity: 0.03,
             speed: 1.5
         });
-        this.rover.keyMap.y1 = [37,37];
-        this.rover.keyMap.p1 = [38,38];
-        this.rover.keyMap.y2 = [39,39];
-        this.rover.keyMap.p2 = [40,40];
+        this.rover.keyMap.y1 = [37, 37];
+        this.rover.keyMap.p1 = [38, 38];
+        this.rover.keyMap.y2 = [39, 39];
+        this.rover.keyMap.p2 = [40, 40];
     }
-    onUpdate() {
-        if(keyIsDown(68)) {
-            this.rover.moveY( -this.rover.speed);
+    calculateMousePosition() {
+        let cam = _renderer._curCamera;
+        let normX = mouseX / width;
+        let normY = mouseY / height;
+        let ndcX = (mouseX - width / 2) / width * 2;
+        let ndcY = (mouseY - height / 2) / height * 2;
+        let ndcZ = 1;
+        let ndc = new DOMPoint(ndcX,-ndcY,ndcZ);
+        let p = _renderer.uPMatrix.mat4;
+        let projectionMatrix = new DOMMatrix([
+          p[0],
+          p[1],
+          p[2],
+          p[3],
+          p[4],
+          p[5],
+          p[6],
+          p[7],
+          p[8],
+          p[9],
+          p[10],
+          p[11],
+          p[12],
+          p[13],
+          p[14],
+          p[15]
+        ]);
+        let camV = projectionMatrix.inverse().transformPoint(ndc);
+        let w = camV.w;
+        let m = _renderer.uMVMatrix.mat4;
+        let modelViewMatrix = new DOMMatrix([
+          m[0],
+          m[1],
+          m[2],
+          m[3],
+          m[4],
+          m[5],
+          m[6],
+          m[7],
+          m[8],
+          m[9],
+          m[10],
+          m[11],
+          m[12],
+          m[13],
+          m[14],
+          m[15]
+        ]);
+        let world = modelViewMatrix.inverse().transformPoint(camV);
+        let world2 = [world.x / w, world.y / w, world.z / w];
+        let phi = atan2(world2[1] - cam.eyeY, Math.hypot(world2[0] - cam.eyeX, world2[2] - cam.eyeZ));
+        let th = -atan2(world2[0] - cam.eyeX, world2[2] - cam.eyeZ) + PI / 2;
+        let dRay = -cam.eyeZ / (cos(phi) * sin(th));
+        let projectedToZ = [
+          cam.eyeX + dRay * cos(phi) * cos(th),
+          cam.eyeY + dRay * sin(phi),
+          dRay
+        ];
+        let ray = {
+          x:cos(phi) * cos(th),
+          y:sin(phi) ,
+          z:cos(phi) * sin(th)
         }
-        if(keyIsDown(65)) {
-            this.rover.moveY( this.rover.speed);
+        return [ray,projectedToZ];
+      }
+    onUpdate() {
+        if (keyIsDown(68)) {
+            this.rover.moveY(-this.rover.speed);
+        }
+        if (keyIsDown(65)) {
+            this.rover.moveY(this.rover.speed);
+        }
+        if (keyIsDown(16) && mouseIsPressed && !overUI) {
+            if(!keyIsDown(18))selectedObjects = [];
+            let Info = this.calculateMousePosition();
+            let Ball ={}
+            Ball.getCollisionType = () => {
+                    return 'Circle'
+                }
+            Ball.getCollisionVectors = () => {
+                return [{ x: Info[1][0], y: Info[1][1] }, 2];
+              }
+            for(let obj of engine.activeScene.boxes) {
+                if (obj.collision && !obj.is3D) {
+                    //Change to use collision types
+                    let c = obj.collision(Ball, false) ? 1 : 0;
+                    if (c) {
+                        selectedObjects.push(obj.uuid);
+                        //console.log(t_box.uuid);
+                    }
+                    obj.clr = c * 50
+                    //console.log(c);
+                }else if(obj.collision) {
+                    //TODO: 3D Shapes
+                }
+            }
+            if(selectedObjects.length == 0) {
+                editor.removeSelection()
+                info = [];
+            }
+        }
+        if (this.levelMode) {
+            this.rover.setState({           // optional
+                position: [0, 0, (height / 2.0) / tan(PI * 30.0 / 180.0)],
+                rotation: [-PI / 2, 0, 0],
+            });
         }
     }
     setCameraPos(box: GameObject) {
@@ -600,13 +700,6 @@ class Editor2D extends BaseEditor {
             this.selectionBox[1][1] - this.selectionBox[0][1]);
     }
     onUpdate() {
-        if (mouseIsPressed && overUI) {
-            lastWasPressed = 'startedOverUi'
-        }
-        if (!overUI && lastWasPressed !== 'startedOverUi') {
-            lastWasPressed = Pressed;
-            Pressed = mouseIsPressed && !this.levelMode;
-        }
         if (this.selectionBox[1]) {
             this.DrawSelection()
         }
@@ -616,13 +709,7 @@ class Editor2D extends BaseEditor {
             this.creatingNew = false;
             this.moveScreen()
         }
-        if (!this.levelMode && lastWasPressed != Pressed && !mouseIsPressed && !overUI) {
-            if (lastWasPressed === 'startedOverUi') {
-                lastWasPressed = false;
-            } else {
-                this.releaseSelectBox();
-            }
-        } else if (Pressed && this.selectionBox[0] && !this.selectionBox[2]) {
+        if (Pressed && this.selectionBox[0] && !this.selectionBox[2]) {
             this.mouseDown();
         }
     }
@@ -843,10 +930,10 @@ class EditorManager {
             addMenuInput(
                 "Grid Size",
                 (value: any) => {
-                    this.gridSize = parseStringNum(value, this.gridSize, true);
+                    this.editor.gridSize = parseStringNum(value, this.editor.gridSize, true);
                 },
                 () => {
-                    return this.gridSize
+                    return this.editor.gridSize
                 }
             );
         } else {
@@ -1054,7 +1141,14 @@ class EditorManager {
     }
     // Redirect function calls to the appropriate editor instance
     onUpdate() {
-        if(this.last3D !== engine.is3D) {
+        if (mouseIsPressed && overUI) {
+            lastWasPressed = 'startedOverUi'
+        }
+        if (!overUI && lastWasPressed !== 'startedOverUi') {
+            lastWasPressed = Pressed;
+            Pressed = mouseIsPressed && !this.levelMode;
+        }
+        if (this.last3D !== engine.is3D) {
             this.init();
         }
         this.last3D = engine.is3D;
@@ -1098,6 +1192,13 @@ class EditorManager {
             this.editor.pasteObjects();
         } else {
             this.pasted = false;
+        }
+        if (!this.levelMode && lastWasPressed != Pressed && !mouseIsPressed && !overUI) {
+            if (lastWasPressed === 'startedOverUi') {
+                lastWasPressed = false;
+            } else {
+                this.editor.releaseSelectBox?.();
+            }
         }
     }
     updateLevels() {
