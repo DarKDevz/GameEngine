@@ -298,7 +298,7 @@ class BaseEditor {
         removeButton.elt.title = "Remove Object(s)";
         this.uiElement(removeButton);
         levelButton = createButton('Level').class('allButtons');
-        levelButton.mousePressed(this.levelScreen.bind(this));
+        levelButton.mousePressed(editor.levelScreen.bind(editor));
         levelButton.parent('actionMenu');
         levelButton.elt.title = "Show/Hide UI and Scene Variables";
         this.uiElement(levelButton);
@@ -429,16 +429,6 @@ class BaseEditor {
         this.uiElement(_)
         return _;
     }
-    updateLevels() {
-        //console.log(engine.scene);
-        let leftDiv = document.getElementById("leftDiv");
-        for (let oldScene of sceneHolder) {
-            oldScene.remove()
-        }
-        for (let scene of engine.scene) {
-            scene.addSceneBtn(leftDiv, openerState);
-        }
-    }
     removeScene(ind) {
         engine.scene.splice(ind, 1)
         for (let i = ind; i < engine.scene.length; i++) {
@@ -498,60 +488,35 @@ class BaseEditor {
             this.copiedObjs.push(copiedObj)
         }
     }
-    levelScreen() {
-        this.levelMode = !this.levelMode;
-        this.deleteInfoDivs()
-
-        if (this.levelMode) {
-            const activeScene = engine.getActiveScene();
-            const levelValues = activeScene.getLevelValues();
-            const levelValueNames = activeScene.getLevelValueNames();
-            const actualLevelValues = activeScene.getActualLevelValues();
-
-            for (let i = 0; i < levelValues.length; i++) {
-                addMenuInput(
-                    levelValueNames[i],
-                    (val: any) => {
-                        const actValue = parseStringNum(val, activeScene[actualLevelValues[i]]);
-                        activeScene[actualLevelValues[i]] = actValue;
-                        levelValues[i] = actValue;
-                    },
-                    () => levelValues[i]
-                );
-            }
-            addMenuInput(
-                "Grid Size",
-                (value: any) => {
-                    this.gridSize = parseStringNum(value, this.gridSize, true);
-                },
-                () => {
-                    return this.gridSize
-                }
-            );
-        } else {
-            this.removeSelection();
-            info = [];
-        }
-    }
-    removeSelection() {
-        selectedObjects = [];
-        this.tryOffset = {}
-        for (let t_info of infoDivs) {
-            t_info.remove();
-        }
-    }
 }
 class Editor3D extends BaseEditor {
     constructor() {
         super()
-        rover = createRoverCam();
-        rover.usePointerLock();    // optional; default is keyboard control only
-        rover.setState({           // optional
-          position: [-400,-200,-200],
-          rotation: [0.4,0.3,0],
-          sensitivity: 0.1,
-          speed: 1.5
+        this.rover = createRoverCam();
+        this.rover.setState({           // optional
+            position: [-400, -200, -200],
+            rotation: [0.4, 0.3, 0],
+            sensitivity: 0.03,
+            speed: 1.5
         });
+        this.rover.keyMap.y1 = [37,37];
+        this.rover.keyMap.p1 = [38,38];
+        this.rover.keyMap.y2 = [39,39];
+        this.rover.keyMap.p2 = [40,40];
+    }
+    onUpdate() {
+        if(keyIsDown(68)) {
+            this.rover.moveY( -this.rover.speed);
+        }
+        if(keyIsDown(65)) {
+            this.rover.moveY( this.rover.speed);
+        }
+    }
+    setCameraPos(box: GameObject) {
+        //
+    }
+    setSelection(newArr: any[]) {
+        selectedObjects = newArr;
     }
     onSetup(): void {
         super.onSetup();
@@ -634,15 +599,6 @@ class Editor2D extends BaseEditor {
             this.selectionBox[1][0] - this.selectionBox[0][0],
             this.selectionBox[1][1] - this.selectionBox[0][1]);
     }
-    pressedLevelMode() {
-        let coords = createVector(mouseX, mouseY);
-        for (let UUID in engine.guiObjects) {
-            let GUIElement = engine.guiObjects[UUID];
-            if (GUIElement.collidesPoint(coords)) {
-                selectedObjects = [UUID]
-            }
-        }
-    }
     onUpdate() {
         if (mouseIsPressed && overUI) {
             lastWasPressed = 'startedOverUi'
@@ -668,46 +624,6 @@ class Editor2D extends BaseEditor {
             }
         } else if (Pressed && this.selectionBox[0] && !this.selectionBox[2]) {
             this.mouseDown();
-        }
-        if (mouseIsPressed && lastWasPressed !== 'startedOverUI' && this.levelMode) {
-            this.pressedLevelMode()
-        }
-        //If switching scenes remove selected
-        if (lastScene != engine.currentScene) {
-            this.removeSelection()
-        }
-        lastScene = engine.currentScene;
-
-        for (let uuid of selectedObjects) {
-            let tempBox = engine.getfromUUID(uuid);
-            if (tempBox) {
-                tempBox?.customDraw?.();
-            } else {
-                selectedObjects.splice(uuid, 1);
-            }
-        }
-        //Disallow selecting if Playing
-        //if(Playing  && !Paused) this.selectionBox = [];
-
-        if (selectedObjects.length != 0) {
-            this.OpenEditMenu()
-        }
-        let newFile = Object.keys(engine.files);
-        if (!newFile.equals(OldFiles) || editor.updates.browser) {
-            editor.updates.browser = false;
-            console.warn("added a file!/ changed");
-            OldFiles = newFile;
-            content.removeOldContent()
-            readTypeAndName()
-        }
-        if (editor.updates.level && engine?.scene?.length > 0) {
-            editor.updates.level = false;
-            this.updateLevels()
-        }
-        if (keyIsDown(17) && keyIsDown(86)) {
-            this.pasteObjects();
-        } else {
-            this.pasted = false;
         }
     }
     mouseCoords() {
@@ -758,7 +674,7 @@ class Editor2D extends BaseEditor {
             }
         }
         if (selectedObjects.length === 0) {
-            this.removeSelection()
+            editor.removeSelection()
             info = [];
         }
     }
@@ -849,6 +765,110 @@ class Editor2D extends BaseEditor {
             selectedObjects.push(_obj.uuid);
         }
         this.pasted = true;
+    }
+}
+class EditorManager {
+    editor: BaseEditor;
+    constructor() {
+        this.editor;
+        this.init();
+    }
+
+    init() {
+        this.editor = engine.is3D ? new Editor3D() : new Editor2D();
+    }
+    get updates() {
+        return this.editor.updates;
+    }
+    set updates(x) {
+        this.editor.updates = x;
+    }
+    // Redirect variable access to the appropriate editor instance
+    get levelMode() {
+        return this.editor.levelMode;
+    }
+
+    set levelMode(value) {
+        this.editor.levelMode = value;
+    }
+
+    get cameraPos() {
+        return this.editor.cameraPos;
+    }
+    set cameraPos(value) {
+        this.editor.cameraPos = value;
+    }
+    setCameraPos() {
+        this.editor.setCameraPos(...arguments)
+    }
+    openSceneContext() {
+        this.editor.openSceneContext(...arguments)
+    }
+    setSelection() {
+        this.editor.setSelection(...arguments)
+    }
+    openBrowserContext() {
+        this.editor.openBrowserContext(...arguments)
+    }
+    openContextMenu() {
+        this.editor.openContextMenu(...arguments);
+    }
+    fromReference() {
+        return this.editor.fromReference(...arguments)
+    }
+    onResize() {
+        this.editor.onResize(...arguments);
+    }
+    levelScreen() {
+        this.levelMode = !this.levelMode;
+        this.editor.deleteInfoDivs()
+
+        if (this.levelMode) {
+            const activeScene = engine.getActiveScene();
+            const levelValues = activeScene.getLevelValues();
+            const levelValueNames = activeScene.getLevelValueNames();
+            const actualLevelValues = activeScene.getActualLevelValues();
+
+            for (let i = 0; i < levelValues.length; i++) {
+                addMenuInput(
+                    levelValueNames[i],
+                    (val: any) => {
+                        const actValue = parseStringNum(val, activeScene[actualLevelValues[i]]);
+                        activeScene[actualLevelValues[i]] = actValue;
+                        levelValues[i] = actValue;
+                    },
+                    () => levelValues[i]
+                );
+            }
+            addMenuInput(
+                "Grid Size",
+                (value: any) => {
+                    this.gridSize = parseStringNum(value, this.gridSize, true);
+                },
+                () => {
+                    return this.gridSize
+                }
+            );
+        } else {
+            this.removeSelection();
+            info = [];
+        }
+    }
+    pressedLevelMode() {
+        let coords = createVector(mouseX, mouseY);
+        for (let UUID in engine.guiObjects) {
+            let GUIElement = engine.guiObjects[UUID];
+            if (GUIElement.collidesPoint(coords)) {
+                selectedObjects = [UUID]
+            }
+        }
+    }
+    removeSelection() {
+        selectedObjects = [];
+        this.editor.tryOffset = {}
+        for (let t_info of infoDivs) {
+            t_info.remove();
+        }
     }
     countChildren(obj, stack = 0) {
         let count = 0;
@@ -980,29 +1000,6 @@ class Editor2D extends BaseEditor {
                 }
             }
         }
-   }
-    useEditObj(obj: EditableObject, parent = 'sideMenu', opened) {
-        let Holder;
-        if (typeof obj.value === "object") {
-            let divHolder = createDiv().parent(parent);
-            let headerText = createDiv();
-            Holder = accordionMenu(headerText, createDiv(), "", opened);
-            headerText.parent(divHolder);
-            Holder.parent(divHolder);
-            infoDivs.push(headerText);
-            opened[""] ??= { value: false };
-            this.addNewEditObj(obj.value, Holder, opened[""], () => { obj.set(obj.value) });
-        } else {
-            addMenuInput(obj.name, (_) => {
-                obj.set(parseStringNum(_));
-                return obj.get()
-            }
-                , () => {
-                    return obj.get()
-                }
-                , parent)
-            //console.log("final Object", obj[i]);
-        }
     }
     addNewEditObj(obj: any, parent = 'sideMenu', opened, onUpdate = () => { }) {
         let Holder;
@@ -1032,65 +1029,90 @@ class Editor2D extends BaseEditor {
             }
         }
     }
-}
-class EditorManager {
-    constructor() {
-        this.editor;
-        this.init();
-    }
-
-    init() {
-        this.editor = engine.is3D ? new Editor3D() : new Editor2D();
-    }
-    get updates() {
-        return this.editor.updates;
-    }
-    set updates(x) {
-        this.editor.updates = x;
-    }
-    // Redirect variable access to the appropriate editor instance
-    get levelMode() {
-        return this.editor.levelMode;
-    }
-
-    set levelMode(value) {
-        this.editor.levelMode = value;
-    }
-
-    get cameraPos() {
-        return this.editor.cameraPos;
-    }
-    set cameraPos(value) {
-        this.editor.cameraPos = value;
-    }
-    setCameraPos() {
-        this.editor.setCameraPos(...arguments)
-    }
-    openSceneContext() {
-        this.editor.openSceneContext(...arguments)
-    }
-    setSelection() {
-        this.editor.setSelection(...arguments)
-    }
-    openBrowserContext() {
-        this.editor.openBrowserContext(...arguments)
-    }
-    openContextMenu() {
-        this.editor.openContextMenu(...arguments);
-    }
-    fromReference() {
-        return this.editor.fromReference(...arguments)
-    }
-    onResize() {
-        this.editor.onResize(...arguments);
+    useEditObj(obj: EditableObject, parent = 'sideMenu', opened) {
+        let Holder;
+        if (typeof obj.value === "object") {
+            let divHolder = createDiv().parent(parent);
+            let headerText = createDiv();
+            Holder = accordionMenu(headerText, createDiv(), "", opened);
+            headerText.parent(divHolder);
+            Holder.parent(divHolder);
+            infoDivs.push(headerText);
+            opened[""] ??= { value: false };
+            this.addNewEditObj(obj.value, Holder, opened[""], () => { obj.set(obj.value) });
+        } else {
+            addMenuInput(obj.name, (_) => {
+                obj.set(parseStringNum(_));
+                return obj.get()
+            }
+                , () => {
+                    return obj.get()
+                }
+                , parent)
+            //console.log("final Object", obj[i]);
+        }
     }
     // Redirect function calls to the appropriate editor instance
     onUpdate() {
+        if(this.last3D !== engine.is3D) {
+            this.init();
+        }
+        this.last3D = engine.is3D;
         this.editor.onUpdate();
-    }
+        if (mouseIsPressed && lastWasPressed !== 'startedOverUI' && this.levelMode) {
+            this.pressedLevelMode()
+        }
+        //If switching scenes remove selected
+        if (lastScene != engine.currentScene) {
+            this.removeSelection()
+        }
+        lastScene = engine.currentScene;
 
+        for (let uuid of selectedObjects) {
+            let tempBox = engine.getfromUUID(uuid);
+            if (tempBox) {
+                tempBox?.customDraw?.();
+            } else {
+                selectedObjects.splice(uuid, 1);
+            }
+        }
+        //Disallow selecting if Playing
+        //if(Playing  && !Paused) this.selectionBox = [];
+
+        if (selectedObjects.length != 0) {
+            this.OpenEditMenu()
+        }
+        let newFile = Object.keys(engine.files);
+        if (!newFile.equals(OldFiles) || editor.updates.browser) {
+            editor.updates.browser = false;
+            console.warn("added a file!/ changed");
+            OldFiles = newFile;
+            content.removeOldContent()
+            readTypeAndName()
+        }
+        if (editor.updates.level && engine?.scene?.length > 0) {
+            editor.updates.level = false;
+            this.updateLevels()
+        }
+        if (keyIsDown(17) && keyIsDown(86)) {
+            this.editor.pasteObjects();
+        } else {
+            this.pasted = false;
+        }
+    }
+    updateLevels() {
+        //console.log(engine.scene);
+        let leftDiv = document.getElementById("leftDiv");
+        for (let oldScene of sceneHolder) {
+            oldScene.remove()
+        }
+        for (let scene of engine.scene) {
+            scene.addSceneBtn(leftDiv, openerState);
+        }
+    }
     onSetup() {
         this.editor.onSetup();
+        this.last3D = engine.is3D;
     }
 }
 
