@@ -173,7 +173,7 @@ class BaseEditor {
         })
         addButton = this.fromReference("addButton");
         addButton.mouseReleased(() => {
-            this.creatingNew = !this.creatingNew;
+            editor.editor.creatingNew = !editor.editor.creatingNew;
         });
         addSelect = this.fromReference("addSelect");
         Object.keys(classes).forEach(element => {
@@ -503,6 +503,8 @@ class Editor3D extends BaseEditor {
         this.rover.keyMap.p1 = [38, 38];
         this.rover.keyMap.y2 = [39, 39];
         this.rover.keyMap.p2 = [40, 40];
+        this.select2D = [];
+        this.newObject = {};
     }
     calculateMousePosition() {
         let cam = _renderer._curCamera;
@@ -513,45 +515,11 @@ class Editor3D extends BaseEditor {
         let ndcZ = 1;
         let ndc = new DOMPoint(ndcX,-ndcY,ndcZ);
         let p = _renderer.uPMatrix.mat4;
-        let projectionMatrix = new DOMMatrix([
-          p[0],
-          p[1],
-          p[2],
-          p[3],
-          p[4],
-          p[5],
-          p[6],
-          p[7],
-          p[8],
-          p[9],
-          p[10],
-          p[11],
-          p[12],
-          p[13],
-          p[14],
-          p[15]
-        ]);
+        let projectionMatrix = new DOMMatrix([...p]);
         let camV = projectionMatrix.inverse().transformPoint(ndc);
         let w = camV.w;
         let m = _renderer.uMVMatrix.mat4;
-        let modelViewMatrix = new DOMMatrix([
-          m[0],
-          m[1],
-          m[2],
-          m[3],
-          m[4],
-          m[5],
-          m[6],
-          m[7],
-          m[8],
-          m[9],
-          m[10],
-          m[11],
-          m[12],
-          m[13],
-          m[14],
-          m[15]
-        ]);
+        let modelViewMatrix = new DOMMatrix([...m]);
         let world = modelViewMatrix.inverse().transformPoint(camV);
         let world2 = [world.x / w, world.y / w, world.z / w];
         let phi = atan2(world2[1] - cam.eyeY, Math.hypot(world2[0] - cam.eyeX, world2[2] - cam.eyeZ));
@@ -593,7 +561,7 @@ class Editor3D extends BaseEditor {
                     if (c) {
                         selectedObjects.push(obj.uuid);
                     }
-                    obj.clr = Number(c) * 50
+                    if(!keyIsDown(18) {obj.clr = Number(c) * 50}
                     //console.log(c);
                 }else if(obj.collision) {
                     //TODO: 3D Shapes
@@ -602,7 +570,55 @@ class Editor3D extends BaseEditor {
             if(selectedObjects.length == 0) {
                 editor.removeSelection()
                 info = [];
+                this.select2D = []
             }
+        }else if(mouseIsPressed && !overUI && this.creatingNew) {
+            let data = this.calculateMousePosition();
+            if(this.select2D.length !== 2) {
+                this.select2D.push(data);
+            }else {
+                this.select2D[1] = data;
+            }
+        }
+        if(!mouseIsPressed && lastWasPressed && this.creatingNew) {
+            if(this.select2D.length == 2) {
+                let objClass = classes[addSelect.value()];
+                let classParameters = [];
+                this.newObject = {};
+                this.newObject.x = min(this.select2D[0][1][0],this.select2D[1][1][0])
+                this.newObject.y = min(this.select2D[0][1][1],this.select2D[1][1][1])
+                this.newObject.width = max(this.select2D[0][1][0],this.select2D[1][1][0])
+                this.newObject.height = max(this.select2D[0][1][1],this.select2D[1][1][1])
+                this.newObject.width -= this.newObject.x;
+                this.newObject.height -= this.newObject.y;
+                if (!this.newObject.width) {
+                    this.newObject.width = 1;
+                }
+                if (!this.newObject.height) {
+                    this.newObject.height = 1;
+                }
+                    this.newObject.radius = dist(this.select2D[0][1][0], this.select2D[0][1][1], this.select2D[1][1][0], this.select2D[1][1][1]);
+                    if (this.isCircle) {
+                        this.newObject.x = this.select2D[0][1][0]
+                        this.newObject.y = this.select2D[1][1][0];
+                    }
+                    for (let param of objClass.prototype.parameterNames()) {
+                        let resp = this.newObject[param];
+                        if (resp === undefined) {
+                            let paramResp = param !== "noMenu" ? prompt(param) : ' ';
+                            classParameters.push(parseStringNum(paramResp));
+                        } else {
+                            classParameters.push(parseStringNum(resp));
+                        }
+                    }
+                    let obj = new objClass(...classParameters)
+                    obj.init();
+                    engine.getActiveScene().boxes.push(obj);
+                    selectedObjects.push(obj.uuid);
+                    obj.clr = 50;
+                    editor.updateLevels();
+            } 
+            this.select2D = [];
         }
     }
     setCameraPos(box: GameObject) {
@@ -790,7 +806,7 @@ class Editor2D extends BaseEditor {
                     engine.getActiveScene().boxes.push(obj);
                     selectedObjects.push(obj.uuid);
                     obj.clr = 50;
-                    this.updateLevels();
+                    editor.updateLevels();
                 }
             } else {
                 this.mouseDown([this.mouseCoords().array()], false);
