@@ -561,7 +561,7 @@ class Editor3D extends BaseEditor {
                     if (c) {
                         selectedObjects.push(obj.uuid);
                     }
-                    if(!keyIsDown(18) {obj.clr = Number(c) * 50}
+                    if(!keyIsDown(18)) {obj.clr = Number(c) * 50}
                     //console.log(c);
                 }else if(obj.collision) {
                     //TODO: 3D Shapes
