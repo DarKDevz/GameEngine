@@ -214,7 +214,7 @@ class Engine extends GameEvents {
     };
   }
   setup() {
-    document.oncontextmenu = function(e) {
+    document.oncontextmenu = function (e) {
       e.preventDefault();
     };
   }
@@ -222,6 +222,7 @@ class Engine extends GameEvents {
     this.gui.clear();
     push();
     background(150, 230, 240);
+    box()
     player?.update?.();
     this.activeScene?.earlyUpdate();
     player?.camera?.();
@@ -233,9 +234,19 @@ class Engine extends GameEvents {
     this.gui.fill(0);
     this.gui.text("FPS: " + round(frameRate() / 10) * 10, 50, 50);
     if (webglVersion !== "p2d") {
-      drawingContext.disable(drawingContext.DEPTH_TEST);
-      image(this.gui, -width / 2, -height / 2, width, height);
-      drawingContext.enable(drawingContext.DEPTH_TEST);
+      if (this.is3D) {
+        let cam = _renderer._curCamera;
+        let pan = atan2(cam.eyeZ - cam.centerZ, cam.eyeX - cam.centerX)
+        let tilt = atan2(cam.eyeY - cam.centerY, dist(cam.centerX, cam.centerZ, cam.eyeX, cam.eyeZ))
+        
+        translate(cam.eyeX, cam.eyeY, cam.eyeZ)
+        rotateY(-pan)
+        rotateZ(tilt + PI)
+        translate((height / 2.0) / tan(PI * 30.0 / 180.0),0,0)
+        rotateY(-PI/2)
+        rotateZ(PI)
+      }
+      image(this.gui, -width/2, -height/2, width, height);
     } else {
       image(this.gui, 0, 0, width, height);
     }

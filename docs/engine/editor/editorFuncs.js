@@ -526,11 +526,11 @@ class Editor3D extends BaseEditor {
       };
       for (let obj of engine.activeScene.boxes) {
         if (obj.collision && !obj.is3D) {
-          let c = obj.collision(Ball, false) ? 1 : 0;
+          let c = obj.collision(Ball, false) && Info[1][2] > 0;
           if (c) {
             selectedObjects.push(obj.uuid);
           }
-          obj.clr = c * 50;
+          obj.clr = Number(c) * 50;
         } else if (obj.collision) {
         }
       }

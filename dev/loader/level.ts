@@ -397,7 +397,7 @@ class Level extends GameEvents {
         translate(cameraPos.x, cameraPos.y)
         if (engine.errorText) {
             engine.gui.fill(0)
-            engine.gui.textSize(16);
+            engine.gui.textSize(16*pixelDensity());
             engine.gui.text(engine.errorText, 50, 150)
         }
         translate(-cameraPos.x, -cameraPos.y)

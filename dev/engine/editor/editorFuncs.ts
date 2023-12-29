@@ -589,12 +589,11 @@ class Editor3D extends BaseEditor {
             for(let obj of engine.activeScene.boxes) {
                 if (obj.collision && !obj.is3D) {
                     //Change to use collision types
-                    let c = obj.collision(Ball, false) ? 1 : 0;
+                    let c = obj.collision(Ball, false) && Info[1][2] > 0;
                     if (c) {
                         selectedObjects.push(obj.uuid);
-                        //console.log(t_box.uuid);
                     }
-                    obj.clr = c * 50
+                    obj.clr = Number(c) * 50
                     //console.log(c);
                 }else if(obj.collision) {
                     //TODO: 3D Shapes
@@ -604,12 +603,6 @@ class Editor3D extends BaseEditor {
                 editor.removeSelection()
                 info = [];
             }
-        }
-        if (this.levelMode) {
-            this.rover.setState({           // optional
-                position: [0, 0, (height / 2.0) / tan(PI * 30.0 / 180.0)],
-                rotation: [-PI / 2, 0, 0],
-            });
         }
     }
     setCameraPos(box: GameObject) {

@@ -6,20 +6,20 @@ import('../libs/rapier2d.js').then((obj) => {
 });
 function waitForEngine() {
     return new Promise((resolve, reject) => {
-      const checkRapier = () => {
-        if (window.RAPIER) {
-          resolve(clearInterval(intervalID));
-        } else if (++counter > 20) {
-          clearInterval(intervalID);
-          reject(new Error("Couldn't load rapier"));
-        }
-      };
-  
-      let counter = 0;
-      const intervalID = setInterval(checkRapier, 300);
-      checkRapier(); // Check immediately in case RAPIER is already available.
+        const checkRapier = () => {
+            if (window.RAPIER) {
+                resolve(clearInterval(intervalID));
+            } else if (++counter > 20) {
+                clearInterval(intervalID);
+                reject(new Error("Couldn't load rapier"));
+            }
+        };
+
+        let counter = 0;
+        const intervalID = setInterval(checkRapier, 300);
+        checkRapier(); // Check immediately in case RAPIER is already available.
     });
-  }
+}
 class Engine extends GameEvents {
     static removeListeners: Function[];
     static componentList: { [x: string]: Component };
@@ -59,9 +59,9 @@ class Engine extends GameEvents {
         this.world = new RAPIER.World({
             x: 0.0,
             y: 9.81,
-          });
-          //Prevents weird glitches
-          this.world.step() // wheter to doSleep enabled to true because otherwise it will fuck over performance
+        });
+        //Prevents weird glitches
+        this.world.step() // wheter to doSleep enabled to true because otherwise it will fuck over performance
         this.componentList = Engine.componentList
         this.eventListener = {}
         this.collisionWorker;
@@ -76,13 +76,15 @@ class Engine extends GameEvents {
             }
         })
         setTimeout(() => { this.tryFirstLoad() }, 500)
+        textSize(12*pixelDensity)
+        this.gui.textSize(12*pixelDensity());
         this.is3D;
         this.defaultPlayer;
         // this.body = new p2.Body({ mass: 1 });
         // this.world.addBody(this.body);
     }
     finishedLoading() {
-        if(this.defaultPlayer) {
+        if (this.defaultPlayer) {
             window.player = new Player();
         }
     }
@@ -241,10 +243,20 @@ class Engine extends GameEvents {
         this.gui.fill(0);
         this.gui.text("FPS: " + round(frameRate() / 10) * 10, 50, 50);
         if (webglVersion !== "p2d") {
-            drawingContext.disable(drawingContext.DEPTH_TEST)
+            //A Hack to draw GUI, otherwise it will get translated
+            if (this.is3D) {
+                let cam = _renderer._curCamera;
+                let pan = atan2(cam.eyeZ - cam.centerZ, cam.eyeX - cam.centerX)
+                let tilt = atan2(cam.eyeY - cam.centerY, dist(cam.centerX, cam.centerZ, cam.eyeX, cam.eyeZ))
+                
+                translate(cam.eyeX, cam.eyeY, cam.eyeZ)
+                rotateY(-pan)
+                rotateZ(tilt + PI)
+                translate((height / 2.0) / tan(PI * 30.0 / 180.0),0,0)
+                rotateY(-PI/2)
+                rotateZ(PI)
+              }
             image(this.gui, -width / 2, -height / 2, width, height);
-            drawingContext.enable(drawingContext.DEPTH_TEST)
-
         } else {
             image(this.gui, 0, 0, width, height);
         }
