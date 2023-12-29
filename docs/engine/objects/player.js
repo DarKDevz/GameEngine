@@ -46,7 +46,6 @@ class Player {
     this.body = engine.world.createRigidBody(rigidBody);
     let colliderDesc = RAPIER.ColliderDesc.cuboid(this.size.x / 100, this.size.y / 100);
     engine.world.createCollider(colliderDesc, this.body);
-    engine.physics = !window?.editor;
     engine.cameraPos = this.cameraPos;
   }
   get x() {

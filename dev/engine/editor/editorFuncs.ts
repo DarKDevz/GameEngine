@@ -639,6 +639,7 @@ class Editor2D extends BaseEditor {
         } else {
             this.cameraPos.x -= diffX;
             this.cameraPos.y -= diffY;
+            engine.camera.target = this.cameraPos;
         }
     }
     moveObjects(frameDiff: xyObject) {
@@ -855,6 +856,7 @@ class EditorManager {
     }
 
     init() {
+        this.editor?.rover?.setActive?.(false)
         this.editor = engine.is3D ? new Editor3D() : new Editor2D();
     }
     get updates() {
@@ -1004,7 +1006,7 @@ class EditorManager {
         //Means Different Values
         if (check === 0 && !editor.updates.menu) {
             for (let t_info of infoDivs) {
-                t_info.elt.dispatchEvent(this.valChanged);
+                t_info.elt.dispatchEvent(this.editor.valChanged);
                 //Hacky solution to fix updating dom every time
                 /*if (infoI < info.length)
                     t_info.child()[1].value = info[infoI + 2].toString();*/

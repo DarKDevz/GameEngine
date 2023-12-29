@@ -539,13 +539,6 @@ class Editor3D extends BaseEditor {
         info = [];
       }
     }
-    if (this.levelMode) {
-      this.rover.setState({
-        // optional
-        position: [0, 0, height / 2 / tan(PI * 30 / 180)],
-        rotation: [-PI / 2, 0, 0]
-      });
-    }
   }
   setCameraPos(box) {
   }
@@ -580,6 +573,7 @@ class Editor2D extends BaseEditor {
     } else {
       this.cameraPos.x -= diffX;
       this.cameraPos.y -= diffY;
+      engine.camera.target = this.cameraPos;
     }
   }
   moveObjects(frameDiff) {
@@ -802,6 +796,7 @@ class EditorManager {
     this.init();
   }
   init() {
+    this.editor?.rover?.setActive?.(false);
     this.editor = engine.is3D ? new Editor3D() : new Editor2D();
   }
   get updates() {
@@ -941,7 +936,7 @@ class EditorManager {
     }
     if (check === 0 && !editor.updates.menu) {
       for (let t_info of infoDivs) {
-        t_info.elt.dispatchEvent(this.valChanged);
+        t_info.elt.dispatchEvent(this.editor.valChanged);
       }
       return;
     }
