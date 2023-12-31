@@ -19,6 +19,7 @@ class BaseEditor {
         this.startPos = createVector(0, 0);
         this.tryOffset = {}
     }
+    setSelection(newArr) {}
     readFileAsDataURL(file: Blob): Promise<string> {
         return new Promise(resolve => {
             const reader = new FileReader();
@@ -56,9 +57,7 @@ class BaseEditor {
         engine.getActiveScene().boxes = getCurrentBoxes().filter((_) => {
             return _
         })
-        selectedObjects = selectedObjects.filter((_) => {
-            return _
-        })
+        this.setSelection([]);
         this.deleteInfoDivs();
     }
     onSetup() {
@@ -158,6 +157,7 @@ class BaseEditor {
             engine.cameraPos = this.cameraPos
             let sceneMaker = this.fromReference('#sceneMaker')
             sceneMaker.hide()
+            editor.init()
         });
         let closeButton = this.fromReference("closeButton");
         closeButton.mousePressed(() => {

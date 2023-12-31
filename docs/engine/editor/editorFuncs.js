@@ -9,6 +9,7 @@ var lastWasPressed = false, overUI = false, Pressed = lastWasPressed, button = n
   Divs: []
 }, OldFiles = [];
 class Editor3D extends BaseEditor {
+  test;
   constructor() {
     super();
     this.rover = createRoverCam();
@@ -28,7 +29,7 @@ class Editor3D extends BaseEditor {
     this.rover.keyMap.a1 = [65, 65];
     this.select2D = [];
     this.newObject = {};
-    this.test = new Gizmo(createVector(5, 5, 5));
+    this.test = new GizmoManager();
   }
   controller() {
     if (this.enableControl && document.activeElement === document.body) {
@@ -72,8 +73,10 @@ class Editor3D extends BaseEditor {
   }
   onUpdate() {
     if (keyIsDown(16) && mouseIsPressed && !overUI) {
-      if (!keyIsDown(18))
+      if (!keyIsDown(18)) {
         selectedObjects = [];
+        this.test.removeAll();
+      }
       let Info = this.calculateMousePosition();
       let Ball = {};
       Ball.getCollisionType = () => {
@@ -87,6 +90,7 @@ class Editor3D extends BaseEditor {
           let c = obj.collision(Ball, false) && Info[1][2] > 0;
           if (c) {
             selectedObjects.push(obj.uuid);
+            this.test.addGizmo(obj.uuid, obj);
           }
           if (!keyIsDown(18) || c) {
             obj.clr = Number(c) * 50;
@@ -155,13 +159,17 @@ class Editor3D extends BaseEditor {
     if (mouseIsPressed && !overUI) {
       this.test.check(this.calculateMousePosition());
     } else {
-      this.test.released();
+      this.test.release();
     }
   }
-  setCameraPos(box2) {
+  setCameraPos(box) {
   }
   setSelection(newArr) {
+    this.test.removeAll();
     selectedObjects = newArr;
+    for (let uuid of selectedObjects) {
+      this.test.addGizmo(uuid, engine.uuidList[uuid]);
+    }
   }
   onSetup() {
     super.onSetup();
@@ -415,6 +423,7 @@ class EditorManager {
   }
   init() {
     this.editor?.rover?.setActive?.(false);
+    camera();
     this.editor = engine.is3D ? new Editor3D() : new Editor2D();
   }
   get updates() {
@@ -494,12 +503,12 @@ class EditorManager {
     for (let UUID in engine.guiObjects) {
       let GUIElement = engine.guiObjects[UUID];
       if (GUIElement.collidesPoint(coords)) {
-        selectedObjects = [UUID];
+        this.setSelection([UUID]);
       }
     }
   }
   removeSelection() {
-    selectedObjects = [];
+    this.setSelection([]);
     this.editor.tryOffset = {};
     for (let t_info of infoDivs) {
       t_info.remove();
@@ -688,10 +697,6 @@ class EditorManager {
       lastWasPressed = Pressed;
       Pressed = mouseIsPressed && !this.levelMode;
     }
-    if (this.last3D !== engine.is3D) {
-      this.init();
-    }
-    this.last3D = engine.is3D;
     this.editor.onUpdate();
     if (mouseIsPressed && lastWasPressed !== "startedOverUI" && this.levelMode) {
       this.pressedLevelMode();
@@ -747,14 +752,17 @@ class EditorManager {
   }
   onSetup() {
     this.editor.onSetup();
-    this.last3D = engine.is3D;
   }
 }
 class Gizmo {
   pos;
   select;
-  constructor(pos) {
-    this.pos = pos;
+  is3D;
+  obj;
+  constructor(obj) {
+    this.pos = createVector(obj.x, obj.y, obj.z);
+    this.is3D = obj.is3D;
+    this.obj = obj;
     this.select = [];
   }
   draw() {
@@ -781,30 +789,34 @@ class Gizmo {
     translate(0, len / 2, 0);
     cone(5, 10);
     pop();
-    push();
-    fill(0, 0, 255);
-    rotateX(Math.PI / 2);
-    translate(0, len / 2, 0);
-    cylinder(thickness, len);
-    translate(0, len / 2, 0);
-    cone(5, 10);
+    if (this.is3D) {
+      push();
+      fill(0, 0, 255);
+      rotateX(Math.PI / 2);
+      translate(0, len / 2, 0);
+      cylinder(thickness, len);
+      translate(0, len / 2, 0);
+      cone(5, 10);
+      pop();
+    }
     pop();
     pop();
-    pop();
-    push();
-    translate(this.pos.x, this.pos.y, this.pos.z);
-    rotateX(-PI / 2);
-    translate(side / 2, -side / 2, 0);
-    fill(0, 255, 0);
-    plane(side);
-    pop();
-    push();
-    translate(this.pos.x, this.pos.y, this.pos.z);
-    rotateY(PI / 2);
-    translate(-side / 2, -side / 2, 0);
-    fill(255, 0, 0);
-    plane(side);
-    pop();
+    if (this.is3D) {
+      push();
+      translate(this.pos.x, this.pos.y, this.pos.z);
+      rotateX(-PI / 2);
+      translate(side / 2, -side / 2, 0);
+      fill(0, 255, 0);
+      plane(side);
+      pop();
+      push();
+      translate(this.pos.x, this.pos.y, this.pos.z);
+      rotateY(PI / 2);
+      translate(-side / 2, -side / 2, 0);
+      fill(255, 0, 0);
+      plane(side);
+      pop();
+    }
     push();
     translate(this.pos.x, this.pos.y, this.pos.z);
     rotateZ(PI / 2);
@@ -834,12 +846,15 @@ class Gizmo {
     rayPosition = this.getRayProjected(prePos, rayDirection, "x");
     let isZSelect = rayPosition.y > this.pos.y && rayPosition.y < this.pos.y + 5 && rayPosition.z > this.pos.z && rayPosition.z < this.pos.z + 100;
     let isYSelect = rayPosition.y < this.pos.y && rayPosition.y > this.pos.y - 100 && rayPosition.z > this.pos.z && rayPosition.z < this.pos.z + 5;
-    if (isZSelect && isFirstSelect) {
-      select = ["z"];
-    } else if (isYSelect && isFirstSelect) {
+    if (isYSelect && isFirstSelect) {
       select = ["y"];
-    } else if (rayPosition.z < this.pos.z + 50 && rayPosition.z > this.pos.z && rayPosition.y - this.pos.y > -50 && rayPosition.y < this.pos.y && select.length === 0) {
-      select = ["zy"];
+    }
+    if (this.is3D) {
+      if (isZSelect && isFirstSelect) {
+        select = ["z"];
+      } else if (rayPosition.z < this.pos.z + 50 && rayPosition.z > this.pos.z && rayPosition.y - this.pos.y > -50 && rayPosition.y < this.pos.y && select.length === 0) {
+        select = ["zy"];
+      }
     }
     if (select[0] === "z" || select[0] === "y" || select[0] === "zy") {
       select.push(rayPosition.copy());
@@ -854,17 +869,19 @@ class Gizmo {
     if (select[0] === "x" || select[0] === "xy") {
       select.push(rayPosition.copy());
     }
-    rayPosition = this.getRayProjected(prePos, rayDirection, "y");
-    if (rayPosition.x < this.pos.x + 10 && rayPosition.x > this.pos.x - 10 && rayPosition.z < this.pos.z + 10 && rayPosition.z > this.pos.z - 10 && isFirstSelect) {
-      select = ["xyz"];
-    } else if (rayPosition.x > this.pos.x && rayPosition.x < this.pos.x + 50 && rayPosition.z > this.pos.z && rayPosition.z < this.pos.z + 50 && isFirstSelect) {
-      select = ["xz"];
-    }
-    if (select[0] === "xz") {
-      select.push(rayPosition.copy());
-    }
-    if (select[0] === "xyz") {
-      select.push(prePos.copy().add(rayDirection.copy().mult(this.pos.dist(prePos))));
+    if (this.is3D) {
+      rayPosition = this.getRayProjected(prePos, rayDirection, "y");
+      if (rayPosition.x < this.pos.x + 10 && rayPosition.x > this.pos.x - 10 && rayPosition.z < this.pos.z + 10 && rayPosition.z > this.pos.z - 10 && isFirstSelect) {
+        select = ["xyz"];
+      } else if (rayPosition.x > this.pos.x && rayPosition.x < this.pos.x + 50 && rayPosition.z > this.pos.z && rayPosition.z < this.pos.z + 50 && isFirstSelect) {
+        select = ["xz"];
+      }
+      if (select[0] === "xz") {
+        select.push(rayPosition.copy());
+      }
+      if (select[0] === "xyz") {
+        select.push(prePos.copy().add(rayDirection.copy().mult(this.pos.dist(prePos))));
+      }
     }
     let lastMove = select[1];
     if (this.select.length !== 0) {
@@ -882,9 +899,42 @@ class Gizmo {
           this.pos.add(select[1].copy().sub(lastMove));
           break;
       }
+      if (this.is3D) {
+        this.obj.offSet(this.pos.x, this.pos.y, this.pos.z);
+      } else {
+        this.obj.offSet(this.pos.x, this.pos.y);
+      }
     }
   }
   released() {
     this.select = [];
+  }
+}
+class GizmoManager {
+  GizmoList;
+  constructor() {
+    this.GizmoList = {};
+  }
+  draw() {
+    for (const uuid in this.GizmoList) {
+      this.GizmoList[uuid].draw();
+    }
+  }
+  check(data) {
+    for (const uuid in this.GizmoList) {
+      this.GizmoList[uuid].check(data);
+    }
+  }
+  release() {
+    for (const uuid in this.GizmoList) {
+      this.GizmoList[uuid].released();
+    }
+  }
+  addGizmo(uuid, pos) {
+    const gizmo = new Gizmo(pos);
+    this.GizmoList[uuid] = gizmo;
+  }
+  removeAll() {
+    this.GizmoList = {};
   }
 }
