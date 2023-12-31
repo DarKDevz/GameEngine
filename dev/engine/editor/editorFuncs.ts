@@ -795,8 +795,11 @@ class EditorManager {
     }
 }
 class Gizmo {
+    pos: Vec;
+    select: any;
     constructor(pos) {
         this.pos = pos;
+        this.select = [];
     }
     draw(){
     noStroke();
@@ -854,29 +857,31 @@ class Gizmo {
           plane(side)
         pop()
   }
+    getRayProjected(rayPos,rayDir,axis) {
+        let rayPosition = rayPos.copy()
+        let length = this.pos[axis] - rayPosition[axis];
+        length /= rayDir[axis];
+        rayPosition.add(rayDir.copy().mult(length))
+        return rayPosition
+    }
     check(data) {
         this.select ??= [];
         let select = [];
-        if(this.select[0]) {
-            select = [this.select[0]]
+        let isFirstSelect = !Boolean(this.select[0])
+        if(!isFirstSelect) {
+            select = [this.select[0]]  
         }
         let rayDirection = createVector(data[0].x,data[0].y,data[0].z);
         let cam = _renderer._curCamera;
         let rayPosition = createVector(cam.eyeX,cam.eyeY,cam.eyeZ);
         let prePos = rayPosition.copy()
-        let length = this.pos.x - rayPosition.x;
-        length /= rayDirection.x;
-        push()
-        rayPosition.add(rayDirection.mult(length))
-        translate(rayPosition.x,rayPosition.y,rayPosition.z)
+        rayPosition = this.getRayProjected(prePos,rayDirection,"x")
         let isZSelect = (rayPosition.y>this.pos.y && rayPosition.y<this.pos.y+5 && rayPosition.z>this.pos.z && rayPosition.z<this.pos.z+100);
         let isYSelect = (rayPosition.y < this.pos.y && rayPosition.y > this.pos.y - 100 && rayPosition.z>this.pos.z && rayPosition.z<this.pos.z+5)
-        if(isZSelect && select.length === 0) {
-            fill(0,0,255);
+        if(isZSelect && isFirstSelect) {
             select = ['z'];
         }
-        else if(isYSelect && select.length === 0) {
-            fill(0,0,255);
+        else if(isYSelect && isFirstSelect) {
             select = ['y'];
         }else if(rayPosition.z<this.pos.z+50&&rayPosition.z>this.pos.z&&rayPosition.y-this.pos.y>-50&&rayPosition.y<this.pos.y && select.length === 0) {
             select = ['zy']
@@ -884,40 +889,28 @@ class Gizmo {
         if(select[0] === 'z' || select[0] === 'y' || select[0] === 'zy') {
             select.push(rayPosition.copy())
         }
-        pop()
-        rayPosition = prePos.copy()
-        length = this.pos.z - rayPosition.z;
-        length /= rayDirection.z;
-        push()
-        rayPosition.add(rayDirection.mult(length))
-        translate(rayPosition.x,rayPosition.y,rayPosition.z)
+        rayPosition = this.getRayProjected(prePos,rayDirection,"z")
         let IsXSelect = (rayPosition.y>this.pos.y && rayPosition.y<this.pos.y+5 && rayPosition.x>this.pos.x && rayPosition.x<this.pos.x+100);
-        if(IsXSelect && select.length === 0) {
-            fill(255,0,0)
+        if(IsXSelect && isFirstSelect) {
             select = ['x']
-        }else if(rayPosition.x<this.pos.x+50&&rayPosition.x>this.pos.x&&rayPosition.y-this.pos.y>-50&&rayPosition.y<this.pos.y && select.length === 0) {
+        }else if(rayPosition.x<this.pos.x+50&&rayPosition.x>this.pos.x&&rayPosition.y-this.pos.y>-50&&rayPosition.y<this.pos.y && isFirstSelect) {
             select = ['xy']
         }
             if(select[0] === 'x' || select[0] === 'xy') {
             select.push(rayPosition.copy())
         }
-        pop()
-        rayPosition = prePos.copy()
-        length = this.pos.y - rayPosition.y;
-        length /= rayDirection.y;
-        push()
-        rayPosition.add(rayDirection.mult(length))
-        translate(rayPosition.x,rayPosition.y,rayPosition.z)
-    if(rayPosition.x<this.pos.x+10&&rayPosition.x>this.pos.x-10&&rayPosition.z<this.pos.z+10&&rayPosition.z>this.pos.z-10 && select.length === 0) {
-            box(20)
+        rayPosition = this.getRayProjected(prePos,rayDirection,"y")
+    if(rayPosition.x<this.pos.x+10&&rayPosition.x>this.pos.x-10&&rayPosition.z<this.pos.z+10&&rayPosition.z>this.pos.z-10 && isFirstSelect) {
             select = ['xyz']
-        }else if(rayPosition.x>this.pos.x&&rayPosition.x<this.pos.x+50&&rayPosition.z>this.pos.z&&rayPosition.z<this.pos.z+50 && select.length === 0) {
+        }else if(rayPosition.x>this.pos.x&&rayPosition.x<this.pos.x+50&&rayPosition.z>this.pos.z&&rayPosition.z<this.pos.z+50 && isFirstSelect) {
         select = ["xz"]
         }
-        if(select[0] === 'xyz' || select[0] === 'xz') {
+        if(select[0] === 'xz') {
             select.push(rayPosition.copy())
         }
-        pop()
+        if(select[0] === 'xyz') {
+        select.push(prePos.copy().add(rayDirection.copy().mult(this.pos.dist(prePos))))
+        }
         let lastMove = select[1];
         if(this.select.length !== 0 ){
             if(this.select[0] === select[0]) {
@@ -929,12 +922,8 @@ class Gizmo {
             case 1:
             this.pos[select[0]] += select[1].copy().sub(lastMove)[select[0]]
             break;
-            case 2:
-                    this.pos[select[0][0]] += select[1].copy().sub(lastMove)[select[0][0]];
-                    this.pos[select[0][1]] += select[1].copy().sub(lastMove)[select[0][1]];
-            break;
-            case 3:
-                    //TODO
+            default:
+                    this.pos.add(select[1].copy().sub(lastMove))
             break;
             }
         }
