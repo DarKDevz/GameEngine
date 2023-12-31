@@ -190,6 +190,7 @@ class Editor3D extends BaseEditor {
                     selectedObjects.push(obj.uuid);
                     obj.clr = 50;
                     editor.updateLevels();
+                    editor.editor.test.addGizmo(obj.uuid,obj)
                 } else {
                     this.creatingNew = false;
                 }

@@ -90,12 +90,12 @@ class GameObject extends GameEvents {
       get: () => {
         return this.y;
       },
-      value: this.x
+      value: this.y
     }];
   }
-  getValues() {
-    return [this.x, this.y];
-  }
+  /*     getValues(): any[] {
+          return [this.x, this.y];
+      } */
   parameterNames() {
     return ["x", "y"];
   }
@@ -130,10 +130,82 @@ class GameObject extends GameEvents {
     engine.addScriptByName(name, vals, this);
   }
 }
-var Categories = {
-  DEFAULT: 1,
-  BOX: 2,
-  ENEMY: 4,
-  PLATFORM: 8,
-  PLAYER: 16
-};
+class GameObject3D extends GameObject {
+  constructor(x, y, z, tag) {
+    super(x, y, tag);
+    this.z = z;
+    this.depth = 1;
+    this.scene = "Not set";
+    this.components = [];
+    this.overrides = {};
+    this.savedFuncs = {};
+    this.newOverrides = {};
+    this.uuid = engine.generateUUID();
+    this.sprites = [];
+    this.shown = {};
+    this.collisionType = "Sphere";
+    this.imageInitialized = false;
+    this.alwaysDraw = false;
+    this.is3D = true;
+    engine.uuidList[this.uuid] = this;
+  }
+  offSet(x, y, z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+  getCollisionType() {
+    return "Sphere";
+  }
+  getCollisionVectors() {
+    return [{ x: this.x, y: this.y, z: this.z }, 2];
+  }
+  display(OnlyDraw, noDraw = false) {
+    if (!noDraw)
+      this.draw();
+    if (!OnlyDraw)
+      this.update();
+  }
+  draw() {
+    throw new Error("Method not implemented.");
+  }
+  getParameters() {
+    [this.x, this.y, this.z];
+  }
+  parameterNames() {
+    ["x", "y", "z"];
+  }
+  getEditableArray() {
+    return [{
+      name: "x",
+      set: (num) => {
+        this.x = num;
+        this?.updateShape?.();
+      },
+      get: () => {
+        return this.x;
+      },
+      value: this.x
+    }, {
+      name: "y",
+      set: (num) => {
+        this.y = num;
+        this?.updateShape?.();
+      },
+      get: () => {
+        return this.y;
+      },
+      value: this.y
+    }, {
+      name: "z",
+      set: (num) => {
+        this.z = num;
+        this?.updateShape?.();
+      },
+      get: () => {
+        return this.z;
+      },
+      value: this.z
+    }];
+  }
+}

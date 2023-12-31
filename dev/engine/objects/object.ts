@@ -89,12 +89,12 @@ class GameObject extends GameEvents{
             get:()=>{
                 return this.y
             },
-            value:this.x
+            value:this.y
         }]
     }
-    getValues(): any[] {
+/*     getValues(): any[] {
         return [this.x, this.y];
-    }
+    } */
     parameterNames() {
         return ["x", "y"];
     }
@@ -132,10 +132,82 @@ class GameObject extends GameEvents{
         engine.addScriptByName(name, vals, this);
     }
 }
-var Categories = {
-    DEFAULT: 0b1,
-    BOX: 0b10,
-    ENEMY: 0b100,
-    PLATFORM: 0b1000,
-    PLAYER: 0b10000
+class GameObject3D extends GameObject {
+    constructor(x: number, y: number, z: number, tag?: string) {
+        super(x,y,tag);
+        this.z = z;
+        this.depth = 1; // Assuming depth property for 3D objects
+        this.scene = "Not set";
+        this.components = [];
+        this.overrides = {};
+        this.savedFuncs = {};
+        this.newOverrides = {};
+        this.uuid = engine.generateUUID();
+        this.sprites = [];
+        this.shown = {};
+        this.collisionType = 'Sphere'; // Assuming collision type for 3D objects is a sphere
+        this.imageInitialized = false;
+        this.alwaysDraw = false;
+        this.is3D = true;
+        engine.uuidList[this.uuid] = this;
+    }
+    offSet(x: number, y: number, z: number) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+    getCollisionType(): collisionTypes {
+        return 'Sphere';
+    }
+    getCollisionVectors(): any[] {
+        return [{ x: this.x, y: this.y, z: this.z }, 2]; // Example, adjust based on your needs
+    }
+    display(OnlyDraw: boolean, noDraw: boolean = false) {
+        if (!noDraw) this.draw();
+        if (!OnlyDraw) this.update();
+    }
+    draw() {
+        throw new Error("Method not implemented.");
+        // Implement your 3D drawing logic here
+    }
+    getParameters(): any[] {
+        [this.x,this.y,this.z]
+    }
+    parameterNames(): string[] {
+        ["x","y","z"]
+    }
+
+    getEditableArray(): EditableObject[] {
+        return [{
+            name:"x",
+            set:(num:number)=>{
+                this.x = num;
+                this?.updateShape?.();
+            },
+            get:()=>{
+                return this.x
+            },
+            value:this.x
+        },{
+            name:"y",
+            set:(num:number)=>{
+                this.y = num;
+                this?.updateShape?.();
+            },
+            get:()=>{
+                return this.y
+            },
+            value:this.y
+        },{
+            name:"z",
+            set:(num:number)=>{
+                this.z = num;
+                this?.updateShape?.();
+            },
+            get:()=>{
+                return this.z
+            },
+            value:this.z
+        }]
+    }
 }

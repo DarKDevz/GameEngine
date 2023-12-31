@@ -161,5 +161,59 @@ class Box extends GameObject {
         }]
     }
 }
-
+class Box3D extends GameObject3D {
+    constructor(x,y,z,width,height,depth) {
+        super(x,y,z,"Box3D");
+        this.width = width;
+        this.height = height;
+        this.depth = depth;
+        this.alwaysDraw = true;
+    }
+    getEditableArray(): EditableObject[] {
+        return [...super.getEditableArray(),{
+            name:"width",
+            set:(val) => {
+                this.width = val;
+            },
+            get:() => {
+                return this.width
+            },
+            value:this.width
+        },{
+            name:"height",
+            set:(val) =>{
+                this.height = val;
+            },
+            get:() => {
+                return this.height
+            },
+            value:this.height
+        },{
+            name:"depth",
+            set:(val) =>{
+                this.depth = val;
+            },
+            get:() => {
+                return this.depth
+            },
+            value:this.depth
+        }]
+    }
+    getCollisionType(): collisionTypes {
+        return "Box3D"
+    }
+    getParameters(): any[] {
+        return super.getParameters().concat(this.width, this.height,this.width)
+    }
+    parameterNames(): string[] {
+        return super.parameterNames().concat("width","height,depth")
+    }
+    draw(): void {
+        push()
+        fill(this.clr)
+        translate(this.x,this.y,this.z);
+        box(this.width,this.height,this.width)
+        pop()
+    }
+}
 
