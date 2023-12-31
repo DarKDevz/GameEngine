@@ -1,5 +1,5 @@
 # Shimmer Engine
-A WIP 2d game engine built on p5.js
+A 2d/3d(WIP) game engine built on p5.js
 ## Shimmer editor:
 https://darkdevz.github.io/GameEngine/map.html
 ## Example Site:
