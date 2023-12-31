@@ -584,7 +584,9 @@ interface Engine extends GameEvents {
 
     is3D: boolean;
 }
-
+interface Gizmo {
+    pos: Vec
+}
 interface GUIElement extends GameObject {
     id: UUID
     mobileOnly: boolean;
