@@ -56,6 +56,19 @@ class Editor3D extends BaseEditor {
         this.select2D = [];
         this.newObject = {};
         this.test = new GizmoManager();
+        //Restart selection screen options
+        addSelect = this.fromReference("addSelect");
+        var i, L = addSelect.elt.options.length - 1;
+        for(i = L; i >= 0; i--) {
+            addSelect.elt.remove(i);
+        }
+        Object.keys(classes).forEach(element => {
+            addSelect.option(element);
+        });
+        Object.keys(classes3D).forEach(element => {
+            addSelect.option(element);
+        });
+
     }
     controller() {
         if (this.enableControl && document.activeElement === document.body) {
@@ -135,8 +148,14 @@ class Editor3D extends BaseEditor {
                     }
                     if (!keyIsDown(18) || c) { obj.clr = Number(c) * 50 }
                     //console.log(c);
-                } else if (obj.collision) {
-                    //TODO: 3D Shapes
+                } else if (obj.is3D && obj.rayIntersection) {
+                    let cam = _renderer._curCamera;
+                    let c = obj.rayIntersection({x:cam.eyeX,y:cam.eyeY,z:cam.eyeZ},Info[0])
+                    if(c) {
+                            selectedObjects.push(obj.uuid);
+                            this.test.addGizmo(obj.uuid, obj);
+                    }
+                    if (!keyIsDown(18) || c) { obj.clr = Number(c) * 50 }
                 }
             }
             if (selectedObjects.length == 0) {
@@ -154,15 +173,26 @@ class Editor3D extends BaseEditor {
         }
         if (!mouseIsPressed && lastWasPressed && this.creatingNew) {
             if (this.select2D.length == 2) {
-                let objClass = classes[addSelect.value()];
+                let objClass = classes[addSelect.value()] || classes3D[addSelect.value()];
                 let classParameters = [];
                 this.newObject = {};
-                this.newObject.x = min(this.select2D[0][1][0], this.select2D[1][1][0])
-                this.newObject.y = min(this.select2D[0][1][1], this.select2D[1][1][1])
-                this.newObject.width = max(this.select2D[0][1][0], this.select2D[1][1][0])
-                this.newObject.height = max(this.select2D[0][1][1], this.select2D[1][1][1])
-                this.newObject.width -= this.newObject.x;
-                this.newObject.height -= this.newObject.y;
+                if(objClass.prototype.rayIntersection) {
+                    let obj = new objClass(0,0,0,...((new Array(Box3D.length-3)).fill(50)))
+                    obj.init();
+                    engine.getActiveScene().boxes.push(obj);
+                    selectedObjects.push(obj.uuid);
+                    obj.clr = 50;
+                    editor.updateLevels();
+                    editor.editor.test.addGizmo(obj.uuid,obj)
+                    obj.alwaysDraw = false;
+                    obj.typeId = "3D";
+                }else {
+                    this.newObject.x = min(this.select2D[0][1][0], this.select2D[1][1][0])
+                    this.newObject.y = min(this.select2D[0][1][1], this.select2D[1][1][1])
+                    this.newObject.width = max(this.select2D[0][1][0], this.select2D[1][1][0])
+                    this.newObject.height = max(this.select2D[0][1][1], this.select2D[1][1][1])
+                    this.newObject.width -= this.newObject.x;
+                    this.newObject.height -= this.newObject.y;
                 if (this.newObject.width < 1) {
                     this.newObject.width = 1;
                 }
@@ -195,6 +225,7 @@ class Editor3D extends BaseEditor {
                     this.creatingNew = false;
                 }
             }
+            }
             this.select2D = [];
         }
         this.test.draw()
@@ -223,6 +254,14 @@ class Editor2D extends BaseEditor {
         super()
         this.selectionBox = [];
         this.isCircle = false;
+        addSelect = this.fromReference("addSelect");
+        var i, L = addSelect.elt.options.length - 1;
+        for(i = L; i >= 0; i--) {
+            addSelect.elt.remove(i);
+        }
+        Object.keys(classes).forEach(element => {
+            addSelect.option(element);
+        });
     }
     onSetup(): void {
         super.onSetup();
@@ -937,6 +976,7 @@ class Gizmo {
         }
         this.select = select
         if (this.select.length !== 0) {
+            editor.editor.creatingNew = false;
             switch (select[0].length) {
                 case 1:
                     this.pos[select[0]] += select[1].copy().sub(lastMove)[select[0]]

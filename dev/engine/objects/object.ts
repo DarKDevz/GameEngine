@@ -142,14 +142,12 @@ class GameObject3D extends GameObject {
         this.overrides = {};
         this.savedFuncs = {};
         this.newOverrides = {};
-        this.uuid = engine.generateUUID();
         this.sprites = [];
         this.shown = {};
         this.collisionType = 'Sphere'; // Assuming collision type for 3D objects is a sphere
         this.imageInitialized = false;
         this.alwaysDraw = false;
         this.is3D = true;
-        engine.uuidList[this.uuid] = this;
     }
     offSet(x: number, y: number, z: number) {
         this.x = x;
@@ -171,12 +169,11 @@ class GameObject3D extends GameObject {
         // Implement your 3D drawing logic here
     }
     getParameters(): any[] {
-        [this.x,this.y,this.z]
+        return [this.x,this.y,this.z]
     }
     parameterNames(): string[] {
         ["x","y","z"]
     }
-
     getEditableArray(): EditableObject[] {
         return [{
             name:"x",
@@ -210,4 +207,38 @@ class GameObject3D extends GameObject {
             value:this.z
         }]
     }
+    rayIntersection(rayPos, rayDir) {
+        const sphereCenter = { x: this.x, y: this.y, z: this.z };
+        const sphereRadius = 2;
+    
+        const oc = {
+            x: rayPos.x - sphereCenter.x,
+            y: rayPos.y - sphereCenter.y,
+            z: rayPos.z - sphereCenter.z
+        };
+    
+        const a = rayDir.x * rayDir.x + rayDir.y * rayDir.y + rayDir.z * rayDir.z;
+        const b = 2 * (oc.x * rayDir.x + oc.y * rayDir.y + oc.z * rayDir.z);
+        const c = oc.x * oc.x + oc.y * oc.y + oc.z * oc.z - sphereRadius * sphereRadius;
+    
+        const discriminant = b * b - 4 * a * c;
+    
+        if (discriminant < 0) {
+            // No intersection
+            return false;
+        } else {
+            // Calculate the two possible solutions for t
+            const t1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+            const t2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+    
+            // Check if either t1 or t2 is positive (intersection along the ray)
+            if (t1 >= 0 || t2 >= 0) {
+                // Ray intersects the sphere
+                return Boolean(Math.min(t1, t2));
+            } else {
+                // Ray points away from the sphere
+                return false;
+            }
+        }
+    } 
 }

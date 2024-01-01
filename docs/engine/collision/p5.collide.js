@@ -154,6 +154,12 @@ p5.prototype.collidePolyPolyVector = function(t, o, e) {
 p5.prototype.collidePointArcVector = function(t, o, e, i, r, l) {
   return p5.prototype.collidePointArc(t.x, t.y, o.x, o.y, e, i, r, l);
 };
+p5.prototype.collideRectBox3DVector = function(pos, size, pos3d, size3d) {
+  if (pos3d.z - size3d.z / 2 < 0 && pos3d.z + size3d.z / 2) {
+    return p5.prototype.collideRectRectVector(pos, size, { x: pos3d.x - size3d.x / 2, y: pos3d.y - size3d.y / 2 }, size3d);
+  }
+  return false;
+};
 p5.prototype.updateColliders = function() {
   this.cam = p5.instance._renderer._curCamera;
   this.hnear = 2 * Math.tan(this.cam.cameraFOV / 2) * this.cam.cameraNear;
@@ -214,7 +220,7 @@ p5.prototype.collideFrustumCircleVector = function(a, b, c) {
 };
 p5.prototype.collideFrustumBox3DVector = function(a, b, c) {
   let startPoint = new DOMPoint(b.x, b.y, b.z);
-  let endPoint = new DOMPoint(b.x + c.x/2, b.y + c.y/2, b.z + c.y/2);
+  let endPoint = new DOMPoint(b.x + c.x / 2, b.y + c.y / 2, b.z + c.y / 2);
   return this.checkIfVisible(createVector(startPoint.x, startPoint.y, startPoint.z)) || this.checkIfVisible(createVector(endPoint.x, endPoint.y, endPoint.z));
 };
 p5.Shader.prototype.initializedInstancedAttribute = function(attributeName, instanceCount, options, ignore = false) {

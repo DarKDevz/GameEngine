@@ -166,17 +166,22 @@ class Player {
     let t_box = engine.getfromUUID(id);
     let bpos = createVector(t_box.x, t_box.y);
     let bsize = createVector(t_box.width, t_box.height);
+    let half = bsize.copy().div(2);
     let t_center = this.center(bsize, bpos);
+    if (t_box.is3D) {
+      t_center = bpos.copy();
+      bpos = bpos.sub(bsize.copy().div(2));
+    }
     let pos_center = this.posCenter();
     if (pos_center.y < t_center.y) {
-      let distance = this.size.copy().div(2).y + bsize.copy().div(2).y - (t_center.y - pos_center.y);
+      let distance = this.size.copy().div(2).y + half.y - (t_center.y - pos_center.y);
       this.pos.y -= distance;
       this.grounded = true;
       this.groundedId = id;
     }
     if (pos_center.y > t_center.y) {
       this.vel.y = 0;
-      let distance = this.size.copy().div(2).y + bsize.copy().div(2).y + (t_center.y - pos_center.y);
+      let distance = this.size.copy().div(2).y + half.y + (t_center.y - pos_center.y);
       this.pos.y += distance;
     }
   }
@@ -184,16 +189,21 @@ class Player {
     let t_box = engine.getfromUUID(id);
     let bpos = createVector(t_box.x, t_box.y);
     let bsize = createVector(t_box.width, t_box.height);
+    let half = bsize.copy().div(2);
     let t_center = this.center(bsize, bpos);
     let pos_center = this.posCenter();
+    if (t_box.is3D) {
+      t_center = bpos.copy();
+      bpos = bpos.sub(half);
+    }
     if (pos_center.x < t_center.x) {
       this.vel.x = 0;
-      let distance = this.size.copy().div(2).x + bsize.copy().div(2).x - (t_center.x - pos_center.x);
+      let distance = this.size.copy().div(2).x + half.x - (t_center.x - pos_center.x);
       this.pos.x -= distance;
     }
     if (pos_center.x > t_center.x) {
       this.vel.x = 0;
-      let distance = this.size.copy().div(2).x + bsize.copy().div(2).x + (t_center.x - pos_center.x);
+      let distance = this.size.copy().div(2).x + half.x + (t_center.x - pos_center.x);
       this.pos.x += distance;
     }
   }

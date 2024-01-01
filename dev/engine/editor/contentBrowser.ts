@@ -119,10 +119,6 @@ class BaseEditor {
         addButton.mouseReleased(() => {
             editor.editor.creatingNew = !editor.editor.creatingNew;
         });
-        addSelect = this.fromReference("addSelect");
-        Object.keys(classes).forEach(element => {
-            addSelect.option(element);
-        });
         saveButton = this.fromReference("saveFile");
         saveButton.mouseReleased(this.saveMap);
         this.uiElement(saveButton);
@@ -748,5 +744,8 @@ var classes = {
     Platform: movingPlatform,
     End: End,
     Enemy: Enemy,
-    Interact: Interactive
+    Interact: Interactive,
 };
+var classes3D = {
+    Box3D: Box3D
+}

@@ -1,6 +1,4 @@
 class Box extends GameObject {
-  pos;
-  size;
   constructor(x, y, w, h) {
     super(x, y, "Box");
     this.width = w;
@@ -168,6 +166,40 @@ class Box3D extends GameObject3D {
     this.height = height;
     this.depth = depth;
     this.alwaysDraw = true;
+    this.clr = 0;
+  }
+  rayIntersection(rayPos, rayDir) {
+    const aabbMin = {
+      x: this.x - this.width / 2,
+      y: this.y - this.height / 2,
+      z: this.z - this.depth / 2
+    };
+    const aabbMax = {
+      x: this.x + this.width / 2,
+      y: this.y + this.height / 2,
+      z: this.z + this.depth / 2
+    };
+    let tmin = Number.NEGATIVE_INFINITY;
+    let tmax = Number.POSITIVE_INFINITY;
+    for (let i of ["x", "y", "z"]) {
+      if (rayDir[i] === 0) {
+        if (rayPos[i] < aabbMin[i] || rayPos[i] > aabbMax[i]) {
+          return null;
+        }
+      } else {
+        let t1 = (aabbMin[i] - rayPos[i]) / rayDir[i];
+        let t2 = (aabbMax[i] - rayPos[i]) / rayDir[i];
+        if (t1 > t2) {
+          [t1, t2] = [t2, t1];
+        }
+        tmin = Math.max(tmin, t1);
+        tmax = Math.min(tmax, t2);
+        if (tmin > tmax) {
+          return null;
+        }
+      }
+    }
+    return { tmin, tmax };
   }
   getCollisionVectors() {
     return [{ x: this.x, y: this.y, z: this.z }, { x: this.width, y: this.height, z: this.depth }];
