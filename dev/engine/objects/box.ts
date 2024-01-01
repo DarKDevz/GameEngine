@@ -169,6 +169,9 @@ class Box3D extends GameObject3D {
         this.depth = depth;
         this.alwaysDraw = true;
     }
+    getCollisionVectors(): (this | { x: number; y: number; z: number})[] {
+        return [{x:this.x,y:this.y,z:this.z}, { x: this.width, y: this.height,z : this.depth}]
+    }
     getEditableArray(): EditableObject[] {
         return [...super.getEditableArray(),{
             name:"width",

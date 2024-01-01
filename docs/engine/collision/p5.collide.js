@@ -212,6 +212,11 @@ p5.prototype.collideFrustumRectVector = function(a, b, c) {
 p5.prototype.collideFrustumCircleVector = function(a, b, c) {
   return this.checkIfVisible(createVector(b.x, b.y, 0), c);
 };
+p5.prototype.collideFrustumBox3DVector = function(a, b, c) {
+  let startPoint = new DOMPoint(b.x, b.y, b.z);
+  let endPoint = new DOMPoint(b.x + c.x/2, b.y + c.y/2, b.z + c.y/2);
+  return this.checkIfVisible(createVector(startPoint.x, startPoint.y, startPoint.z)) || this.checkIfVisible(createVector(endPoint.x, endPoint.y, endPoint.z));
+};
 p5.Shader.prototype.initializedInstancedAttribute = function(attributeName, instanceCount, options, ignore = false) {
   this.init();
   const attribute = this.attributes[attributeName];

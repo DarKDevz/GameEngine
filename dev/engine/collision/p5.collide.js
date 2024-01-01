@@ -166,6 +166,10 @@ p5.prototype.collideFrustumCircleVector = function (a, b, c) {
     //console.log(a.uPMatrix.multiplyVec4(...a.uMVMatrix.multiplyVec4(b.x,b.y,0,1)))
     return this.checkIfVisible(createVector(b.x, b.y, 0), c);
 };
+p5.prototype.collideFrustumBox3DVector = function (a,b,c) {
+    console.log(a,b,c)
+    return false;
+}
 /*
  * Initialize both a typed JavaScript array and the WebGL buffer for the
  * attribute.
