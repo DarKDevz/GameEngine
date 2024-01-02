@@ -24,6 +24,7 @@ const filesToCache = [
     "loader/level.js",
     "loader/support.js",
     "map.js",
+    "libs/defaultFont.ttf",
     "libs/shoelace/cdn/shoelace.js",
     "libs/rapier2d.js",
     "libs/shoelace/cdn/chunks/chunk.ULMIBG4O.js",

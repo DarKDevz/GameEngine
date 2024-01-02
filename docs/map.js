@@ -12,7 +12,7 @@ window.preload = async function () {
     const data = await response.json();
     window.loaded = false;
     engine.loadFromObject(data);
-    textFont(loadFont(defaultFont))
+    textFont(loadFont("./libs/defaultFont.ttf"))
 };
 window.setup = function () {
     //Initialize Game things

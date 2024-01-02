@@ -539,6 +539,10 @@ class gameSprite extends Component {
 	getSprite() {
 		return this.sprite.get(...arguments)
 	}
+	onCreateFile(file:gameFile) {
+		let sprite = loadImage(file.data.toString())
+		file.customData = sprite;
+	}
 	reloadImage() {
 		//console.log(_img);
 		//Check if file has already loaded image, then get reference
@@ -549,10 +553,7 @@ class gameSprite extends Component {
 			_sprite = loadImage(this.file.data.toString(), () => {
 				//console.error("Image has been loaded");
 				for (let objId in this.file.whoUses) {
-					if (!engine.uuidList[objId].imageInitialized) {
-						engine.uuidList[objId].init()
 						engine.uuidList[objId].imageInitialized = true;
-					}
 				}
 			});
 			//engine.getActiveScene().initiateBoxes();

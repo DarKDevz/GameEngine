@@ -97,7 +97,7 @@ class BaseEditor {
         editor.updates.level = true;
         engine = new Engine();
         LoadMap(file);
-        engine.cameraPos = editor.cameraPos;
+        editor.init();
       }
     );
     inputFile.elt.accept = ".js,.json";
@@ -136,7 +136,6 @@ class BaseEditor {
             sceneData: [0, 400, -10, 500]
           }
         },
-        _font: { default: true, value: "" },
         is3D: this.fromReference("#is3D").checked(),
         defaultPlayer: this.fromReference("#defaultPlayer").checked()
       };

@@ -502,6 +502,10 @@ class gameSprite extends Component {
   getSprite() {
     return this.sprite.get(...arguments);
   }
+  onCreateFile(file2) {
+    let sprite = loadImage(file2.data.toString());
+    file2.customData = sprite;
+  }
   reloadImage() {
     var _sprite;
     if (this.file.customData !== void 0) {
@@ -509,10 +513,7 @@ class gameSprite extends Component {
     } else {
       _sprite = loadImage(this.file.data.toString(), () => {
         for (let objId in this.file.whoUses) {
-          if (!engine.uuidList[objId].imageInitialized) {
-            engine.uuidList[objId].init();
-            engine.uuidList[objId].imageInitialized = true;
-          }
+          engine.uuidList[objId].imageInitialized = true;
         }
       });
     }
