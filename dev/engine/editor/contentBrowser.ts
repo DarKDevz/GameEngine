@@ -19,7 +19,9 @@ class BaseEditor {
         this.startPos = createVector(0, 0);
         this.tryOffset = {}
     }
-    setSelection(newArr) {}
+    setSelection(newArr) {
+        this.editor.setSelection(newArr);
+    }
     readFileAsDataURL(file: Blob): Promise<string> {
         return new Promise(resolve => {
             const reader = new FileReader();
@@ -57,8 +59,8 @@ class BaseEditor {
         engine.getActiveScene().boxes = getCurrentBoxes().filter((_) => {
             return _
         })
-        this.setSelection([]);
-        this.deleteInfoDivs();
+        editor.editor.setSelection([]);
+        editor.editor.deleteInfoDivs();
     }
     onSetup() {
         if (button) return;

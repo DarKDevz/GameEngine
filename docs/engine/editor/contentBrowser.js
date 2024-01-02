@@ -20,6 +20,7 @@ class BaseEditor {
     this.tryOffset = {};
   }
   setSelection(newArr) {
+    this.editor.setSelection(newArr);
   }
   readFileAsDataURL(file) {
     return new Promise((resolve) => {
@@ -56,8 +57,8 @@ class BaseEditor {
     engine.getActiveScene().boxes = getCurrentBoxes().filter((_) => {
       return _;
     });
-    this.setSelection([]);
-    this.deleteInfoDivs();
+    editor.editor.setSelection([]);
+    editor.editor.deleteInfoDivs();
   }
   onSetup() {
     if (button)

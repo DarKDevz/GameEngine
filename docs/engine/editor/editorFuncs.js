@@ -137,7 +137,11 @@ class Editor3D extends BaseEditor {
         let classParameters = [];
         this.newObject = {};
         if (objClass.prototype.rayIntersection) {
-          let obj = new objClass(0, 0, 0, ...new Array(Box3D.length - 3).fill(50));
+          let defaultPos = [this.select2D[0][0].x * 300, this.select2D[0][0].y * 300, this.select2D[0][0].z * 300];
+          defaultPos[0] += _renderer._curCamera.eyeX;
+          defaultPos[1] += _renderer._curCamera.eyeY;
+          defaultPos[2] += _renderer._curCamera.eyeZ;
+          let obj = new objClass(...defaultPos, ...new Array(Box3D.length - 3).fill(50));
           obj.init();
           engine.getActiveScene().boxes.push(obj);
           selectedObjects.push(obj.uuid);

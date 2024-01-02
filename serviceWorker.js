@@ -1,4 +1,3 @@
-const cacheName = 'your-pwa-cache-v1';
 const filesToCache = [
     "map.html",
     "libs/p5.min.js",
@@ -94,7 +93,6 @@ const filesToCache = [
     "libs/shoelace/cdn/chunks/chunk.QKHOWDSI.js",
     "libs/shoelace/cdn/chunks/chunk.FQXWNSAM.js",
     "libs/shoelace/cdn/chunks/chunk.TWRQNFRE.js",
-    "serviceWorker.js",
     "libs/shoelace/cdn/chunks/chunk.QUKXBKMR.js",
     "libs/shoelace/cdn/chunks/chunk.DX4UYOJN.js",
     "libs/shoelace/cdn/chunks/chunk.DAINRGQE.js",

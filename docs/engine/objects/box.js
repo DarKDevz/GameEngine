@@ -167,6 +167,7 @@ class Box3D extends GameObject3D {
     this.depth = depth;
     this.alwaysDraw = true;
     this.clr = 0;
+    this.typeId = "3D";
   }
   rayIntersection(rayPos, rayDir) {
     const aabbMin = {
