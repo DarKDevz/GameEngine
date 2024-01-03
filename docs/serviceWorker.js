@@ -1,4 +1,4 @@
-const cacheName = 'Shimmer-build-oua4dluqt6vyxzkp5fh4';
+const cacheName = 'Shimmer-build-artk5t3r1b0i0tsws569';
   
 const filesToCache = [
     "map.html",
@@ -264,7 +264,10 @@ self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request)
             .then(response => {
-                return response || fetch(event.request);
+                if(navigator.onLine) {
+                    return fetch(event.request);
+                }
+                return response;
             })
     );
 });
