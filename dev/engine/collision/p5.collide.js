@@ -93,90 +93,66 @@ p5.prototype.collidePolyPolyVector = function (t, o, e) { return p5.prototype.co
     return !1;
 };
 p5.prototype.collidePointArcVector = function (t, o, e, i, r, l) { return p5.prototype.collidePointArc(t.x, t.y, o.x, o.y, e, i, r, l); };
-p5.prototype.collideRectBox3DVector = function (pos,size,pos3d,size3d) {
-    if(pos3d.z-size3d.z/2<0&&pos3d.z+size3d.z/2) {
-        return p5.prototype.collideRectRectVector(pos,size,{x:pos3d.x-size3d.x/2,y:pos3d.y-size3d.y/2},size3d)
+p5.prototype.collideRectBox3DVector = function (pos, size, pos3d, size3d) {
+    if (pos3d.z - size3d.z / 2 < 0 && pos3d.z + size3d.z / 2) {
+        return p5.prototype.collideRectRectVector(pos, size, { x: pos3d.x - size3d.x / 2, y: pos3d.y - size3d.y / 2 }, size3d)
     }
     return false;
 }
 p5.prototype.updateColliders = function () {
-    this.cam = p5.instance._renderer._curCamera;
-    this.hnear = 2 * Math.tan(this.cam.cameraFOV / 2) * this.cam.cameraNear;
-    this.wnear = this.hnear * this.cam.aspectRatio;
-    this.hfar = 2 * Math.tan(this.cam.cameraFOV / 2) * this.cam.cameraFar;
-    this.wfar = this.hfar * this.cam.aspectRatio;
-    this.camPos = createVector(this.cam.eyeX, this.cam.eyeY, this.cam.eyeZ);
-    /**
-     * xyz lookat
-     * x'y'z' position
-     * xyz-x'y'z'
-     * give the look at vector
-     * you can normalize if you dont know the length  or divide
-     * by the near
-     */
-    this.nCamPos = createVector(this.cam.centerX, this.cam.centerY, this.cam.centerZ).sub(this.camPos).normalize();
-    this.fc = this.camPos.copy().add(this.nCamPos.copy().mult(this.cam.cameraFar));
-    let upV = createVector(...p5.instance.cam._getLocalAxes().y);
-    let rightV = createVector(...p5.instance.cam._getLocalAxes().x);
-    rightV.x *= -1;
-    rightV.z *= -1;
-    this.ftl = this.fc.copy().add(rightV.copy().mult(-this.wfar / 2)).add(upV.copy().mult(this.hfar / 2));
-    this.ftr = this.fc.copy().add(rightV.copy().mult(this.wfar / 2)).add(upV.copy().mult(this.hfar / 2));
-    this.fbr = this.fc.copy().add(rightV.copy().mult(this.wfar / 2)).add(upV.copy().mult(-this.hfar / 2));
-    this.fbl = this.fc.copy().add(rightV.copy().mult(-this.wfar / 2)).add(upV.copy().mult(-this.hfar / 2));
-    this.nc = this.camPos.copy().add(this.nCamPos.copy().mult(this.cam.cameraNear));
-    this.ntl = this.nc.copy().add(rightV.copy().mult(-this.wfar / 2)).add(upV.copy().mult(this.hfar / 2));
-    this.ntr = this.nc.copy().add(rightV.copy().mult(this.wfar / 2)).add(upV.copy().mult(this.hfar / 2));
-    this.nbr = this.nc.copy().add(rightV.copy().mult(this.wfar / 2)).add(upV.copy().mult(-this.hfar / 2));
-    this.nbl = this.nc.copy().add(rightV.copy().mult(-this.wfar / 2)).add(upV.copy().mult(-this.hfar / 2));
-    //
-    this.planes = [];
-    //Has same direction as camera
-    this.planes.push(this.addPlane(this.ntl, this.ntr, this.nbr));
-    //Has opposite direction as camera
-    this.planes.push(this.addPlane(this.ftr, this.ftl, this.fbl));
-    return this;
+    let cam = p5.instance._renderer._curCamera;
+    this.cam = this.createVector(cam.eyeX, cam.eyeY, cam.eyeZ);
+    this.dir = this.createVector(cam.centerX, cam.centerY, cam.centerZ).sub(this.cam).normalize();
 };
 p5.prototype.checkIfVisible = function (transformedPosition, threshold = 0) {
-    for (let i in this.planes) {
-        let plane = this.planes[i];
-        let ogD = plane.dist;
-        let norm = plane.normalDir;
-        if (ogD + norm.dot(transformedPosition) < threshold) {
-            return false;
-        }
-    }
-    return true;
-};
-p5.prototype.addPlane = function (p0, p1, p2) {
-    let aux1, aux2;
-    aux1 = p0.copy().sub(p1);
-    aux2 = p2.copy().sub(p1);
-    let normal = aux1.cross(aux2).normalize();
-    //console.log(normal);
-    //cross product of (po-p1)cross(p2-p1)
-    //normalize then get dot product of p2
-    return {
-        top: p0.copy(),
-        bottom: p1.copy(),
-        normalDir: normal.copy(),
-        dist: -normal.dot(p2.copy())
-    };
+    // Assuming _renderer._pInst.cam is the camera position
+    let tPos = (this.cam).copy().sub(transformedPosition).normalize();
+    let test = tPos.copy().dot(this.dir.copy().normalize())
+    return test < threshold;
 };
 p5.prototype.collideFrustumRectVector = function (a, b, c) {
-    let startPoint = (new DOMPoint(b.x, b.y, 0));
-    let endPoint = (new DOMPoint(b.x + c.x, b.y + c.y, 0));
-    return this.checkIfVisible(createVector(startPoint.x, startPoint.y, 0)) || this.checkIfVisible(createVector(endPoint.x, endPoint.y, 0));
-};
+    let listOfPoints = [];
+    listOfPoints.push(createVector(b.x, b.y));
+    listOfPoints.push(createVector(b.x, b.y+c.y));
+    listOfPoints.push(createVector(b.x+c.x, b.y));
+    listOfPoints.push(createVector(b.x+c.x, b.y+c.y));
+    for (let i of listOfPoints) {
+        if (this.checkIfVisible(i.x, i.y, 0)) {
+            return true;
+        }
+    }
+    return false};
 p5.prototype.collideFrustumCircleVector = function (a, b, c) {
     //console.log(a.uPMatrix.multiplyVec4(...a.uMVMatrix.multiplyVec4(b.x,b.y,0,1)))
-    return this.checkIfVisible(createVector(b.x, b.y, 0), c);
+    let listOfPoints = [];
+    listOfPoints.push(createVector(b.x + c, b.y + c));
+    listOfPoints.push(createVector(b.x + c, b.y - c));
+    listOfPoints.push(createVector(b.x - c, b.y + c));
+    listOfPoints.push(createVector(b.x - c, b.y - c));
+    for (let i of listOfPoints) {
+        if (this.checkIfVisible(i.x, i.y, 0)) {
+            return true;
+        }
+    }
+    return false
 };
-p5.prototype.collideFrustumBox3DVector = function(a, b, c) {
-    let startPoint = new DOMPoint(b.x, b.y, b.z);
-    let endPoint = new DOMPoint(b.x + c.x/2, b.y + c.y/2, b.z + c.y/2);
-    return this.checkIfVisible(createVector(startPoint.x, startPoint.y, startPoint.z)) || this.checkIfVisible(createVector(endPoint.x, endPoint.y, endPoint.z));
-  };
+p5.prototype.collideFrustumBox3DVector = function (a, b, c) {
+    let listOfPoints = [];
+    listOfPoints.push(createVector(b.x + c.x / 2, b.y + c.y / 2, b.z + c.y / 2));
+    listOfPoints.push(createVector(b.x + c.x / 2, b.y - c.y / 2, b.z + c.y / 2));
+    listOfPoints.push(createVector(b.x - c.x / 2, b.y + c.y / 2, b.z + c.y / 2))
+    listOfPoints.push(createVector(b.x - c.x / 2, b.y - c.y / 2, b.z + c.y / 2))
+    listOfPoints.push(createVector(b.x + c.x / 2, b.y + c.y / 2, b.z - c.y / 2));
+    listOfPoints.push(createVector(b.x + c.x / 2, b.y - c.y / 2, b.z - c.y / 2));
+    listOfPoints.push(createVector(b.x - c.x / 2, b.y - c.y / 2, b.z - c.y / 2))
+    listOfPoints.push(createVector(b.x - c.x / 2, b.y + c.y / 2, b.z - c.y / 2))
+    for (let i of listOfPoints) {
+        if (this.checkIfVisible(i.x, i.y, i.z)) {
+            return true;
+        }
+    }
+    return false
+};
 /*
  * Initialize both a typed JavaScript array and the WebGL buffer for the
  * attribute.
@@ -184,7 +160,7 @@ p5.prototype.collideFrustumBox3DVector = function(a, b, c) {
  * May return either an Typed JavaScript array corresponding to the attribute
  * type, or in the case of matrices and vectors, an Array of Typed arrays.
  */
-p5.Shader.prototype.initializedInstancedAttribute = function (attributeName, instanceCount, options,ignore=false) {
+p5.Shader.prototype.initializedInstancedAttribute = function (attributeName, instanceCount, options, ignore = false) {
     this.init();
     const attribute = this.attributes[attributeName];
     if (!attribute) {
@@ -296,11 +272,11 @@ p5.RendererGL.prototype._drawElements = function (drawMode, gId) {
                             const loc = location + i;
                             gl.enableVertexAttribArray(loc);
                             gl.vertexAttribPointer(loc, // location
-                            4, // size (the number of positions in the array to advance per instance)
-                            gl.FLOAT, // type of data in buffer
-                            false, // normalize
-                            bytesPerMatrix, // stride (the number of bytes to advance to get to next set of values)
-                            i * bytesPerRow // offset in buffer
+                                4, // size (the number of positions in the array to advance per instance)
+                                gl.FLOAT, // type of data in buffer
+                                false, // normalize
+                                bytesPerMatrix, // stride (the number of bytes to advance to get to next set of values)
+                                i * bytesPerRow // offset in buffer
                             );
                             // this line says this attribute only changes for each 1 instance
                             gl.vertexAttribDivisor(loc, 1);
@@ -340,7 +316,7 @@ p5.RendererGL.prototype._drawElements = function (drawMode, gId) {
         }
     }
     else {
-        ogDraw.apply(this,arguments)
+        ogDraw.apply(this, arguments)
     }
 };
 window.testVert = `
@@ -550,60 +526,60 @@ void main(void) {
 }`;
 class InstanceDrawer {
     constructor(shape) {
-      this.shape = shape;
-      this.usesTexture = false;
-      this.shader = createShader(window.testVert, window.testFrag)
-      this.shader.setUniform('useTexture',false);
+        this.shape = shape;
+        this.usesTexture = false;
+        this.shader = createShader(window.testVert, window.testFrag)
+        this.shader.setUniform('useTexture', false);
 
-      this.matrix = [];
-      this.oldMatrix;
-      this.color;
-      this.oldColor;
-      this.length = 0;
-      this.texture;
+        this.matrix = [];
+        this.oldMatrix;
+        this.color;
+        this.oldColor;
+        this.length = 0;
+        this.texture;
     }
     enableTexture(texture) {
-      this.usesTexture = texture;
-      this.shader.setUniform('useTexture',true);
+        this.usesTexture = texture;
+        this.shader.setUniform('useTexture', true);
     }
-    add(position=[0,0,0],scale=[1,1,1],rotation=[0,0,0],color = [0,0,0,255]) {
-      this.length++;
-      this.oldMatrix = [];
-      for(let i of this.matrix) {
-        this.oldMatrix.push(i.mat4);
-      }
-      this.matrix = this.shader.initializedInstancedAttribute('aWorldMatrix', this.length,{},true);
-      // transformations in reverse order.
-      for(let i in this.oldMatrix) {
-        this.matrix[i].set(...this.oldMatrix[i]);
-      }
-      this.matrix[this.length-1].translate(position);
-      this.matrix[this.length-1].scale(...scale);
-      this.matrix[this.length-1].rotateX(rotation[0]);
-      this.matrix[this.length-1].rotateY(rotation[1]);
-      this.matrix[this.length-1].rotateZ(rotation[2]);
+    add(position = [0, 0, 0], scale = [1, 1, 1], rotation = [0, 0, 0], color = [0, 0, 0, 255]) {
+        this.length++;
+        this.oldMatrix = [];
+        for (let i of this.matrix) {
+            this.oldMatrix.push(i.mat4);
+        }
+        this.matrix = this.shader.initializedInstancedAttribute('aWorldMatrix', this.length, {}, true);
+        // transformations in reverse order.
+        for (let i in this.oldMatrix) {
+            this.matrix[i].set(...this.oldMatrix[i]);
+        }
+        this.matrix[this.length - 1].translate(position);
+        this.matrix[this.length - 1].scale(...scale);
+        this.matrix[this.length - 1].rotateX(rotation[0]);
+        this.matrix[this.length - 1].rotateY(rotation[1]);
+        this.matrix[this.length - 1].rotateZ(rotation[2]);
 
-  
-      this.oldColor = this.color;
-      this.color = this.shader.initializedInstancedAttribute('aMaterialColor', this.length,{},true);
-      // transformations in reverse order.
-      for(let i in this.oldColor) {
-        this.color[i] = this.oldColor[i];
-      }
-      //Colors are stored in succession
-      this.color[(this.length*4)-1] = color[3]/255;
-      this.color[(this.length*4)-2] = color[2]/255;
-      this.color[(this.length*4)-3] = color[1]/255;
-      this.color[(this.length*4)-4] = color[0]/255;
-  
+
+        this.oldColor = this.color;
+        this.color = this.shader.initializedInstancedAttribute('aMaterialColor', this.length, {}, true);
+        // transformations in reverse order.
+        for (let i in this.oldColor) {
+            this.color[i] = this.oldColor[i];
+        }
+        //Colors are stored in succession
+        this.color[(this.length * 4) - 1] = color[3] / 255;
+        this.color[(this.length * 4) - 2] = color[2] / 255;
+        this.color[(this.length * 4) - 3] = color[1] / 255;
+        this.color[(this.length * 4) - 4] = color[0] / 255;
+
     }
     removeAll() {
-      this.length = 0;
+        this.length = 0;
     }
     draw() {
-      shader(this.shader)
-      this.usesTexture?this.shader.setUniform('uTexture',this.usesTexture):()=>{};
-      this.shape((new Array(this.shape.length)).fill(1))
-      resetShader()
+        shader(this.shader)
+        this.usesTexture ? this.shader.setUniform('uTexture', this.usesTexture) : () => { };
+        this.shape((new Array(this.shape.length)).fill(1))
+        resetShader()
     }
-  }
+}
