@@ -15,6 +15,7 @@ class GameObject extends GameEvents{
         this.newOverrides = {};
         this.uuid = engine.generateUUID();
         this.sprites = [];
+        this.models = [];
         this.shown = {};
         this.collisionType = 'Circle';
         this.imageInitialized = false;

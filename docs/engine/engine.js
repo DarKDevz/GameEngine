@@ -75,7 +75,7 @@ class Engine extends GameEvents {
     setTimeout(() => {
       this.tryFirstLoad();
     }, 500);
-    textSize(12 * pixelDensity);
+    textSize(12 * pixelDensity());
     this.gui.textSize(12 * pixelDensity());
     this.is3D;
     this.defaultPlayer;

@@ -392,6 +392,171 @@ class gameGlobalScript extends Component{
 		eval(file.data);
 	}
 }
+class gameModel extends Component {
+	constructor({ obj, src = { imageb64: '' }, fileUUID = '' }: { obj: GameObject, src: any, fileUUID: UUID }) {
+		super("gameModel");
+		if (!obj.models) {
+			debugger;
+		}
+		this.fileType = ".obj"
+		obj.models.push(this);
+		if (fileUUID !== '') {
+			this.file = engine.files[fileUUID];
+			this.file.type = ".obj";
+			this.file.addUser(this, obj.uuid);
+		}else {
+			this.file = addGameFile('', ".obj");
+			this.file.addUser(this, obj.uuid);
+		}
+		this.ownObject = obj;
+		this.id = engine.generateUUID()
+		this.sprite;
+	}
+	ContentBrowser(file: gameFile, Panel: any) {
+		let isDragging = false;
+        let buttonName = file.name
+		let typeOfFile = file.type;
+		buttonName = buttonName + typeOfFile
+		let img = createButton(buttonName).parent(Panel.HUD);
+		img.elt.draggable = "true";
+		img.elt.ondragstart = (event) => {
+			event.dataTransfer.setData("UUID", file.UUID);
+			console.log(file);
+			isDragging = true;
+		}
+		img.elt.ondragend = () => {
+			isDragging = false
+		}
+		img.mouseReleased(() => {
+			if (isDragging) return;
+			if (mouseButton === "right") {
+                editor.openBrowserContext(file);
+			} else {
+				let popup = window.open('fileInput.html', '_blank', 'width=400,height=400');
+				window.modelFile = (text: string) => {
+					//TODO: info box: Updated:(name of file)
+					editor.updates.browser = true;
+					//_file.loadFile(addGameFile(val.imageb64,'.img'));
+					file.data = text;
+					//Remove Sprite definition so it reloads it correctly
+					file.customData = undefined;
+					console.log(file.whoUses);
+					for (let uuid in file.whoUses) {
+						let _sprite = file.whoUses[uuid];
+						console.log(_sprite);
+						_sprite.loadFile(file);
+						console.log(_sprite);
+					}
+				};
+			}
+		});
+		img.size(140, 140);
+		Panel.Divs.push(img);
+	}
+	MenuEdit(parent: string | Div) {
+		if (!addEditableModel)
+			return;
+		let divHolder = createDiv()
+		let FileEdit = this.AddFileEdit();
+		FileEdit.parent(divHolder);
+		Component.componentOpen[this.id] ??= { value: false }
+		let shouldOpen = Component.componentOpen[this.id]
+		let mainDiv = addEditableModel("Object", (val) => {
+			editor.updates.browser = true;
+			let actValue = val;
+			console.log(val);
+			if (val) {
+				this.loadFile(addGameFile(val, '.obj'));
+			}
+			return actValue;
+		}, parent, [divHolder], divHolder, shouldOpen)
+	}
+	AddFileEdit() {
+		let buttonName = this.file.name
+		let inp = createButton(buttonName + this.file.type);
+		inp.elt.ondrop = (event) => {
+			console.log(event);
+			console.warn(event.dataTransfer.getData("UUID"));
+			let uuid = event.dataTransfer.getData("UUID");
+			let file = engine.files[uuid];
+			//If file isn't an image return
+			if (file.type !== ".obj") return;
+			//Replace old file with new file;
+			this.loadFile(file);
+			//Replace old file with new file
+		}
+		inp.elt.ondragover = (event) => {
+			event.preventDefault();
+			//console.warn(event.dataTransfer.getData("UUID"));
+		}
+		return inp;
+	}
+	deleteUser(shouldDelete = true) {
+		this.file.removeUser(this.ownObject.uuid, shouldDelete);
+	}
+	loadFile(file: gameFile) {
+		//Remove Og File
+		if (this.file.UUID !== file.UUID) {
+			this.deleteUser()
+		}
+		this.file = file;
+		//Include Ourselfs as a user
+		this.file.addUser(this, this.ownObject.uuid);
+		//Will load all sprites and not initialize correctly
+		//Load Sprite automatically
+		if (!this.file.customData) {
+			this.file.customData = loadModel(this.file.data,()=>{},()=>{},'.obj');
+		}
+		this.setModel(this.file.customData);
+		editor.updates.menu = true;
+		editor.updates.browser = true;
+	}
+	getModel() {
+		return this.model
+	}
+	onCreateFile(file:gameFile) {
+		let sprite = loadModel(file.data,()=>{},()=>{},'.obj')
+		file.customData = sprite;
+	}
+	reloadModel() {
+		//console.log(_img);
+		//Check if file has already loaded image, then get reference
+		var _sprite
+		if (this.file.customData !== undefined) {
+			_sprite = this.file.customData;
+		} else {
+			_sprite = loadModel(this.file.data,()=>{},()=>{},'.obj');
+			//engine.getActiveScene().initiateBoxes();
+		}
+		this.setModel(_sprite);
+		//engine.getActiveScene().initiateBoxes();
+	}
+	setModel(model: ReturnType<typeof loadModel>) {
+		this.file.customData = model;
+		this.model = model;
+		if (typeof this.ownObject.model !== 'object') {
+			let _og = this.ownObject.model
+			this.ownObject.model = _og ? [_og] : [];
+		}
+		this.ownObject.model[this.ownObject.models.indexOf(this)] = model;
+		if (this.ownObject.model.length === 1) {
+			this.ownObject.model = model;
+		}
+	}
+	getModel() {
+		return this.ownObject.model;
+	}
+	toJson() {
+		//this._src.imageb64 = this.fileData.data;
+		let _return = {
+			name: this.componentName,
+			params: {
+				fileUUID: this.file.UUID
+			}
+		};
+		return _return
+	}
+}
 class gameSprite extends Component {
 	constructor({ obj, src = { imageb64: '' }, fileUUID = '' }: { obj: GameObject, src: any, fileUUID: UUID }) {
 		super("gameSprite");
@@ -1007,6 +1172,7 @@ class gameAnimation {
 addComponent("gameScript", gameScript, ".js");
 addComponent("gameGlobalScript", gameGlobalScript, ".gjs");
 addComponent("gameSprite", gameSprite, ".img");
+addComponent("gameModel", gameModel, ".obj");
 addComponent("gameFile", gameFile);
 addComponent("gameParticle", gameParticle)
 function checkifexists(data: any) {

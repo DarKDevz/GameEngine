@@ -44,7 +44,9 @@
                 } else if (file.type.startsWith('audio/') || file.type === 'text/plain') {
                     // Throw an error for audio or text file
                     throw new Error('Unsupported file type');
-                } else {
+                } else if(file.name.endsWith('.obj')){
+                    window.opener?.modelFile(result.substring(0,result.length-2));
+                }else{
                     console.log(result);
                     throw new Error('Invalid file type');
                 }

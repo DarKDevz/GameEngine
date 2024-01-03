@@ -650,6 +650,27 @@ function addEditableSprite(name, set, get, parentName = "sideMenu", additionalDi
   inputField.parent(divHolder);
   return [inputField, divHolder];
 }
+function addEditableModel(name, set, parentName = "sideMenu", additionalDivs = [], replaceButton, opener) {
+  let divHolder = createDiv();
+  let headerText = createSpan("Model Component").parent(divHolder);
+  let inputField = createDiv();
+  inputField.child(...additionalDivs);
+  let inp = replaceButton;
+  inp.elt.title = "Model Editor";
+  accordionMenu(headerText, inputField, "Model Component", opener);
+  inp.mousePressed(() => {
+    let popup = window.open("fileInput.html", "_blank", "width=400,height=400");
+    window.modelFile = (text) => {
+      console.log(text);
+      let val = set(text);
+    };
+  });
+  inp.size(177, "fit-content");
+  let infoId = infoDivs.push(divHolder);
+  infoDivs[infoId - 1].parent(parentName);
+  inputField.parent(divHolder);
+  return [inputField, divHolder];
+}
 function addMenuInput(name, set, get, par = "sideMenu") {
   const divHolder = createDiv().html("");
   const _span = createSpan(name + ": ").parent(divHolder);
