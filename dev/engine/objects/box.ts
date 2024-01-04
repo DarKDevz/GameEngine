@@ -258,7 +258,7 @@ class Box3D extends GameObject3D {
         push()
         fill(this.clr)
         translate(this.x,this.y,this.z);
-        box(this.width,this.height,this.width)
+        box(this.width,this.height,this.depth)
         pop()
     }
 }
