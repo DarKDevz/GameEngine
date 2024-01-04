@@ -117,7 +117,7 @@ p5.prototype.collideFrustumRectVector = function (a, b, c) {
     listOfPoints.push(createVector(b.x+c.x, b.y));
     listOfPoints.push(createVector(b.x+c.x, b.y+c.y));
     for (let i of listOfPoints) {
-        if (this.checkIfVisible(i.x, i.y, 0)) {
+        if (this.checkIfVisible(i)) {
             return true;
         }
     }
@@ -130,7 +130,7 @@ p5.prototype.collideFrustumCircleVector = function (a, b, c) {
     listOfPoints.push(createVector(b.x - c, b.y + c));
     listOfPoints.push(createVector(b.x - c, b.y - c));
     for (let i of listOfPoints) {
-        if (this.checkIfVisible(i.x, i.y, 0)) {
+        if (this.checkIfVisible(i)) {
             return true;
         }
     }
@@ -147,7 +147,7 @@ p5.prototype.collideFrustumBox3DVector = function (a, b, c) {
     listOfPoints.push(createVector(b.x - c.x / 2, b.y - c.y / 2, b.z - c.y / 2))
     listOfPoints.push(createVector(b.x - c.x / 2, b.y + c.y / 2, b.z - c.y / 2))
     for (let i of listOfPoints) {
-        if (this.checkIfVisible(i.x, i.y, i.z)) {
+        if (this.checkIfVisible(i)) {
             return true;
         }
     }

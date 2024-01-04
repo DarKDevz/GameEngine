@@ -1,4 +1,4 @@
-const cacheName = 'Shimmer-build-yzigpgltvn90hloxht8k';
+const cacheName = 'Shimmer-build-esxpsa52spetmg3kvciv';
   
 const filesToCache = [
     "map.html",
