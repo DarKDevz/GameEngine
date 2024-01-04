@@ -66,6 +66,18 @@ window.draw = function () {
     pop();
     if (webglVersion !== "p2d") {
         drawingContext.disable(drawingContext.DEPTH_TEST);
+        if(engine.is3D) {
+            let cam = _renderer._curCamera;
+            let pan = atan2(cam.eyeZ - cam.centerZ, cam.eyeX - cam.centerX)
+            let tilt = atan2(cam.eyeY - cam.centerY, dist(cam.centerX, cam.centerZ, cam.eyeX, cam.eyeZ))
+            
+            translate(cam.eyeX, cam.eyeY, cam.eyeZ)
+            rotateY(-pan)
+            rotateZ(tilt + PI)
+            translate((height / 2.0) / tan(PI * 30.0 / 180.0),0,0)
+            rotateY(-PI/2)
+            rotateZ(PI)
+          }
         image(engine.gui, -width / 2, -height / 2, width, height);
         drawingContext.enable(drawingContext.DEPTH_TEST);
     }
