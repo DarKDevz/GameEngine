@@ -63,16 +63,17 @@ class BaseEditor {
   onSetup() {
     if (button)
       return;
-    canvas.ondragover = (event) => {
+    document.body.ondragover = (event) => {
       event.preventDefault();
     };
-    canvas.ondrop = (event) => {
+    document.body.ondrop = (event) => {
       event.preventDefault();
       if (event.dataTransfer.files[0].type === "application/json") {
         event.dataTransfer.files[0].text().then(
           (data) => {
             engine = new Engine();
             LoadMap({ data });
+            editor.init();
             engine.cameraPos = editor.cameraPos;
           }
         );
