@@ -167,7 +167,8 @@ class Box3D extends GameObject3D {
         this.depth = depth;
         this.alwaysDraw = true;
         this.clr = 0;
-        this.typeId = "3D";
+        this.typeId = "Box3D";
+        this.collisionType = 'Box3D';
     }
     rayIntersection(rayPos, rayDir) {
         const aabbMin = {
