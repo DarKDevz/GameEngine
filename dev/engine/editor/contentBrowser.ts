@@ -64,18 +64,17 @@ class BaseEditor {
     }
     onSetup() {
         if (button) return;
-        //TODO
-        //This whole thing stopped working 
-        canvas.ondragover = (event) => {
+        document.body.ondragover = (event) => {
             event.preventDefault();
         };
-        canvas.ondrop = (event) => {
+        document.body.ondrop = (event) => {
             event.preventDefault()
             if (event.dataTransfer.files[0].type === 'application/json') {
                 event.dataTransfer.files[0].text().then(
                     (data: string) => {
                         engine = new Engine();
                         LoadMap({ data: data })
+                        editor.init()
                         engine.cameraPos = editor.cameraPos;
                     }
                 );
