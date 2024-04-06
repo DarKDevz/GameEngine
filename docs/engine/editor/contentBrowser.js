@@ -36,7 +36,7 @@ class BaseEditor {
   }
   openContextMenu(uuid) {
     let objContextMenu = this.fromReference("#objectContext");
-    this.contextObj = uuid;
+    editor.contextObj = uuid;
     objContextMenu.show();
     objContextMenu.elt.style.position = "absolute";
     objContextMenu.position(winMouseX, winMouseY);
@@ -46,7 +46,7 @@ class BaseEditor {
     fileContext.show();
     fileContext.elt.style.position = "absolute";
     fileContext.position(winMouseX, winMouseY);
-    this.contextObj = _file;
+    editor.contextObj = _file;
   }
   removeMapObject() {
     for (let selectedId in selectedObjects) {
@@ -244,13 +244,13 @@ class BaseEditor {
     fileContext.mouseReleased((e) => {
       switch (e.target.innerText) {
         case "Rename":
-          if (this.contextObj)
-            content.changeName(this.contextObj);
+          if (editor.contextObj)
+            content.changeName(editor.contextObj);
           fileContext.hide();
           break;
         case "Delete":
-          if (this.contextObj?.UUID)
-            engine.deleteGameFile(this.contextObj.UUID);
+          if (editor.contextObj?.UUID)
+            engine.deleteGameFile(editor.contextObj.UUID);
           fileContext.hide();
           break;
       }
@@ -263,15 +263,15 @@ class BaseEditor {
       switch (e.target.innerText) {
         case "Copy":
           let copiedObj = {
-            vals: engine.getfromUUID(this.contextObj).getParameters(),
-            type: engine.getfromUUID(this.contextObj).typeId || engine.getfromUUID(this.contextObj).constructor.name,
-            components: engine.getfromUUID(this.contextObj).jsonComponents()
+            vals: engine.getfromUUID(editor.contextObj).getParameters(),
+            type: engine.getfromUUID(editor.contextObj).typeId || engine.getfromUUID(editor.contextObj).constructor.name,
+            components: engine.getfromUUID(editor.contextObj).jsonComponents()
           };
-          this.copiedObjs = [copiedObj];
+          editor.copiedObjs = [copiedObj];
           objContextMenu.hide();
           break;
         case "Paste":
-          let scene = engine.getfromUUID(this.contextObj)?.scene;
+          let scene = engine.getfromUUID(editor.contextObj)?.scene;
           if (scene && this.copiedObjs) {
             for (let copiedObj2 of this.copiedObjs) {
               if (copiedObj2.type === "" || copiedObj2.type === void 0) {
@@ -291,7 +291,7 @@ class BaseEditor {
           }
           break;
         case "Delete":
-          removeObject(this.contextObj);
+          removeObject(editor.contextObj);
           objContextMenu.hide();
           break;
       }
