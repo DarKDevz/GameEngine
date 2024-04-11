@@ -122,7 +122,7 @@ function parseStringNum(str: any, ogVal = str, onlyPositive: boolean = false) {
 
 function DrawAll() {
     for (let i of engine.world.colliders.getAll()) {
-        let position = i.translation();
+        let position = i.parent().translation();
         position.x *= 50;
         position.y *= 50;
         switch (i._shape.type) {
