@@ -299,6 +299,7 @@ class gameScript extends Component {
     this.file.addUser(this, this.ownObject.uuid);
     this.fn = this.file.data;
     editor.updates.menu = true;
+    editor.updates.browser = true;
   }
   toJson() {
     return {
