@@ -12,7 +12,7 @@ class movingPlatform extends Box {
 		if (!this.width) return;
 		if (this.width && this.height) {
 			if (!this.body) {
-				let rigidBody = RAPIER.RigidBodyDesc.dynamic()
+				let rigidBody = RAPIER.RigidBodyDesc.kinematicPositionBased()
 				rigidBody.setTranslation((this.x+this.hw)/50,(this.y+this.hh)/50);
 				//this.body = new p2.Body({mass:0,position:[this.x,-this.y],fixedRotation : true})
 				//this.body.addShape(new p2.Box({ width: this.width,height:this.height}));
@@ -82,8 +82,10 @@ class movingPlatform extends Box {
 			this.x -= 3;
 		}
 		if (this.x < this.x1) this.direction = "r";
-		//this.x = this.body.GetTransform().position.x - this.width / 2;
-		//this.phySprite.pos = {x:this.x+this.width/2,y:this.y+this.height/2};
+		  this.body?.setNextKinematicTranslation({
+    x: (this.x + this.hw) / 50,
+    y: (this.y + this.hh) / 50,
+  }, true);
 	}
 	customDraw() {
 		stroke(0, 0, 255);
