@@ -335,6 +335,7 @@ class gameScript extends Component {
 		// }
 		//console.error("Not assigned to any level defaulting it to be the active scene", engine.getfromUUID(this.ownObject.uuid).scene);
 		editor.updates.menu = true;
+		editor.updates.browser = true;
 	}
 	toJson() {
 		return {
