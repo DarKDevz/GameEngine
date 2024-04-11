@@ -15,7 +15,7 @@ class movingPlatform extends Box {
       return;
     if (this.width && this.height) {
       if (!this.body) {
-        let rigidBody = RAPIER.RigidBodyDesc.dynamic();
+        let rigidBody = RAPIER.RigidBodyDesc.kinematicPositionBased();
         rigidBody.setTranslation((this.x + this.hw) / 50, (this.y + this.hh) / 50);
         this.body = engine.world.createRigidBody(rigidBody);
         let colliderDesc = RAPIER.ColliderDesc.cuboid(this.width / 100, this.height / 100);
@@ -79,8 +79,13 @@ class movingPlatform extends Box {
     if (this.direction == "l") {
       this.x -= 3;
     }
+      this.body?.setNextKinematicTranslation({
+    x: (this.x + this.hw) / 50,
+    y: (this.y + this.hh) / 50,
+  }, true);
     if (this.x < this.x1)
       this.direction = "r";
+    
   }
   customDraw() {
     stroke(0, 0, 255);
