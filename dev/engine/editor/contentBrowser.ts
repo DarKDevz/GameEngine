@@ -372,23 +372,34 @@ class BaseEditor {
         return _;
     }
     removeScene(ind) {
-        engine.scene.splice(ind, 1)
-        for (let i = ind; i < engine.scene.length; i++) {
-            engine.scene[i].ind = i;
-            for (let obj of engine.scene[i].boxes) {
-                obj.scene = "" + i;
-            }
-        }
-        editor.updates.level = true;
-        if (engine.currentScene < this.sceneContext) return;
-        let file = { data: SaveMap() }
-        editor.updates.browser = true;
-        editor.updates.menu = true;
-        engine = new Engine()
-        LoadMap(file)
-        engine.cameraPos = editor.cameraPos;
-        editor.updates.level = true;
+    engine.scene.splice(ind, 1);
+    for (let i = ind; i < engine.scene.length; i++) {
+      engine.scene[i].ind = i;
+      for (let obj of engine.scene[i].boxes) {
+        obj.scene = "" + i;
+      }
     }
+    editor.updates.level = true;
+        for(let i in openerState) {
+      if(i>=this.sceneContext) {
+          if(engine.scene.length < i+1) {
+              delete openerState[i]
+          }
+          if(i<engine.scene.length) {
+              openerState[i-1] = openerState[i];
+          }
+      }
+    }
+    if (engine.currentScene < this.sceneContext)
+      return;
+    let file = { data: SaveMap() };
+    editor.updates.browser = true;
+    editor.updates.menu = true;
+    engine = new Engine();
+    LoadMap(file);
+    engine.cameraPos = editor.cameraPos;
+    editor.updates.level = true;
+  }
     openSceneContext(id: number) {
         //means objectContext menu is already open
         if (this.fromReference('#objectContext').elt.style.display === 'block') return;
