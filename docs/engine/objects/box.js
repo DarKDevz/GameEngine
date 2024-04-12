@@ -165,7 +165,7 @@ class Box3D extends GameObject3D {
     this.width = width;
     this.height = height;
     this.depth = depth;
-    this.alwaysDraw = true;
+    this.alwaysDraw = false;
     this.clr = 0;
     this.typeId = "Box3D";
     this.collisionType = "Box3D";

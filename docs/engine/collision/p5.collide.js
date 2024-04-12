@@ -165,8 +165,8 @@ p5.prototype.updateColliders = function() {
   this.cam = this.createVector(cam.eyeX, cam.eyeY, cam.eyeZ);
   this.dir = this.createVector(cam.centerX, cam.centerY, cam.centerZ).sub(this.cam).normalize();
 };
-p5.prototype.checkIfVisible = function(transformedPosition, threshold = 0) {
-  let tPos = this.cam.copy().sub(transformedPosition).normalize();
+p5.prototype.checkIfVisible = function(transformedPosition, threshold = 0, projection = 0) {
+  let tPos = this.cam.copy().sub(transformedPosition.add(this.dir.copy().mult(projection))).normalize();
   let test = tPos.copy().dot(this.dir.copy().normalize());
   return test < threshold;
 };
@@ -198,16 +198,12 @@ p5.prototype.collideFrustumCircleVector = function(a, b, c) {
 };
 p5.prototype.collideFrustumBox3DVector = function(a, b, c) {
   let listOfPoints = [];
-  listOfPoints.push(createVector(b.x + c.x / 2, b.y + c.y / 2, b.z + c.y / 2));
-  listOfPoints.push(createVector(b.x + c.x / 2, b.y - c.y / 2, b.z + c.y / 2));
-  listOfPoints.push(createVector(b.x - c.x / 2, b.y + c.y / 2, b.z + c.y / 2));
-  listOfPoints.push(createVector(b.x - c.x / 2, b.y - c.y / 2, b.z + c.y / 2));
-  listOfPoints.push(createVector(b.x + c.x / 2, b.y + c.y / 2, b.z - c.y / 2));
-  listOfPoints.push(createVector(b.x + c.x / 2, b.y - c.y / 2, b.z - c.y / 2));
-  listOfPoints.push(createVector(b.x - c.x / 2, b.y - c.y / 2, b.z - c.y / 2));
-  listOfPoints.push(createVector(b.x - c.x / 2, b.y + c.y / 2, b.z - c.y / 2));
+  let maxDist = max(c.x, c.y, c.z);
+  let midDist = c.x + c.y + c.z - maxDist - min(c.x, c.y, c.z);
+  let distSquared = sqrt(maxDist * maxDist + midDist * midDist);
+  listOfPoints.push(createVector(b.x, b.y, b.z));
   for (let i of listOfPoints) {
-    if (this.checkIfVisible(i)) {
+    if (this.checkIfVisible(i, 0, distSquared)) {
       return true;
     }
   }
