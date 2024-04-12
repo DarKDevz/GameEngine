@@ -364,14 +364,14 @@ class BaseEditor {
       }
     }
     editor.updates.level = true;
-        for(let i in openerState) {
-      if(i>=this.sceneContext) {
-          if(engine.scene.length < i+1) {
-              delete openerState[i]
-          }
-          if(i<engine.scene.length) {
-              openerState[i-1] = openerState[i];
-          }
+    for (let i in openerState) {
+      if (i >= this.sceneContext) {
+        if (engine.scene.length < i + 1) {
+          delete openerState[i];
+        }
+        if (i < engine.scene.length) {
+          openerState[i - 1] = openerState[i];
+        }
       }
     }
     if (engine.currentScene < this.sceneContext)

@@ -79,13 +79,12 @@ class movingPlatform extends Box {
     if (this.direction == "l") {
       this.x -= 3;
     }
-      this.body?.setNextKinematicTranslation({
-    x: (this.x + this.hw) / 50,
-    y: (this.y + this.hh) / 50,
-  }, true);
     if (this.x < this.x1)
       this.direction = "r";
-    
+    this.body?.setNextKinematicTranslation({
+      x: (this.x + this.hw) / 50,
+      y: (this.y + this.hh) / 50
+    }, true);
   }
   customDraw() {
     stroke(0, 0, 255);
