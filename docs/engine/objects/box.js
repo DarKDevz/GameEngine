@@ -171,7 +171,18 @@ class Box3D extends GameObject3D {
     this.typeId = "Box3D";
     this.collisionType = "Box3D";
   }
-  rayIntersection(rayPos, rayDir) {
+  rayIntersection(rPos, rDir) {
+    let matrix = new p5.Matrix();
+    matrix.rotateX(this.r.x);
+    matrix.rotateY(this.r.y);
+    matrix.rotateZ(this.r.z);
+    matrix.invert(matrix);
+    let rayPos = createVector(rPos.x, rPos.y, rPos.z);
+    let rayDir = createVector(rDir.x, rDir.y, rDir.z);
+    rayPos.sub(this.x, this.y, this.z);
+    rayPos = matrix.multiplyPoint(rPos);
+    rayPos.add(this.x, this.y, this.z);
+    rayDir = matrix.multiplyDirection(rDir);
     const aabbMin = {
       x: this.x - this.width / 2,
       y: this.y - this.height / 2,
@@ -276,7 +287,7 @@ class Box3D extends GameObject3D {
     return "Box3D";
   }
   getParameters() {
-    return super.getParameters().concat(this.width, this.height, this.width, this.r.x, this.r.y, this.r.z);
+    return super.getParameters().concat(this.width, this.height, this.depth, this.r.x, this.r.y, this.r.z);
   }
   parameterNames() {
     return super.parameterNames().concat("width", "height", "depth", "rx", "ry", "rz");
