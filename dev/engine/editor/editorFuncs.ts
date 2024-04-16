@@ -463,7 +463,7 @@ class Editor2D extends BaseEditor {
         }
     }
     pasteObjects() {
-        if (this.pasted || overUI) {
+        if (this.pasted || overUI || !this.copiedObjs || document.activeElement !== document.body) {
             return;
         }
         let firstObjPos;
@@ -504,6 +504,7 @@ class EditorManager {
         this.editor?.rover?.setActive?.(false)
         camera()
         this.editor = engine.is3D ? new Editor3D() : new Editor2D();
+        this.updates.browser = true;
     }
     get updates() {
         return this.editor.updates;
@@ -818,7 +819,7 @@ class EditorManager {
             this.updateLevels()
         }
         if (keyIsDown(17) && keyIsDown(86)) {
-            this.editor.pasteObjects();
+            this.editor?.pasteObjects();
         } else {
             this.pasted = false;
         }

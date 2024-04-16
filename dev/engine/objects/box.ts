@@ -160,17 +160,47 @@ class Box extends GameObject {
     }
 }
 class Box3D extends GameObject3D {
-    constructor(x,y,z,width,height,depth) {
+    constructor(x,y,z,width,height,depth,rx=0,ry=0,rz=0) {
         super(x,y,z,"Box3D");
         this.width = width;
         this.height = height;
         this.depth = depth;
+        this.r = {x:rx,y:ry,z:rz}
         this.alwaysDraw = false;
         this.clr = 0;
         this.typeId = "Box3D";
         this.collisionType = 'Box3D';
     }
-    rayIntersection(rayPos, rayDir) {
+    rayIntersection(rPos, rDir) {
+        /*Matrix transformations
+         took a LOT of research and debugging,
+         i got it working in the end
+         this took 3 days...
+         8 to 12 hours of just coding it
+         then the rest was me thinking of the solution and research
+         */
+        let matrix = new p5.Matrix();
+        matrix.rotateX(this.r.x);
+        matrix.rotateY(this.r.y);
+        matrix.rotateZ(this.r.z);
+        matrix.invert(matrix);
+        /**
+         * create vectors (not needed but better for doing sub and add)
+         * otherwise the code would've been longer
+         * subtract(translate) the objects position
+         * rotate(counterrotate) to transform to the localspace of object
+         * add(retranslate)
+         * for direction we just multiply the direction as it isn't in any world space
+         * but is just a direction
+         * multiplyDirection in this case does absolutely nothing
+         */
+        let rayPos = createVector(rPos.x, rPos.y, rPos.z);
+        let rayDir = createVector(rDir.x, rDir.y, rDir.z);
+        rayPos.sub(this.x, this.y, this.z);
+        rayPos = matrix.multiplyPoint(rPos);
+        rayPos.add(this.x, this.y, this.z);
+        rayDir = matrix.multiplyDirection(rDir);
+
         const aabbMin = {
             x: this.x - this.width / 2,
             y: this.y - this.height / 2,
@@ -214,51 +244,88 @@ class Box3D extends GameObject3D {
         return { tmin, tmax };
     }
     getCollisionVectors(): (this | { x: number; y: number; z: number})[] {
-        return [{x:this.x,y:this.y,z:this.z}, { x: this.width, y: this.height,z : this.depth}]
+        return [{x:this.x,y:this.y,z:this.z}, { x: this.width, y: this.height,z : this.depth}, this.r]
     }
     getEditableArray(): EditableObject[] {
-        return [...super.getEditableArray(),{
-            name:"width",
-            set:(val) => {
-                this.width = val;
+        return [...super.getEditableArray(),
+            {
+                name: "width",
+                set: (val) => {
+                    this.width = val;
+                },
+                get: () => {
+                    return this.width;
+                },
+                value: this.width
             },
-            get:() => {
-                return this.width
+            {
+                name: "height",
+                set: (val) => {
+                    this.height = val;
+                },
+                get: () => {
+                    return this.height;
+                },
+                value: this.height
             },
-            value:this.width
-        },{
-            name:"height",
-            set:(val) =>{
-                this.height = val;
+            {
+                name: "depth",
+                set: (val) => {
+                    this.depth = val;
+                },
+                get: () => {
+                    return this.depth;
+                },
+                value: this.depth
             },
-            get:() => {
-                return this.height
+            {
+                name: "rx",
+                set: (val) => {
+                    this.r.x = val;
+                },
+                get: () => {
+                    return this.r.x;
+                },
+                value: this.r.x
             },
-            value:this.height
-        },{
-            name:"depth",
-            set:(val) =>{
-                this.depth = val;
+            {
+                name: "ry",
+                set: (val) => {
+                    this.r.y = val;
+                },
+                get: () => {
+                    return this.r.y;
+                },
+                value: this.r.y
             },
-            get:() => {
-                return this.depth
-            },
-            value:this.depth
-        }]
-    }
+            {
+                name: "rz",
+                set: (val) => {
+                    this.r.z = val;
+                },
+                get: () => {
+                    return this.r.z;
+                },
+                value: this.r.z
+            }
+        ]
+    }    
     getCollisionType(): collisionTypes {
         return "Box3D"
     }
     getParameters(): any[] {
-        return super.getParameters().concat(this.width, this.height,this.width)
+        return super.getParameters().concat(this.width, this.height,this.depth,this.r.x,this.r.y,this.r.z)
     }
     parameterNames(): string[] {
-        return super.parameterNames().concat("width","height,depth")
+        return super.parameterNames().concat("width","height","depth","rx","ry","rz")
     }
     draw(): void {
         push()
         fill(this.clr)
         translate(this.x,this.y,this.z);
+        rotateX(this.r.x);
+        rotateY(this.r.y);
+        rotateZ(this.r.z);
         box(this.width,this.height,this.depth)
         pop()
     }

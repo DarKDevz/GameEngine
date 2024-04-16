@@ -119,7 +119,6 @@ function parseStringNum(str: any, ogVal = str, onlyPositive: boolean = false) {
     }
     return ogVal;
 }
-
 function DrawAll() {
     for (let i of engine.world.colliders.getAll()) {
         let position = i.parent().translation();
