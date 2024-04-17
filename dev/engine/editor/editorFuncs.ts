@@ -970,7 +970,7 @@ class Gizmo {
                 select.push(rayPosition.copy())
             }
             if (select[0] === 'xyz') {
-                select.push(prePos.copy().add(rayDirection.copy().mult(this.pos.dist(prePos))))
+                select.push(prePos.copy().add(rayDirection.copy().mult(p5.Vector.dist(createVector(this.pos.x,this.pos.y,this.pos.z),prePos))));
             }
         }
         let lastMove = select[1];
@@ -987,7 +987,10 @@ class Gizmo {
                     this.pos[select[0]] += select[1].copy().sub(lastMove)[select[0]]
                     break;
                 default:
-                    this.pos.add(select[1].copy().sub(lastMove))
+                    let _ = select[1].copy().sub(lastMove)
+                    this.pos.x += _.x;
+                    this.pos.y += _.y;
+                    this.pos.z += _.z;
                     break;
             }
             if (this.is3D) {
