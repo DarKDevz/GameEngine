@@ -197,7 +197,7 @@ class Box3D extends GameObject3D {
         let rayPos = createVector(rPos.x, rPos.y, rPos.z);
         let rayDir = createVector(rDir.x, rDir.y, rDir.z);
         rayPos.sub(this.x, this.y, this.z);
-        rayPos = matrix.multiplyPoint(rPos);
+        rayPos = matrix.multiplyPoint(rayPos);
         rayPos.add(this.x, this.y, this.z);
         rayDir = matrix.multiplyDirection(rDir);
 
