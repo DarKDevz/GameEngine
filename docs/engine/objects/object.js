@@ -4,6 +4,7 @@ class GameObject extends GameEvents {
     this.x = x;
     this.y = y;
     this.z = 0;
+    this.rot = { x: 0, y: 0, z: 0 };
     this.width = 1;
     this.height = 1;
     this.isCollidable = false;
@@ -230,5 +231,68 @@ class GameObject3D extends GameObject {
         return false;
       }
     }
+  }
+}
+class Sphere extends GameObject3D {
+  r;
+  rot;
+  constructor(x, y, z, radius, rx = 0, ry = 0, rz = 0) {
+    super(x, y, z, "Sphere");
+    this.rot = { x: rx, y: ry, z: rz };
+    this.r = radius;
+    this.clr = 0;
+  }
+  getCollisionVectors() {
+    return [{ x: this.x, y: this.y, z: this.z }, this.r];
+  }
+  getEditableArray() {
+    return [...super.getEditableArray(), {
+      name: "radius",
+      set: (num) => {
+        this.r = num;
+        this?.updateShape?.();
+      },
+      get: () => {
+        return this.r;
+      },
+      value: this.r
+    }];
+  }
+  rayIntersection(rayPos, rayDir) {
+    const sphereCenter = { x: this.x, y: this.y, z: this.z };
+    const sphereRadius = this.r;
+    const oc = {
+      x: rayPos.x - sphereCenter.x,
+      y: rayPos.y - sphereCenter.y,
+      z: rayPos.z - sphereCenter.z
+    };
+    const a = rayDir.x * rayDir.x + rayDir.y * rayDir.y + rayDir.z * rayDir.z;
+    const b = 2 * (oc.x * rayDir.x + oc.y * rayDir.y + oc.z * rayDir.z);
+    const c = oc.x * oc.x + oc.y * oc.y + oc.z * oc.z - sphereRadius * sphereRadius;
+    const discriminant = b * b - 4 * a * c;
+    if (discriminant < 0) {
+      return false;
+    } else {
+      const t1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+      const t2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+      if (t1 >= 0 || t2 >= 0) {
+        return Boolean(Math.min(t1, t2));
+      } else {
+        return false;
+      }
+    }
+  }
+  getParameters() {
+    return [this.x, this.y, this.z, this.r, this.rot.x, this.rot.y, this.rot.z];
+  }
+  parameterNames() {
+    return ["x", "y", "z", "radius", "rotationX", "rotationY", "rotationZ"];
+  }
+  draw() {
+    push();
+    fill(this.clr);
+    translate(this.x, this.y, this.z);
+    sphere(this.r);
+    pop();
   }
 }

@@ -165,7 +165,7 @@ class Box3D extends GameObject3D {
         this.width = width;
         this.height = height;
         this.depth = depth;
-        this.r = {x:rx,y:ry,z:rz}
+        this.rot = {x:rx,y:ry,z:rz}
         this.alwaysDraw = false;
         this.clr = 0;
         this.typeId = "Box3D";
@@ -180,9 +180,9 @@ class Box3D extends GameObject3D {
          then the rest was me thinking of the solution and research
          */
         let matrix = new p5.Matrix();
-        matrix.rotateX(this.r.x);
-        matrix.rotateY(this.r.y);
-        matrix.rotateZ(this.r.z);
+        matrix.rotateX(this.rot.x);
+        matrix.rotateY(this.rot.y);
+        matrix.rotateZ(this.rot.z);
         matrix.invert(matrix);
         /**
          * create vectors (not needed but better for doing sub and add)
@@ -244,7 +244,7 @@ class Box3D extends GameObject3D {
         return { tmin, tmax };
     }
     getCollisionVectors(): (this | { x: number; y: number; z: number})[] {
-        return [{x:this.x,y:this.y,z:this.z}, { x: this.width, y: this.height,z : this.depth}, this.r]
+        return [{x:this.x,y:this.y,z:this.z}, { x: this.width, y: this.height,z : this.depth}, this.rot]
     }
     getEditableArray(): EditableObject[] {
         return [...super.getEditableArray(),
@@ -281,32 +281,32 @@ class Box3D extends GameObject3D {
             {
                 name: "rx",
                 set: (val) => {
-                    this.r.x = val;
+                    this.rot.x = val;
                 },
                 get: () => {
-                    return this.r.x;
+                    return this.rot.x;
                 },
-                value: this.r.x
+                value: this.rot.x
             },
             {
                 name: "ry",
                 set: (val) => {
-                    this.r.y = val;
+                    this.rot.y = val;
                 },
                 get: () => {
-                    return this.r.y;
+                    return this.rot.y;
                 },
-                value: this.r.y
+                value: this.rot.y
             },
             {
                 name: "rz",
                 set: (val) => {
-                    this.r.z = val;
+                    this.rot.z = val;
                 },
                 get: () => {
-                    return this.r.z;
+                    return this.rot.z;
                 },
-                value: this.r.z
+                value: this.rot.z
             }
         ]
     }    
@@ -314,7 +314,7 @@ class Box3D extends GameObject3D {
         return "Box3D"
     }
     getParameters(): any[] {
-        return super.getParameters().concat(this.width, this.height,this.depth,this.r.x,this.r.y,this.r.z)
+        return super.getParameters().concat(this.width, this.height,this.depth,this.rot.x,this.rot.y,this.rot.z)
     }
     parameterNames(): string[] {
         return super.parameterNames().concat("width","height","depth","rx","ry","rz")
@@ -323,9 +323,9 @@ class Box3D extends GameObject3D {
         push()
         fill(this.clr)
         translate(this.x,this.y,this.z);
-        rotateX(this.r.x);
-        rotateY(this.r.y);
-        rotateZ(this.r.z);
+        rotateX(this.rot.x);
+        rotateY(this.rot.y);
+        rotateZ(this.rot.z);
         box(this.width,this.height,this.depth)
         pop()
     }

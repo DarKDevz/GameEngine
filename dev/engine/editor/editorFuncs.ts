@@ -181,7 +181,7 @@ class Editor3D extends BaseEditor {
                     defaultPos[0]+=_renderer._curCamera.eyeX;
                     defaultPos[1]+=_renderer._curCamera.eyeY;
                     defaultPos[2]+=_renderer._curCamera.eyeZ;
-                    let obj = new objClass(...defaultPos,...((new Array(Box3D.length-3)).fill(50)))
+                    let obj = new objClass(...defaultPos,...((new Array(objClass.length-3)).fill(50)))
                     obj.init();
                     engine.getActiveScene().boxes.push(obj);
                     selectedObjects.push(obj.uuid);
@@ -849,16 +849,17 @@ class Gizmo {
     select: any;
     is3D: boolean;
     obj: GameObject;
-    constructor(obj) {
-        this.pos = createVector(obj.x, obj.y, obj.z);
+    type: number;
+    constructor(obj,type) {
         this.is3D = obj.is3D
         this.obj = obj;
         this.select = [];
+        this.type = type;
     }
     draw() {
         noStroke();
         push();
-        translate(this.pos.x, this.pos.y, this.pos.z);
+        translate(this.obj.x, this.obj.y, this.obj.z);
         let thickness = 2.5;
         let len = 100;
         let side = 50;
@@ -893,14 +894,14 @@ class Gizmo {
         pop();
         if (this.is3D) {
             push()
-            translate(this.pos.x, this.pos.y, this.pos.z)
+            translate(this.obj.x, this.obj.y, this.obj.z)
             rotateX(-PI / 2)
             translate(side / 2, -side / 2, 0)
             fill(0, 255, 0)
             plane(side)
             pop()
             push()
-            translate(this.pos.x, this.pos.y, this.pos.z)
+            translate(this.obj.x, this.obj.y, this.obj.z)
             rotateY(PI / 2)
             translate(-side / 2, -side / 2, 0)
             fill(255, 0, 0)
@@ -908,7 +909,7 @@ class Gizmo {
             pop()
         }
         push()
-        translate(this.pos.x, this.pos.y, this.pos.z)
+        translate(this.obj.x, this.obj.y, this.obj.z)
         rotateZ(PI / 2)
         translate(-side / 2, -side / 2, 0)
         fill(0, 0, 255)
@@ -917,7 +918,7 @@ class Gizmo {
     }
     getRayProjected(rayPos, rayDir, axis) {
         let rayPosition = rayPos.copy()
-        let length = this.pos[axis] - rayPosition[axis];
+        let length = this.obj[axis] - rayPosition[axis];
         length /= rayDir[axis];
         rayPosition.add(rayDir.copy().mult(length))
         return rayPosition
@@ -934,15 +935,15 @@ class Gizmo {
         let rayPosition = createVector(cam.eyeX, cam.eyeY, cam.eyeZ);
         let prePos = rayPosition.copy()
         rayPosition = this.getRayProjected(prePos, rayDirection, "x")
-        let isZSelect = rayPosition.y > this.pos.y && rayPosition.y < this.pos.y + 5 && rayPosition.z > this.pos.z && rayPosition.z < this.pos.z + 100;
-        let isYSelect = rayPosition.y < this.pos.y && rayPosition.y > this.pos.y - 100 && rayPosition.z > this.pos.z && rayPosition.z < this.pos.z + 5
+        let isZSelect = rayPosition.y > this.obj.y && rayPosition.y < this.obj.y + 5 && rayPosition.z > this.obj.z && rayPosition.z < this.obj.z + 100;
+        let isYSelect = rayPosition.y < this.obj.y && rayPosition.y > this.obj.y - 100 && rayPosition.z > this.obj.z && rayPosition.z < this.obj.z + 5
         if (isYSelect && isFirstSelect) {
             select = ['y'];
         }
         if (this.is3D) {
             if (isZSelect && isFirstSelect) {
                 select = ['z'];
-            } else if (rayPosition.z < this.pos.z + 50 && rayPosition.z > this.pos.z && rayPosition.y - this.pos.y > -50 && rayPosition.y < this.pos.y && select.length === 0) {
+            } else if (rayPosition.z < this.obj.z + 50 && rayPosition.z > this.obj.z && rayPosition.y - this.obj.y > -50 && rayPosition.y < this.obj.y && select.length === 0) {
                 select = ['zy']
             }
         }
@@ -950,10 +951,10 @@ class Gizmo {
             select.push(rayPosition.copy())
         }
         rayPosition = this.getRayProjected(prePos, rayDirection, "z")
-        let IsXSelect = (rayPosition.y > this.pos.y && rayPosition.y < this.pos.y + 5 && rayPosition.x > this.pos.x && rayPosition.x < this.pos.x + 100);
+        let IsXSelect = (rayPosition.y > this.obj.y && rayPosition.y < this.obj.y + 5 && rayPosition.x > this.obj.x && rayPosition.x < this.obj.x + 100);
         if (IsXSelect && isFirstSelect) {
             select = ['x']
-        } else if (rayPosition.x < this.pos.x + 50 && rayPosition.x > this.pos.x && rayPosition.y - this.pos.y > -50 && rayPosition.y < this.pos.y && isFirstSelect) {
+        } else if (rayPosition.x < this.obj.x + 50 && rayPosition.x > this.obj.x && rayPosition.y - this.obj.y > -50 && rayPosition.y < this.obj.y && isFirstSelect) {
             select = ['xy']
         }
         if (select[0] === 'x' || select[0] === 'xy') {
@@ -961,16 +962,16 @@ class Gizmo {
         }
         if (this.is3D) {
             rayPosition = this.getRayProjected(prePos, rayDirection, "y")
-            if (rayPosition.x < this.pos.x + 10 && rayPosition.x > this.pos.x - 10 && rayPosition.z < this.pos.z + 10 && rayPosition.z > this.pos.z - 10 && isFirstSelect) {
+            if (rayPosition.x < this.obj.x + 10 && rayPosition.x > this.obj.x - 10 && rayPosition.z < this.obj.z + 10 && rayPosition.z > this.obj.z - 10 && isFirstSelect) {
                 select = ['xyz']
-            } else if (rayPosition.x > this.pos.x && rayPosition.x < this.pos.x + 50 && rayPosition.z > this.pos.z && rayPosition.z < this.pos.z + 50 && isFirstSelect) {
+            } else if (rayPosition.x > this.obj.x && rayPosition.x < this.obj.x + 50 && rayPosition.z > this.obj.z && rayPosition.z < this.obj.z + 50 && isFirstSelect) {
                 select = ["xz"]
             }
             if (select[0] === 'xz') {
                 select.push(rayPosition.copy())
             }
             if (select[0] === 'xyz') {
-                select.push(prePos.copy().add(rayDirection.copy().mult(p5.Vector.dist(createVector(this.pos.x,this.pos.y,this.pos.z),prePos))));
+                select.push(prePos.copy().add(rayDirection.copy().mult(p5.Vector.dist(createVector(this.obj.x,this.obj.y,this.obj.z),prePos))));
             }
         }
         let lastMove = select[1];
@@ -984,19 +985,19 @@ class Gizmo {
             editor.editor.creatingNew = false;
             switch (select[0].length) {
                 case 1:
-                    this.pos[select[0]] += select[1].copy().sub(lastMove)[select[0]]
+                    this.obj[select[0]] += select[1].copy().sub(lastMove)[select[0]]
                     break;
                 default:
                     let _ = select[1].copy().sub(lastMove)
-                    this.pos.x += _.x;
-                    this.pos.y += _.y;
-                    this.pos.z += _.z;
+                    this.obj.x += _.x;
+                    this.obj.y += _.y;
+                    this.obj.z += _.z;
                     break;
             }
             if (this.is3D) {
-                this.obj.offSet(this.pos.x, this.pos.y, this.pos.z);
+                this.obj.offSet(this.obj.x, this.obj.y, this.obj.z);
             } else {
-                this.obj.offSet(this.pos.x, this.pos.y);
+                this.obj.offSet(this.obj.x, this.obj.y);
             }
         }
     }
@@ -1025,7 +1026,7 @@ class GizmoManager {
         }
     }
     addGizmo(uuid: string, pos: Vec) {
-        const gizmo = new Gizmo(pos);
+        const gizmo = new Gizmo(pos,0);
         this.GizmoList[uuid] = gizmo;
     }
     removeAll() {

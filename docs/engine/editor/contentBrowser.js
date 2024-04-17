@@ -20,7 +20,6 @@ class BaseEditor {
     this.tryOffset = {};
   }
   setSelection(newArr) {
-    this.editor.setSelection(newArr);
   }
   readFileAsDataURL(file) {
     return new Promise((resolve) => {
@@ -739,5 +738,6 @@ var classes = {
   Interact: Interactive
 };
 var classes3D = {
-  Box3D
+  Box3D,
+  Sphere
 };

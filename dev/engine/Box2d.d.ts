@@ -1,6 +1,6 @@
-namespace RAPIER {
-  declare type RigidBodyHandle = number;
-  declare enum RigidBodyType {
+declare namespace RAPIER {
+   type RigidBodyHandle = number;
+   enum RigidBodyType {
     /**
      * A `RigidBodyType::Dynamic` body can be affected by all external forces.
      */
@@ -28,7 +28,7 @@ namespace RAPIER {
      */
     KinematicVelocityBased = 3
 }
-declare class RigidBody {
+ class RigidBody {
   private rawSet;
   private colliderSet;
   readonly handle: RigidBodyHandle;

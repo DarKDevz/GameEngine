@@ -3,8 +3,6 @@ declare var canvas: any
 declare var MapData: { data: any }
 declare var JSZip: any
 declare function showSaveFilePicker(options:any): Promise<any>
-declare var p5: any
-declare var webglVersion: 'p2d'|'webgl2'
 declare var editor: Editor
 type Vec = ReturnType<typeof createVector>
 type Div = ReturnType<typeof createDiv>
@@ -149,7 +147,7 @@ interface EditableObject {
     get:()=>any
     value:any
 }
-type collisionTypes = 'Rect'|'Circle'|'Line'|'Point'|'Frustum'|'Poly'
+type collisionTypes = 'Rect'|'Circle'|'Line'|'Point'|'Frustum'|'Poly'|'Sphere'
 interface CollidableObject {
     getCollisionType(): collisionTypes
     getCollisionVectors(): any[]
@@ -278,7 +276,6 @@ interface Box extends GameObject {
     oldY: number;
     w: number;
     h: number;
-    fixture: b2Fixture;
 }
 interface End extends Box { }
 interface TextObject extends GameObject {
@@ -287,6 +284,10 @@ interface TextObject extends GameObject {
 }
 interface Sprite extends Component {
 
+}
+interface Vector {
+    x:number,
+    y:number
 }
 interface xyObject {
     x: number,
@@ -406,6 +407,12 @@ interface Level {
      * @param {boolean} shouldRun - wheter its should run or not
      */
     display(shouldRun: boolean): void;
+        /**
+     * Displays the custom level values
+     * @function
+     * @param {boolean} shouldRun - wheter its should run or not
+     */
+        customDraw(shouldRun: boolean): void;
 
     /**
      * After drawing function
@@ -607,7 +614,7 @@ interface Particle {
     gY: number
     velocity: number
     toBeRemoved: boolean
-    creation: ReturnType<typeof frameCount>
+    creation: number
     shape: 'line' | 'circle'
     size: number
     color: string
@@ -642,16 +649,8 @@ interface ParticleRenderer {
 }
 interface SpatialHashMap {
     cellSize:number;
-    grid: Map;
-    uuidToGrid: {[x:UUID]:Array[]}
+    grid: Map<String,any>;
+    uuidToGrid: {[x:UUID]:any}
     addObject(a:UUID,collider:CollidableObject):void
     queryObj(collider:CollidableObject):boolean
-    uuidToGrid:any;
 }
-function downloadFile(content: any, arg1: string):void
-/**
- * @description updates frustum planes to use for detecting wheter to draw an object or not
- */
-function updateColliders():void
-function replaceValues<SpecialFunc>():void
-function replaceValues<SpecialFunc>():void

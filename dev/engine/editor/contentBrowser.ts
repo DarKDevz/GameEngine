@@ -19,9 +19,7 @@ class BaseEditor {
         this.startPos = createVector(0, 0);
         this.tryOffset = {}
     }
-    setSelection(newArr) {
-        this.editor.setSelection(newArr);
-    }
+    setSelection(newArr) {}
     readFileAsDataURL(file: Blob): Promise<string> {
         return new Promise(resolve => {
             const reader = new FileReader();
@@ -788,5 +786,6 @@ var classes = {
     Interact: Interactive,
 };
 var classes3D = {
-    Box3D: Box3D
+    Box3D: Box3D,
+    Sphere: Sphere,
 }
