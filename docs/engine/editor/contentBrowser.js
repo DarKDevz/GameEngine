@@ -739,5 +739,7 @@ var classes = {
 };
 var classes3D = {
   Box3D,
-  Sphere
+  Sphere,
+  Plane,
+  Ellipse
 };

@@ -199,6 +199,10 @@ p5.prototype.collideFrustumCircleVector = function(a, b, c) {
 p5.prototype.collideFrustumSphereVector = function(a, b, c) {
   return this.checkIfVisible(createVector(b.x, b.y, b.z), 0, c);
 };
+p5.prototype.collideFrustumEllipseVector = function(a, b, c) {
+  let _ = max(c.x, c.y, c.z);
+  return this.checkIfVisible(createVector(b.x, b.y, b.z), 0, _);
+};
 p5.prototype.collideFrustumBox3DVector = function(a, b, c) {
   let listOfPoints = [];
   let maxDist = max(c.x, c.y, c.z);

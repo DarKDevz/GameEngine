@@ -788,4 +788,6 @@ var classes = {
 var classes3D = {
     Box3D: Box3D,
     Sphere: Sphere,
+    Plane:Plane,
+    Ellipse: Ellipse
 }

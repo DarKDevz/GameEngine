@@ -121,7 +121,8 @@ p5.prototype.collideFrustumRectVector = function (a, b, c) {
             return true;
         }
     }
-    return false};
+    return false
+};
 p5.prototype.collideFrustumCircleVector = function (a, b, c) {
     //console.log(a.uPMatrix.multiplyVec4(...a.uMVMatrix.multiplyVec4(b.x,b.y,0,1)))
     let listOfPoints = [];
@@ -138,6 +139,10 @@ p5.prototype.collideFrustumCircleVector = function (a, b, c) {
 };
 p5.prototype.collideFrustumSphereVector = function(a,b,c) {
     return this.checkIfVisible(createVector(b.x,b.y,b.z),0,c)
+}
+p5.prototype.collideFrustumEllipseVector = function(a,b,c) {
+    let _ = max(c.x,c.y,c.z);
+    return this.checkIfVisible(createVector(b.x,b.y,b.z),0,_)
 }
 p5.prototype.collideFrustumBox3DVector = function (a, b, c) {
     let listOfPoints = [];

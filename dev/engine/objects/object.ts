@@ -1,4 +1,4 @@
-class GameObject extends GameEvents{
+class GameObject extends GameEvents {
     constructor(x: number, y: number, tag?: string) {
         super()
         this.x = x;
@@ -6,7 +6,7 @@ class GameObject extends GameEvents{
         this.z = 0;
         //3D rotations
         //even though you can only use one rotation
-        this.rot = {x:0,y:0,z:0};
+        this.rot = { x: 0, y: 0, z: 0 };
         this.width = 1;
         this.height = 1;
         this.isCollidable = false;
@@ -27,16 +27,16 @@ class GameObject extends GameEvents{
         engine.uuidList[this.uuid] = this;
     }
     updateComponents() {
-        for(let component of this.components) {
+        for (let component of this.components) {
             component.update()
         }
     }
-    resize(ww: number,wh: number) {
+    resize(ww: number, wh: number) {
     }
     keyPress(event: Event) {
 
     }
-    getCollisionType():collisionTypes {
+    getCollisionType(): collisionTypes {
         return 'Circle'
     }
     /**
@@ -44,7 +44,7 @@ class GameObject extends GameEvents{
      * @returns a Collision Vector
      */
     getCollisionVectors(): any[] {
-        return [{x:this.x,y:this.y}, 2]
+        return [{ x: this.x, y: this.y }, 2]
     }
     jsonComponents() {
         let ret = [];
@@ -71,44 +71,44 @@ class GameObject extends GameEvents{
         this.y = y;
     }
     getParameters(): any[] {
-        return [this.x,this.y];
+        return [this.x, this.y];
     }
-    getEditableArray():EditableObject[] {
+    getEditableArray(): EditableObject[] {
         return [{
-            name:"x",
-            set:(num:number)=>{
+            name: "x",
+            set: (num: number) => {
                 this.x = num;
                 this?.updateShape?.();
             },
-            get:()=>{
+            get: () => {
                 return this.x
             },
-            value:this.x
-        },{
-            name:"y",
-            set:(num:number)=>{
+            value: this.x
+        }, {
+            name: "y",
+            set: (num: number) => {
                 this.y = num;
                 this?.updateShape?.();
             },
-            get:()=>{
+            get: () => {
                 return this.y
             },
-            value:this.y
+            value: this.y
         }]
     }
-/*     getValues(): any[] {
-        return [this.x, this.y];
-    } */
+    /*     getValues(): any[] {
+            return [this.x, this.y];
+        } */
     parameterNames() {
         return ["x", "y"];
     }
     collision(obj: CollidableObject, trigger = false) {
-       let collides = HandleCollision(obj,this)
+        let collides = HandleCollision(obj, this)
         if (collides && trigger) this.onCollide(obj);
         return collides;
     }
     onCollide(obj: Object) {
-        
+
     }
     update() {
 
@@ -138,7 +138,7 @@ class GameObject extends GameEvents{
 }
 class GameObject3D extends GameObject {
     constructor(x: number, y: number, z: number, tag?: string) {
-        super(x,y,tag);
+        super(x, y, tag);
         this.z = z;
         this.depth = 1; // Assuming depth property for 3D objects
         this.scene = "Not set";
@@ -173,60 +173,60 @@ class GameObject3D extends GameObject {
         // Implement your 3D drawing logic here
     }
     getParameters(): any[] {
-        return [this.x,this.y,this.z]
+        return [this.x, this.y, this.z]
     }
     parameterNames(): string[] {
-        ["x","y","z"]
+        ["x", "y", "z"]
     }
     getEditableArray(): EditableObject[] {
         return [{
-            name:"x",
-            set:(num:number)=>{
+            name: "x",
+            set: (num: number) => {
                 this.x = num;
                 this?.updateShape?.();
             },
-            get:()=>{
+            get: () => {
                 return this.x
             },
-            value:this.x
-        },{
-            name:"y",
-            set:(num:number)=>{
+            value: this.x
+        }, {
+            name: "y",
+            set: (num: number) => {
                 this.y = num;
                 this?.updateShape?.();
             },
-            get:()=>{
+            get: () => {
                 return this.y
             },
-            value:this.y
-        },{
-            name:"z",
-            set:(num:number)=>{
+            value: this.y
+        }, {
+            name: "z",
+            set: (num: number) => {
                 this.z = num;
                 this?.updateShape?.();
             },
-            get:()=>{
+            get: () => {
                 return this.z
             },
-            value:this.z
+            value: this.z
         }]
     }
     rayIntersection(rayPos, rayDir) {
         const sphereCenter = { x: this.x, y: this.y, z: this.z };
         const sphereRadius = 2;
-    
+
         const oc = {
             x: rayPos.x - sphereCenter.x,
             y: rayPos.y - sphereCenter.y,
             z: rayPos.z - sphereCenter.z
         };
-    
+
         const a = rayDir.x * rayDir.x + rayDir.y * rayDir.y + rayDir.z * rayDir.z;
         const b = 2 * (oc.x * rayDir.x + oc.y * rayDir.y + oc.z * rayDir.z);
         const c = oc.x * oc.x + oc.y * oc.y + oc.z * oc.z - sphereRadius * sphereRadius;
-    
+
         const discriminant = b * b - 4 * a * c;
-    
+
         if (discriminant < 0) {
             // No intersection
             return false;
@@ -234,7 +234,7 @@ class GameObject3D extends GameObject {
             // Calculate the two possible solutions for t
             const t1 = (-b + Math.sqrt(discriminant)) / (2 * a);
             const t2 = (-b - Math.sqrt(discriminant)) / (2 * a);
-    
+
             // Check if either t1 or t2 is positive (intersection along the ray)
             if (t1 >= 0 || t2 >= 0) {
                 // Ray intersects the sphere
@@ -244,49 +244,49 @@ class GameObject3D extends GameObject {
                 return false;
             }
         }
-    } 
+    }
 }
-class Sphere extends GameObject3D{
+class Sphere extends GameObject3D {
     r: number;
     rot: { x: number; y: number; z: number; };
-    constructor(x,y,z,radius,rx=0,ry=0,rz=0) {
-        super(x,y,z,'Sphere');
-        this.rot = {x:rx,y:ry,z:rz}
+    constructor(x, y, z, radius, rx = 0, ry = 0, rz = 0) {
+        super(x, y, z, 'Sphere');
+        this.rot = { x: rx, y: ry, z: rz }
         this.r = radius;
         this.clr = 0;
     }
-    getCollisionVectors(): (number | { x: number; y: number; z: number})[] {
-        return [{x:this.x,y:this.y,z:this.z}, this.r]
+    getCollisionVectors(): (number | { x: number; y: number; z: number })[] {
+        return [{ x: this.x, y: this.y, z: this.z }, this.r]
     }
     getEditableArray(): EditableObject[] {
-        return [...super.getEditableArray(),{
-            name:"radius",
-            set:(num:number)=>{
+        return [...super.getEditableArray(), {
+            name: "radius",
+            set: (num: number) => {
                 this.r = num;
                 this?.updateShape?.();
             },
-            get:()=>{
+            get: () => {
                 return this.r
             },
-            value:this.r
+            value: this.r
         }]
     }
     rayIntersection(rayPos, rayDir) {
         const sphereCenter = { x: this.x, y: this.y, z: this.z };
         const sphereRadius = this.r;
-    
+
         const oc = {
             x: rayPos.x - sphereCenter.x,
             y: rayPos.y - sphereCenter.y,
             z: rayPos.z - sphereCenter.z
         };
-    
+
         const a = rayDir.x * rayDir.x + rayDir.y * rayDir.y + rayDir.z * rayDir.z;
         const b = 2 * (oc.x * rayDir.x + oc.y * rayDir.y + oc.z * rayDir.z);
         const c = oc.x * oc.x + oc.y * oc.y + oc.z * oc.z - sphereRadius * sphereRadius;
-    
+
         const discriminant = b * b - 4 * a * c;
-    
+
         if (discriminant < 0) {
             // No intersection
             return false;
@@ -294,7 +294,7 @@ class Sphere extends GameObject3D{
             // Calculate the two possible solutions for t
             const t1 = (-b + Math.sqrt(discriminant)) / (2 * a);
             const t2 = (-b - Math.sqrt(discriminant)) / (2 * a);
-    
+
             // Check if either t1 or t2 is positive (intersection along the ray)
             if (t1 >= 0 || t2 >= 0) {
                 // Ray intersects the sphere
@@ -306,16 +306,134 @@ class Sphere extends GameObject3D{
         }
     }
     getParameters(): any[] {
-        return [this.x,this.y,this.z,this.r,this.rot.x,this.rot.y,this.rot.z]
+        return [this.x, this.y, this.z, this.r, this.rot.x, this.rot.y, this.rot.z]
     }
     parameterNames(): string[] {
-        return ["x","y","z","radius","rotationX","rotationY","rotationZ"];
+        return ["x", "y", "z", "radius", "rotationX", "rotationY", "rotationZ"];
     }
     draw() {
         push()
         fill(this.clr);
-        translate(this.x,this.y,this.z);
+        translate(this.x, this.y, this.z);
         sphere(this.r);
+        pop()
+    }
+}
+class Ellipse extends GameObject3D {
+    r: number;
+    rot: { x: number; y: number; z: number; };
+    constructor(x, y, z, radiusX, radiusY, radiusZ, rx = 0, ry = 0, rz = 0) {
+        super(x, y, z, 'Ellipse');
+        this.rot = { x: rx, y: ry, z: rz }
+        this.r = { x: radiusX, y: radiusY, z: radiusZ };
+        this.clr = 0;
+    }
+    getCollisionType() {
+        return 'Ellipse'
+    }
+    getCollisionVectors(): (number | { x: number; y: number; z: number })[] {
+        return [{ x: this.x, y: this.y, z: this.z }, this.r]
+    }
+    getEditableArray(): EditableObject[] {
+        return [...super.getEditableArray(), {
+            name: "radiusX",
+            set: (num: number) => {
+                this.r.x = num;
+                this?.updateShape?.();
+            },
+            get: () => {
+                return this.r.x
+            },
+            value: this.r.x
+        }, {
+            name: "radiusY",
+            set: (num: number) => {
+                this.r.y = num;
+                this?.updateShape?.();
+            },
+            get: () => {
+                return this.r.y
+            },
+            value: this.r.y
+        }, {
+            name: "radiusZ",
+            set: (num: number) => {
+                this.r.z = num;
+                this?.updateShape?.();
+            },
+            get: () => {
+                return this.r.z
+            },
+            value: this.r.z
+        }, {
+            name: "rx",
+            set: (val) => {
+                this.rot.x = val;
+            },
+            get: () => {
+                return this.rot.x;
+            },
+            value: this.rot.x
+        },
+        {
+            name: "ry",
+            set: (val) => {
+                this.rot.y = val;
+            },
+            get: () => {
+                return this.rot.y;
+            },
+            value: this.rot.y
+        },
+        {
+            name: "rz",
+            set: (val) => {
+                this.rot.z = val;
+            },
+            get: () => {
+                return this.rot.z;
+            },
+            value: this.rot.z
+        }]
+    }
+    rayIntersection(rPos, rDir) {
+        let matrix = new p5.Matrix();
+        matrix.rotateX(this.rot.x);
+        matrix.rotateY(this.rot.y);
+        matrix.rotateZ(this.rot.z);
+        matrix.invert(matrix);
+        let rayPos = createVector(rPos.x, rPos.y, rPos.z);
+        let rayDir = createVector(rDir.x, rDir.y, rDir.z);
+        rayPos.sub(this.x, this.y, this.z);
+        rayPos = matrix.multiplyPoint(rayPos);
+        rayDir = matrix.multiplyDirection(rDir);
+        let a = (rayDir.x * rayDir.x) / (this.r.x * this.r.x) + (rayDir.y * rayDir.y) / (this.r.y * this.r.y) + (rayDir.z * rayDir.z) / (this.r.z * this.r.z);
+        let b = (2 * rayPos.x * rayDir.x) / (this.r.x * this.r.x) + (2 * rayPos.y * rayDir.y) / (this.r.y * this.r.y) + (2 * rayPos.z * rayDir.z) / (this.r.z * this.r.z);
+        let c = (rayPos.x * rayPos.x) / (this.r.x * this.r.x) + (rayPos.y * rayPos.y) / (this.r.y * this.r.y) + (rayPos.z * rayPos.z) / (this.r.z * this.r.z) - 1;
+        let d = b * b - 4 * a * c;
+        if (d < 0) {
+            return null;
+        } else {
+            d = sqrt(d);
+        }
+        let hit = (-b + d) / (2 * a);
+        let hit_ = (-b - d) / (2 * a);
+        return[Math.min(hit,hit_),Math.max(hit,hit_)]
+    }
+    getParameters(): any[] {
+        return [this.x, this.y, this.z, this.r.x, this.r.y, this.r.z, this.rot.x, this.rot.y, this.rot.z]
+    }
+    parameterNames(): string[] {
+        return ["x", "y", "z", "radiusX", "radiusY", "radiusZ", "rotationX", "rotationY", "rotationZ"];
+    }
+    draw() {
+        push()
+        fill(this.clr)
+        translate(this.x, this.y, this.z);
+        rotateX(this.rot.x);
+        rotateY(this.rot.y);
+        rotateZ(this.rot.z);
+        ellipsoid(this.r.x, this.r.y, this.r.z)
         pop()
     }
 }

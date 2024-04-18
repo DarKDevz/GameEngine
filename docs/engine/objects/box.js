@@ -303,3 +303,20 @@ class Box3D extends GameObject3D {
     pop();
   }
 }
+class Plane extends Box3D {
+  constructor(x, y, z, width, height, rx = 0, ry = 0, rz = 0) {
+    super(x, y, z, width, height, 1, rx, ry, rz);
+    this.tag = "Plane";
+  }
+  getParameters() {
+    return GameObject3D.prototype.getParameters().concat(this.width, this.height, this.rot.x, this.rot.y, this.rot.z);
+  }
+  parameterNames() {
+    return super.parameterNames().concat("width", "height", "rx", "ry", "rz");
+  }
+  getEditableArray() {
+    let _ = super.getEditableArray();
+    _.splice(5, 1);
+    return _;
+  }
+}

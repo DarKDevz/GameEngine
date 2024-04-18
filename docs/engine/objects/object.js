@@ -296,3 +296,127 @@ class Sphere extends GameObject3D {
     pop();
   }
 }
+class Ellipse extends GameObject3D {
+  r;
+  rot;
+  constructor(x, y, z, radiusX, radiusY, radiusZ, rx = 0, ry = 0, rz = 0) {
+    super(x, y, z, "Ellipse");
+    this.rot = { x: rx, y: ry, z: rz };
+    this.r = { x: radiusX, y: radiusY, z: radiusZ };
+    this.clr = 0;
+  }
+  getCollisionType() {
+    return "Ellipse";
+  }
+  getCollisionVectors() {
+    return [{ x: this.x, y: this.y, z: this.z }, this.r];
+  }
+  getEditableArray() {
+    return [
+      ...super.getEditableArray(),
+      {
+        name: "radiusX",
+        set: (num) => {
+          this.r.x = num;
+          this?.updateShape?.();
+        },
+        get: () => {
+          return this.r.x;
+        },
+        value: this.r.x
+      },
+      {
+        name: "radiusY",
+        set: (num) => {
+          this.r.y = num;
+          this?.updateShape?.();
+        },
+        get: () => {
+          return this.r.y;
+        },
+        value: this.r.y
+      },
+      {
+        name: "radiusZ",
+        set: (num) => {
+          this.r.z = num;
+          this?.updateShape?.();
+        },
+        get: () => {
+          return this.r.z;
+        },
+        value: this.r.z
+      },
+      {
+        name: "rx",
+        set: (val) => {
+          this.rot.x = val;
+        },
+        get: () => {
+          return this.rot.x;
+        },
+        value: this.rot.x
+      },
+      {
+        name: "ry",
+        set: (val) => {
+          this.rot.y = val;
+        },
+        get: () => {
+          return this.rot.y;
+        },
+        value: this.rot.y
+      },
+      {
+        name: "rz",
+        set: (val) => {
+          this.rot.z = val;
+        },
+        get: () => {
+          return this.rot.z;
+        },
+        value: this.rot.z
+      }
+    ];
+  }
+  rayIntersection(rPos, rDir) {
+    let matrix = new p5.Matrix();
+    matrix.rotateX(this.rot.x);
+    matrix.rotateY(this.rot.y);
+    matrix.rotateZ(this.rot.z);
+    matrix.invert(matrix);
+    let rayPos = createVector(rPos.x, rPos.y, rPos.z);
+    let rayDir = createVector(rDir.x, rDir.y, rDir.z);
+    rayPos.sub(this.x, this.y, this.z);
+    rayPos = matrix.multiplyPoint(rayPos);
+    rayDir = matrix.multiplyDirection(rDir);
+    let a = rayDir.x * rayDir.x / (this.r.x * this.r.x) + rayDir.y * rayDir.y / (this.r.y * this.r.y) + rayDir.z * rayDir.z / (this.r.z * this.r.z);
+    let b = 2 * rayPos.x * rayDir.x / (this.r.x * this.r.x) + 2 * rayPos.y * rayDir.y / (this.r.y * this.r.y) + 2 * rayPos.z * rayDir.z / (this.r.z * this.r.z);
+    let c = rayPos.x * rayPos.x / (this.r.x * this.r.x) + rayPos.y * rayPos.y / (this.r.y * this.r.y) + rayPos.z * rayPos.z / (this.r.z * this.r.z) - 1;
+    let d = b * b - 4 * a * c;
+    if (d < 0) {
+      return null;
+    } else {
+      d = sqrt(d);
+    }
+    let hit = (-b + d) / (2 * a);
+    let hit_ = (-b - d) / (2 * a);
+    return [Math.min(hit, hit_), Math.max(hit, hit_)];
+  }
+  getParameters() {
+    return [this.x, this.y, this.z, this.r.x, this.r.y, this.r.z, this.rot.x, this.rot.y, this.rot.z];
+  }
+  parameterNames() {
+    return ["x", "y", "z", "radiusX", "radiusY", "radiusZ", "rotationX", "rotationY", "rotationZ"];
+  }
+  draw() {
+    push();
+    fill(this.clr);
+    translate(this.x, this.y, this.z);
+    rotateX(this.rot.x);
+    rotateY(this.rot.y);
+    rotateZ(this.rot.z);
+    ellipsoid(this.r.x, this.r.y, this.r.z);
+    pop();
+  }
+}
