@@ -507,7 +507,7 @@ async function createZip() {
     let createSketchFile = function () {
         return `
         globalThis.setup = async function () {
-                const response = await fetch("./examples/platformer.json");
+                const response = await fetch("./export.json");
                 const data = await response.json();
                 await waitForEngine()
                 window.RAPIER = obj;
@@ -527,34 +527,39 @@ async function createZip() {
     let createMapFile = function () {
         return SaveMap();
     }
+    let allFiles = [
+        "libs/p5.min.js",
+        "libs/p5.camera.js",
+        "libs/rapier2d.js",
+        "rapier_wasm2d_bg.wasm",
+        "engine/utils.js",
+        "engine/engine.js",
+        "engine/collision/p5.collide.js",
+        "engine/collision/handler.js",
+        "engine/objects/collision.js",
+        "engine/components/component.js",
+        "engine/components/scriptComponent.js",
+        "engine/objects/object.js",
+        "engine/objects/box.js",
+        "engine/objects/player.js",
+        "engine/objects/end.js",
+        "engine/objects/text.js",
+        "engine/objects/enemyBox.js",
+        "engine/objects/interactive.js",
+        "engine/objects/bullet.js",
+        "engine/objects/movingPlatform.js",
+        "loader/level.js",
+        "loader/support.js",
+        "index.html"
+    ]
     var scriptTags = [
-        { path: 'libs/p5.min.js' },
-        { path: 'libs/p5.camera.js'},
-        { path: 'libs/rapier2d.js'},
-        { path: 'rapier_wasm2d_bg.wasm'},
-        { path: 'engine/utils.js' },
-        { path: 'engine/engine.js' },
-        { path: 'engine/collision/p5.collide.js' },
-        { path: 'engine/collision/handler.js' },
-        { path: 'engine/objects/collision.js' },
-        { path: 'engine/components/component.js' },
-        { path: 'engine/components/scriptComponent.js' },
-        { path: 'engine/objects/object.js' },
-        { path: 'engine/objects/box.js' },
-        { path: 'engine/objects/player.js' },
-        { path: 'engine/objects/end.js' },
-        { path: 'engine/objects/text.js' },
-        { path: 'engine/objects/enemyBox.js' },
-        { path: 'engine/objects/interactive.js' },
-        { path: 'engine/objects/bullet.js' },
-        { path: 'engine/objects/movingPlatform.js' },
-        { path: 'loader/level.js' },
-        { path: 'loader/support.js' },
-        { path: 'index.html' },
         { path: 'engine/objects/collisionChecker.js' },
         { path: 'sketch.js', makeFile: createSketchFile },
         { path: 'export.json', makeFile: createMapFile }
     ];
+    for(let i of allFiles) {
+        scriptTags.push({path:i});
+    }
     const regex = /<!-- .*<\/script>/gms;
 
     // Fetch and add script files to the zip
