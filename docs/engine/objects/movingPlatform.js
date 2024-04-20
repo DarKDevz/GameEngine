@@ -35,7 +35,7 @@ class movingPlatform extends Box {
     super.offSet(x, y);
   }
   draw() {
-    fill(this.clr);
+    this.material.apply();
     rect(this.x, this.y, this.width, this.height);
   }
   getParameters() {

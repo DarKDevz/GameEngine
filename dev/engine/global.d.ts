@@ -267,11 +267,21 @@ declare interface GameObject extends GameEvents {
      * @function
      */
     updateShape?(): void;
+    material: Material;
     __proto__: any
 
     [x: string]: any
 }
-
+declare interface Material {
+    fun: Function;
+    values: any[];
+    type: number;
+    /**
+     * Applies the material to the p5 renderer
+     */
+    apply():void
+    set(fun:Function,values:Array<()=>any>,type:number): void
+}
 declare interface Box extends GameObject {
     oldX: number;
     oldY: number;
@@ -298,7 +308,7 @@ declare interface xywhObject extends xyObject {
     width: number,
     height: number
 }
-declare interface movingPlatform extends GameObject {
+declare interface movingPlatform extends Box {
     x1: number;
     x2: number;
     direction: 'r' | 'l';

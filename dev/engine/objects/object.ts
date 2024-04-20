@@ -4,6 +4,7 @@ class GameObject extends GameEvents {
         this.x = x;
         this.y = y;
         this.z = 0;
+        this.clr = 0;
         //3D rotations
         //even though you can only use one rotation
         this.rot = { x: 0, y: 0, z: 0 };
@@ -24,6 +25,8 @@ class GameObject extends GameEvents {
         this.imageInitialized = false;
         this.alwaysDraw = false;
         this.is3D = false;
+        this.material = new Material();
+        this.material.set(fill,[()=>this.clr],0);
         engine.uuidList[this.uuid] = this;
     }
     updateComponents() {
@@ -253,7 +256,6 @@ class Sphere extends GameObject3D {
         super(x, y, z, 'Sphere');
         this.rot = { x: rx, y: ry, z: rz }
         this.r = radius;
-        this.clr = 0;
     }
     getCollisionVectors(): (number | { x: number; y: number; z: number })[] {
         return [{ x: this.x, y: this.y, z: this.z }, this.r]
@@ -313,7 +315,7 @@ class Sphere extends GameObject3D {
     }
     draw() {
         push()
-        fill(this.clr);
+        this.material.apply()
         translate(this.x, this.y, this.z);
         sphere(this.r);
         pop()
@@ -326,7 +328,6 @@ class Ellipse extends GameObject3D {
         super(x, y, z, 'Ellipse');
         this.rot = { x: rx, y: ry, z: rz }
         this.radius = { x: radiusX, y: radiusY, z: radiusZ };
-        this.clr = 0;
     }
     getCollisionType(): collisionTypes {
         return 'Ellipse'
@@ -428,7 +429,7 @@ class Ellipse extends GameObject3D {
     }
     draw() {
         push()
-        fill(this.clr)
+        this.material.apply()
         translate(this.x, this.y, this.z);
         rotateX(this.rot.x);
         rotateY(this.rot.y);

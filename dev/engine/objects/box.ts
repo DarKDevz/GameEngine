@@ -84,7 +84,7 @@ class Box extends GameObject {
     }
 
     draw(): void {
-        fill(this.clr);
+        this.material.apply()
         rect(this.x, this.y, this.width, this.height);
     }
     display(OnlyDraw: boolean, noDraw: boolean = false): void {
@@ -321,7 +321,7 @@ class Box3D extends GameObject3D {
     }
     draw(): void {
         push()
-        fill(this.clr)
+        this.material.apply()
         translate(this.x,this.y,this.z);
         rotateX(this.rot.x);
         rotateY(this.rot.y);

@@ -35,7 +35,7 @@ class movingPlatform extends Box {
 	draw() {
 		//if(p5play.groups[1])this.phySprite.overlapping(p5play.groups[1])
 		//this.phySprite.draw();
-		fill(this.clr);
+		this.material.apply()
 		rect(this.x, this.y, this.width, this.height);
 	}
 	getParameters(): any[] {

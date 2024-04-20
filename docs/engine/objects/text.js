@@ -48,7 +48,7 @@ class TextObject extends GameObject {
     return this.t;
   }
   display() {
-    fill(this.clr);
+    this.material.apply();
     text(this.t, this.x, this.y);
   }
 }

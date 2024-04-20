@@ -18,7 +18,8 @@ class Bullet extends GameObject {
   }
   onCollide(obj) {
     if (obj.isShootable) {
-      obj.health--;
+      if (obj.health)
+        obj.health--;
     }
     removeObject(this.uuid);
   }

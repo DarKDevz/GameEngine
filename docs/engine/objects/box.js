@@ -80,7 +80,7 @@ class Box extends GameObject {
     return super.parameterNames().concat(["width", "height"]);
   }
   draw() {
-    fill(this.clr);
+    this.material.apply();
     rect(this.x, this.y, this.width, this.height);
   }
   display(OnlyDraw, noDraw = false) {
@@ -198,7 +198,7 @@ class Box3D extends GameObject3D {
     for (let i of ["x", "y", "z"]) {
       if (rayDir[i] === 0) {
         if (rayPos[i] < aabbMin[i] || rayPos[i] > aabbMax[i]) {
-          return null;
+          return true;
         }
       } else {
         let t1 = (aabbMin[i] - rayPos[i]) / rayDir[i];
@@ -209,11 +209,11 @@ class Box3D extends GameObject3D {
         tmin = Math.max(tmin, t1);
         tmax = Math.min(tmax, t2);
         if (tmin > tmax) {
-          return null;
+          return false;
         }
       }
     }
-    return { tmin, tmax };
+    return true;
   }
   getCollisionVectors() {
     return [{ x: this.x, y: this.y, z: this.z }, { x: this.width, y: this.height, z: this.depth }, this.rot];
@@ -294,7 +294,7 @@ class Box3D extends GameObject3D {
   }
   draw() {
     push();
-    fill(this.clr);
+    this.material.apply();
     translate(this.x, this.y, this.z);
     rotateX(this.rot.x);
     rotateY(this.rot.y);

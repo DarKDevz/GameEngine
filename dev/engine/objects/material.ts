@@ -9,9 +9,13 @@ class Material {
         this.type = 0;
     }
     apply() {
-        this.fun(...this.values);
+        let args:any = [];
+        for(let i of this.values) {
+            args.push(i());
+        }
+        this.fun(...args);
     }
-    set(fun:Function,values:Array<any>,type:number) {
+    set(fun:Function,values:Array<()=>any>,type:number) {
         this.fun = fun;
         this.values = values;
         this.type = type;
