@@ -47,7 +47,7 @@ class GameObject extends GameEvents {
         return [{ x: this.x, y: this.y }, 2]
     }
     jsonComponents() {
-        let ret = [];
+        let ret: any[] = [];
         for (let comp of this.components) {
             ret.push(comp.toJson());
         }
@@ -176,7 +176,7 @@ class GameObject3D extends GameObject {
         return [this.x, this.y, this.z]
     }
     parameterNames(): string[] {
-        ["x", "y", "z"]
+        return ["x", "y", "z"]
     }
     getEditableArray(): EditableObject[] {
         return [{
@@ -320,51 +320,51 @@ class Sphere extends GameObject3D {
     }
 }
 class Ellipse extends GameObject3D {
-    r: number;
+    radius: { x: number; y: number; z: number; };
     rot: { x: number; y: number; z: number; };
     constructor(x, y, z, radiusX, radiusY, radiusZ, rx = 0, ry = 0, rz = 0) {
         super(x, y, z, 'Ellipse');
         this.rot = { x: rx, y: ry, z: rz }
-        this.r = { x: radiusX, y: radiusY, z: radiusZ };
+        this.radius = { x: radiusX, y: radiusY, z: radiusZ };
         this.clr = 0;
     }
-    getCollisionType() {
+    getCollisionType(): collisionTypes {
         return 'Ellipse'
     }
     getCollisionVectors(): (number | { x: number; y: number; z: number })[] {
-        return [{ x: this.x, y: this.y, z: this.z }, this.r]
+        return [{ x: this.x, y: this.y, z: this.z }, this.radius]
     }
     getEditableArray(): EditableObject[] {
         return [...super.getEditableArray(), {
             name: "radiusX",
             set: (num: number) => {
-                this.r.x = num;
+                this.radius.x = num;
                 this?.updateShape?.();
             },
             get: () => {
-                return this.r.x
+                return this.radius.x
             },
-            value: this.r.x
+            value: this.radius.x
         }, {
             name: "radiusY",
             set: (num: number) => {
-                this.r.y = num;
+                this.radius.y = num;
                 this?.updateShape?.();
             },
             get: () => {
-                return this.r.y
+                return this.radius.y
             },
-            value: this.r.y
+            value: this.radius.y
         }, {
             name: "radiusZ",
             set: (num: number) => {
-                this.r.z = num;
+                this.radius.z = num;
                 this?.updateShape?.();
             },
             get: () => {
-                return this.r.z
+                return this.radius.z
             },
-            value: this.r.z
+            value: this.radius.z
         }, {
             name: "rx",
             set: (val) => {
@@ -407,21 +407,21 @@ class Ellipse extends GameObject3D {
         rayPos.sub(this.x, this.y, this.z);
         rayPos = matrix.multiplyPoint(rayPos);
         rayDir = matrix.multiplyDirection(rDir);
-        let a = (rayDir.x * rayDir.x) / (this.r.x * this.r.x) + (rayDir.y * rayDir.y) / (this.r.y * this.r.y) + (rayDir.z * rayDir.z) / (this.r.z * this.r.z);
-        let b = (2 * rayPos.x * rayDir.x) / (this.r.x * this.r.x) + (2 * rayPos.y * rayDir.y) / (this.r.y * this.r.y) + (2 * rayPos.z * rayDir.z) / (this.r.z * this.r.z);
-        let c = (rayPos.x * rayPos.x) / (this.r.x * this.r.x) + (rayPos.y * rayPos.y) / (this.r.y * this.r.y) + (rayPos.z * rayPos.z) / (this.r.z * this.r.z) - 1;
+        let a = (rayDir.x * rayDir.x) / (this.radius.x * this.radius.x) + (rayDir.y * rayDir.y) / (this.radius.y * this.radius.y) + (rayDir.z * rayDir.z) / (this.radius.z * this.radius.z);
+        let b = (2 * rayPos.x * rayDir.x) / (this.radius.x * this.radius.x) + (2 * rayPos.y * rayDir.y) / (this.radius.y * this.radius.y) + (2 * rayPos.z * rayDir.z) / (this.radius.z * this.radius.z);
+        let c = (rayPos.x * rayPos.x) / (this.radius.x * this.radius.x) + (rayPos.y * rayPos.y) / (this.radius.y * this.radius.y) + (rayPos.z * rayPos.z) / (this.radius.z * this.radius.z) - 1;
         let d = b * b - 4 * a * c;
         if (d < 0) {
-            return null;
+            return false;
         } else {
             d = sqrt(d);
         }
         let hit = (-b + d) / (2 * a);
         let hit_ = (-b - d) / (2 * a);
-        return[Math.min(hit,hit_),Math.max(hit,hit_)]
+        return true;
     }
     getParameters(): any[] {
-        return [this.x, this.y, this.z, this.r.x, this.r.y, this.r.z, this.rot.x, this.rot.y, this.rot.z]
+        return [this.x, this.y, this.z, this.radius.x, this.radius.y, this.radius.z, this.rot.x, this.rot.y, this.rot.z]
     }
     parameterNames(): string[] {
         return ["x", "y", "z", "radiusX", "radiusY", "radiusZ", "rotationX", "rotationY", "rotationZ"];
@@ -433,7 +433,7 @@ class Ellipse extends GameObject3D {
         rotateX(this.rot.x);
         rotateY(this.rot.y);
         rotateZ(this.rot.z);
-        ellipsoid(this.r.x, this.r.y, this.r.z)
+        ellipsoid(this.radius.x, this.radius.y, this.radius.z)
         pop()
     }
 }

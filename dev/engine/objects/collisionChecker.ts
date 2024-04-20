@@ -70,7 +70,7 @@ class SpatialHashMap {
     getNearby(uuid: UUID) {
         //No reference to uuid, don't bother
         if (!this.uuidToGrid[uuid]) return [];
-        let allPossible = [];
+        let allPossible: any[] = [];
         let startPos = this.uuidToGrid[uuid];
         for (let toNum of startPos) {
             let i = toNum.map((a) => { return parseInt(a) });
@@ -277,7 +277,7 @@ function hypot(x, y, z?) {
     } // Otherwise use the V8 implementation
     // https://github.com/v8/v8/blob/8cd3cf297287e581a49e487067f5cbd991b27123/src/js/math.js#L217
     var length = arguments.length;
-    var args = [];
+    var args:any[] = [];
     var max = 0;
     for (var i = 0; i < length; i++) {
         var n = arguments[i];

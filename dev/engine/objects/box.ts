@@ -220,7 +220,7 @@ class Box3D extends GameObject3D {
             if (rayDir[i] === 0) {
                 if (rayPos[i] < aabbMin[i] || rayPos[i] > aabbMax[i]) {
                     // Ray origin is outside the AABB along this axis
-                    return null;
+                    return true;
                 }
             } else {
                 let t1 = (aabbMin[i] - rayPos[i]) / rayDir[i];
@@ -235,13 +235,13 @@ class Box3D extends GameObject3D {
     
                 if (tmin > tmax) {
                     // No intersection
-                    return null;
+                    return false;
                 }
             }
         }
     
         // Ray intersects the AABB
-        return { tmin, tmax };
+        return true;
     }
     getCollisionVectors(): (this | { x: number; y: number; z: number})[] {
         return [{x:this.x,y:this.y,z:this.z}, { x: this.width, y: this.height,z : this.depth}, this.rot]

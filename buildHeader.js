@@ -41,7 +41,7 @@ function htmlFilesReplace(arr) {
             }
             let regex = new RegExp(found + '.*?script>', 'gm')
             let array = [...data.matchAll(regex)];
-            let modifiedData = data.replace(array[array.length - 1][0], array[array.length - 1][0] + `\n<script src="${arr.reverse().join('/')}"></script>`);
+            let modifiedData = data.replace(array[array.length - 1][0], array[array.length - 1][0] + `\n\t<script src="${arr.reverse().join('/')}"></script>`);
             arr.reverse()
 
             // Write the modified content back to the file
@@ -72,8 +72,9 @@ function jsFilesReplace(arr) {
             if (!found) {
                 throw new Error("file cant be added, directory doesn't exist")
             }
-            let regex = new RegExp(found + '\/\w+.js,', 'm')
-            let subst = `$0\n\t"${arr.reverse().join('/')}",`;
+            let regex = new RegExp(found + `.*?,`, 'm')
+            let array = [...data.match(regex)];
+            let subst = `${array[0]}\n\t\t"${arr.reverse().join('/')}",`;
             arr.reverse()
             modifiedData = data.replace(regex, subst);
             fs.writeFile(js, modifiedData, 'utf8', (err) => {
