@@ -151,7 +151,9 @@ declare interface EditableObject {
     get: () => any
     value: any
 }
-type collisionTypes = 'Rect' | 'Circle' | 'Line' | 'Point' | 'Frustum' | 'Poly' | 'Sphere' | 'Box3D' | 'Ellipse'|'Cylinder'
+declare function beginGeometry()
+declare function endGeometry(): any
+type collisionTypes = 'Rect' | 'Circle' | 'Line' | 'Point' | 'Frustum' | 'Poly' | 'Sphere' | 'Box3D' | 'Ellipse'|'Cylinder' | 'Cone'
 declare interface CollidableObject {
     getCollisionType(): collisionTypes
     getCollisionVectors(): any[]

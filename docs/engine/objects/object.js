@@ -211,6 +211,27 @@ class GameObject3D extends GameObject {
       value: this.z
     }];
   }
+  rayShapeIntersection(rPos, rDir, shape) {
+    let pos = createVector(this.x, this.y, this.z);
+    let matrix = new p5.Matrix();
+    matrix.rotateX(this.rot.x);
+    matrix.rotateY(this.rot.y);
+    matrix.rotateZ(this.rot.z);
+    matrix.invert(matrix);
+    let rayPos = createVector(rPos.x, rPos.y, rPos.z);
+    let rayDir = createVector(rDir.x, rDir.y, rDir.z);
+    rayPos.sub(pos);
+    rayPos = matrix.multiplyPoint(rayPos);
+    rayDir = matrix.multiplyDirection(rDir);
+    let relativePos = rayPos.copy();
+    rayPos.add(pos);
+    for (let i of shape.faces) {
+      if (rayTriangleIntersection(relativePos, rayDir, [shape.vertices[i[0]], shape.vertices[i[1]], shape.vertices[i[2]]])) {
+        return true;
+      }
+    }
+    return false;
+  }
   rayIntersection(rayPos, rayDir) {
     const sphereCenter = { x: this.x, y: this.y, z: this.z };
     const sphereRadius = 2;

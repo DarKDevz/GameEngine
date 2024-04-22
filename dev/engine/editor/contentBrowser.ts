@@ -537,6 +537,8 @@ async function createZip() {
         "engine/collision/p5.collide.js",
         "engine/collision/handler.js",
         "engine/objects/collision.js",
+		"engine/objects/torus.js",
+		"engine/objects/cone.js",
 		"engine/objects/cylinder.js",
 		"engine/objects/material.js",
         "engine/components/component.js",
@@ -797,5 +799,7 @@ var classes3D = {
     Sphere: Sphere,
     Plane:Plane,
     Ellipse: Ellipse,
-    Cylinder: Cylinder
+    Cylinder: Cylinder,
+    Cone: Cone,
+    Torus: Torus
 }

@@ -1,0 +1,21 @@
+Px=A
+Py=B
+Pz=C
+Pdirx = a
+Pdiry = b
+Pdirz = c
+t = t
+radius/height = P
+{
+x^2+z^2=(r/H)^2*y^2
+Px+Pdirx*t
+Py+Pdiry*t
+Pz+Pdirz*t
+}
+(Px+Pdirx*t)^2+(Pz+Pdirz*t)^2=(radius/height)^(radius/height)*(Py+Pdiry*t)^2
+A^2+2Aat+a^2*t^2+C^2+2Cct+C^2*t^2=P^2*(B^2+2Bbt+b^2*t^2)
+t^2(a^2+c^2-P^2(b^2))+2t(Aa+Cc-(P^2)Bb)+A^2+C^2-(P^2)B=0
+
+coefA=a^2+c^2-P^2(b^2)
+coefB=2*(Aa+Cc-(P^2)Bb)
+coefC=A^2+C^2-(P^2)B

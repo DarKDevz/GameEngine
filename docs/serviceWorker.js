@@ -1,4 +1,4 @@
-const cacheName = 'Shimmer-build-ah9h08moivbi71e8etpn';
+const cacheName = 'Shimmer-build-5yt63u4hixs42l8fxb1p';
   
 const filesToCache = [
     "map.html",
@@ -10,6 +10,8 @@ const filesToCache = [
     "engine/collision/p5.collide.js",
     "engine/collision/handler.js",
     "engine/objects/collision.js",
+		"engine/objects/torus.js",
+		"engine/objects/cone.js",
 		"engine/objects/cylinder.js",
 		"engine/objects/material.js",
     "engine/components/component.js",

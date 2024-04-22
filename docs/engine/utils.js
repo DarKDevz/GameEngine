@@ -236,3 +236,30 @@ function deepReadCheck(obj1, obj2) {
     }
   }
 }
+function rayTriangleIntersection(rayOrigin, rayDirection, triangleVertices) {
+  let v0 = triangleVertices[0];
+  let v1 = triangleVertices[1];
+  let v2 = triangleVertices[2];
+  let edge1 = p5.Vector.sub(v1, v0);
+  let edge2 = p5.Vector.sub(v2, v0);
+  let h = p5.Vector.cross(rayDirection, edge2);
+  let a = p5.Vector.dot(edge1, h);
+  if (a > -1e-4 && a < 1e-4)
+    return null;
+  let f = 1 / a;
+  let s = p5.Vector.sub(rayOrigin, v0);
+  let u = f * p5.Vector.dot(s, h);
+  if (u < 0 || u > 1)
+    return null;
+  let q = p5.Vector.cross(s, edge1);
+  let v = f * p5.Vector.dot(rayDirection, q);
+  if (v < 0 || u + v > 1)
+    return null;
+  let t = f * p5.Vector.dot(edge2, q);
+  if (t > 1e-4) {
+    let intersectionPoint = p5.Vector.add(rayOrigin, p5.Vector.mult(rayDirection, t));
+    return intersectionPoint;
+  } else {
+    return null;
+  }
+}

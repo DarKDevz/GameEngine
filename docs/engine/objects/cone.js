@@ -1,4 +1,4 @@
-class Cylinder extends GameObject3D {
+class Cone extends GameObject3D {
   constructor(x, y, z, height, radius) {
     super(x, y, z);
     this.height = height;
@@ -11,36 +11,14 @@ class Cylinder extends GameObject3D {
     rotateX(this.rot.x);
     rotateY(this.rot.y);
     rotateZ(this.rot.z);
-    cylinder(this.radius, this.height);
+    cone(this.radius, this.height);
     pop();
   }
   rayIntersection(rPos, rDir) {
-    let pos = createVector(this.x, this.y, this.z);
-    let matrix = new p5.Matrix();
-    matrix.rotateX(this.rot.x);
-    matrix.rotateY(this.rot.y);
-    matrix.rotateZ(this.rot.z);
-    matrix.invert(matrix);
-    let rayPos = createVector(rPos.x, rPos.y, rPos.z);
-    let rayDir = createVector(rDir.x, rDir.y, rDir.z);
-    rayPos.sub(pos);
-    rayPos = matrix.multiplyPoint(rayPos);
-    rayDir = matrix.multiplyDirection(rDir);
-    let relativePos = rayPos.copy();
-    rayPos.add(pos);
-    let a = rayDir.x * rayDir.x + rayDir.z * rayDir.z;
-    let b = 2 * (relativePos.x * rayDir.x + relativePos.z * rayDir.z);
-    let c = relativePos.x * relativePos.x + relativePos.z * relativePos.z - this.radius * this.radius;
-    const discriminant = b * b - 4 * a * c;
-    if (discriminant < 0) {
-      return false;
-    } else {
-      let t1 = (-b + Math.sqrt(discriminant)) / (2 * a);
-      let t2 = (-b - Math.sqrt(discriminant)) / (2 * a);
-      let point1 = relativePos.copy().add(rayDir.copy().mult(t1));
-      let point2 = relativePos.copy().add(rayDir.copy().mult(t2));
-      return abs(point1.y) < this.height / 2 || abs(point2.y) < this.height / 2 || Math.sign(point1.y) + Math.sign(point2.y) == 0;
-    }
+    beginGeometry();
+    cone(this.radius, this.height);
+    let shape = endGeometry();
+    return this.rayShapeIntersection(rPos, rDir, shape);
   }
   getCollisionVectors() {
     return [{ x: this.x, y: this.y, z: this.z }, { x: this.height, y: this.radius }, this.rot];
@@ -101,7 +79,7 @@ class Cylinder extends GameObject3D {
     ];
   }
   getCollisionType() {
-    return "Cylinder";
+    return "Cone";
   }
   getParameters() {
     return super.getParameters().concat(this.height, this.radius, this.rot.x, this.rot.y, this.rot.z);

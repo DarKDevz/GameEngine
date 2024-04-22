@@ -8,6 +8,8 @@ const filesToCache = [
     "engine/collision/p5.collide.js",
     "engine/collision/handler.js",
     "engine/objects/collision.js",
+		"engine/objects/torus.js",
+		"engine/objects/cone.js",
 		"engine/objects/cylinder.js",
 		"engine/objects/material.js",
     "engine/components/component.js",
