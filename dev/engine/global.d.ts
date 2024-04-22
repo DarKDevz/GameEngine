@@ -10,6 +10,9 @@ type Div = ReturnType<typeof createDiv>
 declare interface Window {
     [x: string]: any
 }
+declare interface GameEvents {
+
+}
 declare interface Array<T> {
     equals(arg0: Array<T>): boolean;
 }
@@ -148,7 +151,7 @@ declare interface EditableObject {
     get: () => any
     value: any
 }
-type collisionTypes = 'Rect' | 'Circle' | 'Line' | 'Point' | 'Frustum' | 'Poly' | 'Sphere' | 'Box3D' | 'Ellipse'
+type collisionTypes = 'Rect' | 'Circle' | 'Line' | 'Point' | 'Frustum' | 'Poly' | 'Sphere' | 'Box3D' | 'Ellipse'|'Cylinder'
 declare interface CollidableObject {
     getCollisionType(): collisionTypes
     getCollisionVectors(): any[]
@@ -312,6 +315,14 @@ declare interface movingPlatform extends Box {
     x1: number;
     x2: number;
     direction: 'r' | 'l';
+}
+declare interface GameObject3D extends GameObject {
+    z: number;
+    depth: number;
+}
+declare interface Cylinder extends GameObject3D {
+    height: number;
+    radius:number;
 }
 declare interface Interactive extends GameObject {
     canBeInteracted: boolean;
